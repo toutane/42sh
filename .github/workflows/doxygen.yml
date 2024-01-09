@@ -1,0 +1,27 @@
+name: Generate Doxygen Documentation
+
+on:
+  push:
+    tags:
+        - 'docs-*'
+
+jobs:
+  build:
+    run-on: 'ubuntu-latest'
+
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install doxygen
+      run: sudo apt-get update && sudo apt-get install -y doxygen
+
+    - name: Generate doxygen
+      run:  doxygen Doxyfile
+
+        #    - name: Deploy to Wiki
+        #      uses: peaceiris/actions-gh-pages@v3
+        #      whith:
+        #        github_token: ${{ secrets.GITHUB_TOKEN }}
+        #        publish_dir: ./html
+        #        keep_files: true
