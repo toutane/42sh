@@ -22,8 +22,7 @@ int main(void)
         token = lexer_pop(lexer);
     }
 
-    if (token.type == TOKEN_EOF)
-        printf("EOF\n");
+    printf("EOF\n");
 
     lexer_free(lexer);
     free(input);

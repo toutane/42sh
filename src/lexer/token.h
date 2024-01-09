@@ -12,7 +12,7 @@ enum token_type
 struct token
 {
     enum token_type type; // The kind of token
-    char *value; // If the token is a number, its value
+    char *value; // If the token is a word, its value, allocated on the heap !
 };
 
 #endif /* !TOKEN_H */
