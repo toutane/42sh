@@ -13,7 +13,7 @@ TOTAL_RUN=0
 TOTAL_FAIL=0
 
 # binary location - for us ../../42sh
-BINARY=echo
+BINARY=bash
 
 # redirect files
 ref_stdout=/tmp/.ref_stdout
