@@ -44,9 +44,18 @@ void fill_token(struct token *tok, enum token_type type, char *value)
 struct token parse_input_for_tok(struct lexer *lexer)
 {
     // Skip whitespace
-    while (isspace(lexer->input[lexer->pos])) // TODO: check for '\n' and '\r'
+    while (isspace(lexer->input[lexer->pos])
+           && lexer->input[lexer->pos] != '\n')
     {
         lexer->pos++;
+    }
+
+    // Check for a '\n'
+    if (lexer->input[lexer->pos] == '\n')
+    {
+        lexer->pos++;
+        fill_token(&lexer->cur_tok, TOKEN_NEWLINE, NULL);
+        return lexer->cur_tok;
     }
 
     // Check for end of input
@@ -60,9 +69,7 @@ struct token parse_input_for_tok(struct lexer *lexer)
     if (lexer->input[lexer->pos] == ';')
     {
         lexer->pos++;
-        char *value = calloc(2, sizeof(char));
-        value[0] = ';';
-        fill_token(&lexer->cur_tok, TOKEN_WORD, value);
+        fill_token(&lexer->cur_tok, TOKEN_SEMICOLON, NULL);
         return lexer->cur_tok;
     }
 
@@ -73,7 +80,8 @@ struct token parse_input_for_tok(struct lexer *lexer)
         len++;
         lexer->pos++;
 
-        if (lexer->input[lexer->pos] == ';') // Check for a ';' at the end of the word
+        if (lexer->input[lexer->pos]
+            == ';') // Check for a ';' at the end of the word
         {
             break;
         }
