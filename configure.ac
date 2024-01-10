@@ -4,8 +4,12 @@ AM_INIT_AUTOMAKE([subdir-objects] [foreign])
 AC_PROG_CC
 AX_COMPILER_FLAGS([], [], [], [-Wall -Wextra -Werror -std=c99 -pedantic])
 
-AC_CONFIG_FILES(
-   [Makefile] 
-)
+AM_PROG_AR
+AC_PROG_RANLIB
+
+AC_CONFIG_FILES([
+   Makefile
+   src/lexer/Makefile
+])
 
 AC_OUTPUT
