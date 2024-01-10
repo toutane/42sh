@@ -106,3 +106,4 @@ PERCENT_SUCCES=$(((TOTAL_RUN - TOTAL_FAIL)*100/TOTAL_RUN))
 echo -e "$BLUE==========================================="
 echo -e "$WHITE RECAP: $([ $PERCENT_SUCCES = 100 ] && echo $GREEN || echo $RED) $PERCENT_SUCCES%"
 echo -e "$BLUE==========================================="
+echo -ne "$WHITE"
