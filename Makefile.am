@@ -6,4 +6,4 @@ bin_PROGRAMS = 42sh
 
 42sh_LDADD = $(top_builddir)/src/lexer/liblexer.a
 
-SUBDIRS = src/lexer
+SUBDIRS = src/lexer tests

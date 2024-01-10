@@ -10,6 +10,7 @@ AC_PROG_RANLIB
 AC_CONFIG_FILES([
    Makefile
    src/lexer/Makefile
+   tests/Makefile
 ])
 
 AC_OUTPUT
