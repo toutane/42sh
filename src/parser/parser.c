@@ -1,4 +1,30 @@
+#define _XOPEN_SOURCE 500
+
 #include "parser.h"
+
+void fill_sc_node(struct ast *sc_node, struct lexer *lexer)
+{
+    if (sc_node->nb_args == 0)
+    {
+        // Init simple-command node
+        sc_node->type = AST_SIMPLE_COMMAND;
+        sc_node->nb_args = 2;
+        sc_node->argv = malloc(sc_node->nb_args * sizeof(char *));
+        // TODO: Check for NULL after allocation try
+        sc_node->argv[0] = strdup(lexer->cur_tok.value);
+        sc_node->argv[sc_node->nb_args - 1] = NULL;
+    }
+    else
+    {
+        // Append element to simple-command node
+        sc_node->nb_args += 1;
+        sc_node->argv =
+            realloc(sc_node->argv, sc_node->nb_args * sizeof(char *));
+        // TODO: Check for NULL after allocation try
+        sc_node->argv[sc_node->nb_args - 2] = strdup(lexer->cur_tok.value);
+        sc_node->argv[sc_node->nb_args - 1] = NULL;
+    }
+}
 
 enum parser_status parse(struct ast **res, struct lexer *lexer)
 {
@@ -6,7 +32,7 @@ enum parser_status parse(struct ast **res, struct lexer *lexer)
     // | '\n'
     // | EOF
     if (lexer->cur_tok.type == TOKEN_NEWLINE
-            || lexer->cur_tok.type == TOKEN_EOF)
+        || lexer->cur_tok.type == TOKEN_EOF)
     {
         return PARSER_OK;
     }
@@ -14,10 +40,10 @@ enum parser_status parse(struct ast **res, struct lexer *lexer)
     // | list EOF
     if (parse_list(res, lexer) == PARSER_OK)
     {
-        //Checked popped
+        // Checked popped
         lexer_peek(lexer);
         if (lexer->cur_tok.type == TOKEN_NEWLINE
-                || lexer->cur_tok.type == TOKEN_EOF)
+            || lexer->cur_tok.type == TOKEN_EOF)
         {
             return PARSER_OK;
         }
@@ -71,7 +97,15 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
     lexer_peek(lexer);
     if (lexer->cur_tok.type == TOKEN_WORD)
     {
-        // TODO: CREATE NODE with cur_token
+        struct ast *sc_node = calloc(1, sizeof(struct ast));
+        // TODO: Check for NULL after allocation try
+
+        // Fill node
+        fill_sc_node(sc_node, lexer);
+        // replace AST
+        *res = sc_node;
+
+        // Pop first WORD
         lexer_pop(lexer);
 
         // { element }
@@ -90,8 +124,12 @@ enum parser_status parse_element(struct ast **res, struct lexer *lexer)
     lexer_peek(lexer);
     if (lexer->cur_tok.type == TOKEN_WORD)
     {
-        // TODO: Append cur_tok to AST
+        // Append cur_tok to AST simple-command node
+        fill_sc_node(*res, lexer);
+
+        // Pop element
         lexer_pop(lexer);
+
         return PARSER_OK;
     }
     return PARSER_UNEXPECTED_TOKEN;
