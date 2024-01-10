@@ -106,13 +106,14 @@ struct token parse_input_for_tok(struct lexer *lexer)
  */
 struct token lexer_peek(struct lexer *lexer)
 {
-    if (lexer->pos == 0 || lexer->cur_tok.type == TOKEN_EOF)
+    if (lexer->pos == 0 || lexer->must_parse_next_tok)
     {
         if (lexer->cur_tok.value != NULL)
         {
             free(lexer->cur_tok.value); // Free the previous token value if any
         }
 
+        lexer->must_parse_next_tok = 0;
         return parse_input_for_tok(lexer);
     }
 
@@ -125,7 +126,7 @@ struct token lexer_peek(struct lexer *lexer)
  */
 struct token lexer_pop(struct lexer *lexer)
 {
-    struct token tok = lexer_peek(lexer);
-    lexer->cur_tok.type = TOKEN_EOF; // Invalidate the current token
-    return tok;
+    lexer_peek(lexer);
+    lexer->must_parse_next_tok = 1;
+    return lexer->cur_tok;
 }
