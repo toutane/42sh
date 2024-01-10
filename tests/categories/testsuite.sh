@@ -98,7 +98,19 @@ run_testsuite()
   done
 }
 
-run_testsuite $(find . -type d)
+
+#### MAIN ####
+
+# tests that need to be run by the testsuite
+TEST_TO_RUN=$(find . -type d)
+
+# if tests is specified run only thoses tests
+if [ $# -ne 0 ]; then
+    TEST_TO_RUN=$*
+fi
+
+# run the testsuite
+run_testsuite $TEST_TO_RUN
 
 # display results
 PERCENT_SUCCES=$(((TOTAL_RUN - TOTAL_FAIL)*100/TOTAL_RUN))
