@@ -5,11 +5,20 @@
 
 enum token_type
 {
+    TOKEN_NONE, // no token
+
     TOKEN_WORD, // a word
     TOKEN_NEWLINE, // '\n'
     TOKEN_SEMICOLON, // ';'
-    TOKEN_NONE, // no token
     TOKEN_EOF, // end of input marker
+
+    /* Reserved words */
+
+    TOKEN_IF, // 'if'
+    TOKEN_THEN, // 'then'
+    TOKEN_ELSE, // 'else'
+    TOKEN_ELIF, // 'elif'
+    TOKEN_FI, // 'fi'
 };
 
 struct token
