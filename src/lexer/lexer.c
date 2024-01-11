@@ -101,8 +101,30 @@ static void handle_semicolon(struct lexer *lexer)
     }
 }
 
+static void handle_single_quote(struct lexer *lexer, int *is_inside_quotes)
+{
+    if (!*is_inside_quotes)
+    {
+        *is_inside_quotes = 1;
+        if (lexer->cur_tok.type == TOKEN_NONE)
+        {
+            fill_token(&lexer->cur_tok, TOKEN_WORD, NULL);
+        }
+        append_char_to_token_value(&lexer->cur_tok, '\'');
+        stream_pop(lexer->stream);
+    }
+    else
+    {
+        *is_inside_quotes = 0;
+        append_char_to_token_value(&lexer->cur_tok, '\'');
+        stream_pop(lexer->stream);
+    }
+}
+
 static void delimit_token(struct lexer *lexer)
 {
+    int is_inside_quotes = 0;
+
     struct stream_info *stream = lexer->stream;
 
     lexer->cur_tok.type = TOKEN_NONE;
@@ -118,8 +140,15 @@ static void delimit_token(struct lexer *lexer)
             return;
         }
 
+        // Token Recognition Algorithm Rule 4
+        if (cur_char == '\'')
+        {
+            handle_single_quote(lexer, &is_inside_quotes);
+            continue;
+        }
+
         // Token Recognition Algorithm Rule 7 (modified)
-        if (cur_char == '\n')
+        if (cur_char == '\n' && !is_inside_quotes)
         {
             handle_newline(lexer);
             return;
@@ -127,14 +156,14 @@ static void delimit_token(struct lexer *lexer)
 
         // Token Recognition Algorithm Rule 7.1 (added, used to recognize
         // semicolon)
-        if (cur_char == ';')
+        if (cur_char == ';' && !is_inside_quotes)
         {
             handle_semicolon(lexer);
             return;
         }
 
         // Token Recognition Algorithm Rule 8
-        if (isspace(cur_char))
+        if (isspace(cur_char) && !is_inside_quotes)
         {
             stream_pop(stream);
             if (lexer->cur_tok.type == TOKEN_WORD)
@@ -188,10 +217,51 @@ static void categorize_token(struct lexer *lexer)
     }
 }
 
+static void single_quote_expansion(struct lexer *lexer)
+{
+    if (lexer->cur_tok.type != TOKEN_WORD)
+    {
+        return;
+    }
+
+    char *val = lexer->cur_tok.value;
+    size_t len = strlen(val);
+    if (len < 2)
+    {
+        return;
+    }
+
+    // Calculate the number of single quotes in the token value
+    int nb_single_quotes = 0;
+    for (size_t i = 0; i < len; i++)
+    {
+        if (val[i] == '\'')
+        {
+            nb_single_quotes++;
+        }
+    }
+
+    // Remove every single quote from the token value
+    char *new_val = calloc(len - nb_single_quotes + 1, sizeof(char));
+    int j = 0;
+    for (size_t i = 0; i < len; i++)
+    {
+        if (val[i] != '\'')
+        {
+            new_val[j] = val[i];
+            j++;
+        }
+    }
+
+    free(lexer->cur_tok.value);
+    lexer->cur_tok.value = new_val;
+}
+
 struct token parse_input_for_tok(struct lexer *lexer)
 {
     delimit_token(lexer);
     categorize_token(lexer);
+    single_quote_expansion(lexer);
     return lexer->cur_tok;
 }
 
@@ -215,6 +285,5 @@ struct token lexer_pop(struct lexer *lexer)
 {
     lexer_peek(lexer);
     lexer->must_parse_next_tok = 1;
-
     return lexer->cur_tok;
 }
