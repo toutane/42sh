@@ -117,6 +117,15 @@ static void fill_list_node(struct ast *list_node, struct ast *sc_node)
     list_node->children[list_node->nb_child - 1] = sc_node;
 }
 
+static void fill_if_node(struct ast *if_node, struct ast *node)
+{
+    if_node->nb_child += 1;
+    if_node->children =
+        realloc(if_node->children, sizeof(struct ast *) * if_node->nb_child);
+    // TODO: Check for NULL after allocation try
+    if_node->children[if_node->nb_child - 1] = node;
+}
+
 enum parser_status parse(struct ast **res, struct lexer *lexer)
 {
     lexer_peek(lexer);
@@ -230,27 +239,42 @@ static enum parser_status parse_shell_command(struct ast **res,
 static enum parser_status parse_rule_if(struct ast **res, struct lexer *lexer)
 {
     // 'if' compound_list 'then' compound_list [else_clause] 'fi'
-    // TODO: Do a fct to replace ugly strcmps
-    if (lexer_peek(lexer).type == TOKEN_WORD
-        && !strcmp(lexer->cur_tok.value, "if"))
+    if (lexer_peek(lexer).type == TOKEN_IF)
     {
+        // Create IF node
+        struct ast *if_node = calloc(1, sizeof(struct ast));
+        if_node->type = AST_CONDITION;
+
         // Pop 'if'
         lexer_pop(lexer);
 
         if (parse_compound_list(res, lexer) == PARSER_OK
-            && (lexer_peek(lexer).type == TOKEN_WORD
-                && !strcmp(lexer->cur_tok.value, "then")))
+            && (lexer_peek(lexer).type == TOKEN_THEN))
         {
+            fill_if_node(if_node, *res);
+
             // Pop 'then'
             lexer_pop(lexer);
-            if (parse_compound_list(res, lexer) == PARSER_OK
-                && (parse_else_clause(res, lexer) == PARSER_OK || 1)
-                && (lexer_peek(lexer).type == TOKEN_WORD
-                    && !strcmp(lexer->cur_tok.value, "fi")))
+
+            if (parse_compound_list(res, lexer) == PARSER_OK)
             {
-                return PARSER_OK;
+                fill_if_node(if_node, *res);
+
+                if (parse_else_clause(res, lexer) == PARSER_OK)
+                {
+                    fill_if_node(if_node, *res);
+                }
+                if (lexer_peek(lexer).type == TOKEN_FI)
+                {
+                    // Pop 'fi'
+                    lexer_pop(lexer);
+
+                    *res = if_node;
+                    return PARSER_OK;
+                }
             }
         }
+        free(if_node);
     }
     return PARSER_UNEXPECTED_TOKEN;
 }
@@ -260,13 +284,57 @@ static enum parser_status parse_else_clause(struct ast **res,
 {
     // 'else' compound_list
     // | 'elif' compound_list 'then' compound_list [else_clause]
+    lexer_peek(lexer);
+    if (lexer->cur_tok.type == TOKEN_ELSE)
+    {
+        // Pop 'else'
+        lexer_pop(lexer);
+
+        if (parse_compound_list(res, lexer) == PARSER_OK)
+        {
+            return PARSER_OK;
+        }
+    }
+    else if (lexer->cur_tok.type == TOKEN_ELIF)
+    {
+        // Create IF node
+        struct ast *elif_node = calloc(1, sizeof(struct ast));
+        elif_node->type = AST_CONDITION;
+
+        // Pop 'elif'
+        lexer_pop(lexer);
+
+        if (parse_compound_list(res, lexer) == PARSER_OK
+            && lexer_peek(lexer).type == TOKEN_THEN)
+        {
+            fill_if_node(elif_node, *res);
+
+            // Pop 'then'
+            lexer_pop(lexer);
+
+            if (parse_compound_list(res, lexer) == PARSER_OK)
+            {
+                fill_if_node(elif_node, *res);
+
+                if (parse_else_clause(res, lexer) == PARSER_OK)
+                {
+                    fill_if_node(elif_node, *res);
+                }
+
+                *res = elif_node;
+                return PARSER_OK;
+            }
+        }
+        free(elif_node);
+    }
+    return PARSER_UNEXPECTED_TOKEN;
 }
 
 static enum parser_status parse_compound_list(struct ast **res,
                                               struct lexer *lexer)
 {
     // RULE:
-    // compound_list = {'\n'} and_or { ( ';' | '\n' ) {'\n'} and_or }[';']
+    // compound_list = {'\n'} and_or { ( ';' | '\n' ) {'\n'} and_or }[';']{'\n'}
 
     // {'\n'} case - if the and_or is not found afer {'\n'}, all the {'\n'} are
     // already poped, so CHECK if the grammar is deteministic
@@ -348,7 +416,8 @@ static enum parser_status parse_element(struct ast **res, struct lexer *lexer)
 {
     // | WORD
     lexer_peek(lexer);
-    if (lexer->cur_tok.type == TOKEN_WORD)
+    if (lexer->cur_tok.type == TOKEN_WORD
+        || is_token_reserved_word(&lexer->cur_tok))
     {
         // Append cur_tok to AST simple-command node
         fill_sc_node(*res, lexer);
