@@ -3,8 +3,9 @@
 #include <getopt.h>
 #include <stdio.h>
 
-void parse_options(int argc, char *argv[], struct options *options)
+int parse_options(int argc, char *argv[], struct options *options)
 {
+    int status = 0;
     int opt;
     int option_index = 0;
 
@@ -29,7 +30,10 @@ void parse_options(int argc, char *argv[], struct options *options)
             options->pretty_print = 1;
             break;
         default:
+            status = 1;
             break;
         }
     }
+
+    return status;
 }

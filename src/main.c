@@ -5,15 +5,29 @@
 
 #include "ast/ast.h"
 #include "io_backend/io_backend.h"
+#include "options/opt_parser.h"
 #include "lexer/lexer.h"
 #include "lexer/token.h"
 #include "parser/parser.h"
 
-char tab[] = { [TOKEN_SEMICOLON] = ';', [TOKEN_NEWLINE] = 'N' };
-
-int main(void)
+int main(int argc, char *argv[])
 {
-    struct stream_info *stream = stream_new(NULL, "echo toto; echo tata");
+    int status;
+
+    // Parse command line options
+    struct options options = { .command = 0, .pretty_print = 0, .verbose = 0 };
+    status = parse_options(argc, argv, &options);
+    if (status != 0)
+    {
+        return EXIT_FAILURE;
+    }
+
+    // Get input stream according to options
+    struct stream_info *stream = get_stream(argc, argv, &options);
+    if (stream == NULL)
+    {
+        return EXIT_FAILURE;
+    }
 
     struct lexer *lexer = lexer_new(stream);
     struct ast *ast = NULL;

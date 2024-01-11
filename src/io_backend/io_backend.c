@@ -6,6 +6,29 @@
 
 #include "io_backend.h"
 
+struct stream_info *get_stream(int argc, char *argv[], struct options *opts)
+{
+	// Input from string (with '-c' option)
+	if (opts->command)
+	{
+		if (argc < 3)
+		{
+			fprintf(stderr, "42sh: -c: option requires an argument\n");
+			return NULL;
+		}
+		return stream_new(NULL, argv[2]);
+	}
+
+	// Input from stdin
+	if (argc < 2)
+	{
+		return stream_new(NULL, NULL);
+	}
+
+	// Input from file
+	return stream_new(argv[1], NULL);
+}
+
 struct stream_info *stream_new(const char *path, char *buf)
 {
 	struct stream_info *stream = calloc(1, sizeof(struct stream_info));
