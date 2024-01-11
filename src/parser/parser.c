@@ -37,7 +37,8 @@ static enum parser_status parse_command(struct ast **res, struct lexer *lexer);
  *
  * shell_command =  rule_if ;
  */
-static enum parser_status parse_shell_command(struct ast **res, struct lexer *lexer);
+static enum parser_status parse_shell_command(struct ast **res,
+                                              struct lexer *lexer);
 
 /**
  * @brief Parse a rule_if
@@ -53,21 +54,24 @@ static enum parser_status parse_rule_if(struct ast **res, struct lexer *lexer);
  *                | 'elif' compound_list 'then' compound_list [else_clause]
  *                ;
  */
-static enum parser_status parse_else_clause(struct ast **res, struct lexer *lexer);
+static enum parser_status parse_else_clause(struct ast **res,
+                                            struct lexer *lexer);
 
 /**
  * @brief Parse a else_clause
  *
  * compound_list =  and_or [';'] {'\n'} ;
  */
-static enum parser_status parse_compound_list(struct ast **res, struct lexer *lexer);
+static enum parser_status parse_compound_list(struct ast **res,
+                                              struct lexer *lexer);
 
 /**
  * @brief Parse a WORD, followed by any number of element
  *
  * simple_command = WORD { element } ;
  */
-static enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer);
+static enum parser_status parse_simple_command(struct ast **res,
+                                               struct lexer *lexer);
 
 /**
  * @brief Parse a WORD
@@ -212,7 +216,8 @@ static enum parser_status parse_command(struct ast **res, struct lexer *lexer)
     return PARSER_UNEXPECTED_TOKEN;
 }
 
-static enum parser_status parse_shell_command(struct ast **res, struct lexer *lexer)
+static enum parser_status parse_shell_command(struct ast **res,
+                                              struct lexer *lexer)
 {
     // rule_if
     if (parse_rule_if(res, lexer) == PARSER_OK)
@@ -224,41 +229,95 @@ static enum parser_status parse_shell_command(struct ast **res, struct lexer *le
 
 static enum parser_status parse_rule_if(struct ast **res, struct lexer *lexer)
 {
-     // 'if' compound_list 'then' compound_list [else_clause] 'fi'
-     // TODO: Do a fct to replace ugly strcmps
-     if (lexer_peek(lexer).type == TOKEN_WORD && !strcmp(lexer->cur_tok.value, "if"))
-     {
-         // Pop 'if'
-         lexer_pop(lexer);
+    // 'if' compound_list 'then' compound_list [else_clause] 'fi'
+    // TODO: Do a fct to replace ugly strcmps
+    if (lexer_peek(lexer).type == TOKEN_WORD
+        && !strcmp(lexer->cur_tok.value, "if"))
+    {
+        // Pop 'if'
+        lexer_pop(lexer);
 
-         if (parse_compound_list(res, lexer) == PARSER_OK
-                 && (lexer_peek(lexer).type == TOKEN_WORD && !strcmp(lexer->cur_tok.value, "then")))
-         {
-             // Pop 'then'
-             lexer_pop(lexer);
-             if (parse_compound_list(res, lexer) == PARSER_OK
-                     && (parse_else_clause(res, lexer) == PARSER_OK || 1)
-                     && (lexer_peek(lexer).type == TOKEN_WORD && !strcmp(lexer->cur_tok.value, "fi")))
-             {
-                 return PARSER_OK;
-             }
-         }
-     }
-     return PARSER_UNEXPECTED_TOKEN;
+        if (parse_compound_list(res, lexer) == PARSER_OK
+            && (lexer_peek(lexer).type == TOKEN_WORD
+                && !strcmp(lexer->cur_tok.value, "then")))
+        {
+            // Pop 'then'
+            lexer_pop(lexer);
+            if (parse_compound_list(res, lexer) == PARSER_OK
+                && (parse_else_clause(res, lexer) == PARSER_OK || 1)
+                && (lexer_peek(lexer).type == TOKEN_WORD
+                    && !strcmp(lexer->cur_tok.value, "fi")))
+            {
+                return PARSER_OK;
+            }
+        }
+    }
+    return PARSER_UNEXPECTED_TOKEN;
 }
 
-static enum parser_status parse_else_clause(struct ast **res, struct lexer *lexer)
+static enum parser_status parse_else_clause(struct ast **res,
+                                            struct lexer *lexer)
 {
     // 'else' compound_list
     // | 'elif' compound_list 'then' compound_list [else_clause]
 }
 
-static enum parser_status parse_compound_list(struct ast **res, struct lexer *lexer)
+static enum parser_status parse_compound_list(struct ast **res,
+                                              struct lexer *lexer)
 {
-    // and_or [';'] {'\n'} ;
+    // RULE:
+    // compound_list = {'\n'} and_or { ( ';' | '\n' ) {'\n'} and_or }[';']
+
+    // {'\n'} case - if the and_or is not found afer {'\n'}, all the {'\n'} are
+    // already poped, so CHECK if the grammar is deteministic
+    while (lexer_peek(lexer).type == TOKEN_NEWLINE)
+    {
+        lexer_pop(lexer);
+    }
+
+    // and_or
+    if (parse_and_or(res, lexer) == PARSER_OK)
+    {
+        // Create list node for AST
+        struct ast *list_node = calloc(1, sizeof(struct ast));
+        list_node->type = AST_COMMAND_LIST;
+
+        // Add previously parsed `and_or` to AST
+        fill_list_node(list_node, *res);
+
+        //  ( ';' | '\n' )
+        while (lexer_peek(lexer).type == TOKEN_SEMICOLON
+               || lexer_peek(lexer).type == TOKEN_NEWLINE)
+        {
+            lexer_pop(lexer);
+
+            // {'\n'}
+            while (lexer_peek(lexer).type == TOKEN_NEWLINE)
+            {
+                lexer_pop(lexer);
+            }
+
+            // and_or
+            if (parse_and_or(res, lexer) == PARSER_OK)
+            {
+                fill_list_node(list_node, *res);
+            }
+            // end of rule
+            else
+            {
+                break;
+            }
+        }
+
+        *res = list_node;
+        return PARSER_OK;
+    }
+
+    return PARSER_UNEXPECTED_TOKEN;
 }
 
-static enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
+static enum parser_status parse_simple_command(struct ast **res,
+                                               struct lexer *lexer)
 {
     // | WORD { element }
     lexer_peek(lexer);
