@@ -10,7 +10,7 @@
 enum ast_type
 {
     AST_SIMPLE_COMMAND,
-    AST_COMMAND_LIST
+    AST_COMMAND_LIST,
     AST_CONDITION,
     /*
     AST_MUL,
