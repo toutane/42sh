@@ -6,14 +6,6 @@ void ast_print(struct ast *ast)
     {
         return;
     }
-    if (ast->left)
-    {
-        ast_print(ast->left);
-    }
-    if (ast->right)
-    {
-        ast_print(ast->right);
-    }
     if (ast->type == AST_SIMPLE_COMMAND)
     {
         printf(":%s:", ast->argv[0]);
@@ -23,6 +15,18 @@ void ast_print(struct ast *ast)
         }
         printf("\n");
     }
+    else if (ast->type == AST_COMMAND_LIST)
+    {
+        printf("List(\n");
+        if (ast->nb_child > 0)
+        {
+            for (size_t i = 0; i < ast->nb_child; i++)
+            {
+                ast_print(ast->children[i]);
+            }
+        }
+        printf(")\n");
+    }
 }
 
 void ast_free(struct ast *ast)
@@ -31,23 +35,29 @@ void ast_free(struct ast *ast)
     {
         return;
     }
-    if (ast->left)
-    {
-        ast_free(ast->left);
-        ast->left = NULL;
-    }
-    if (ast->right)
-    {
-        ast_free(ast->right);
-        ast->right = NULL;
-    }
     if (ast->type == AST_SIMPLE_COMMAND)
     {
-        for (size_t i = 0; i < ast->nb_args; i++)
+        if (ast->nb_args > 0)
         {
-            free(ast->argv[i]);
+            for (size_t i = 0; i < ast->nb_args; i++)
+            {
+                free(ast->argv[i]);
+            }
+            free(ast->argv);
+            ast->argv = NULL;
         }
-        free(ast->argv);
+    }
+    else if (ast->type == AST_COMMAND_LIST)
+    {
+        if (ast->nb_child > 0)
+        {
+            for (size_t i = 0; i < ast->nb_child; i++)
+            {
+                ast_free(ast->children[i]);
+            }
+            free(ast->children);
+            ast->children = NULL;
+        }
     }
     free(ast);
 }
@@ -74,6 +84,13 @@ int ast_eval(struct ast *ast)
     if (ast->type == AST_SIMPLE_COMMAND)
     {
         return eval_sc_node(ast);
+    }
+    else if (ast->type == AST_COMMAND_LIST)
+    {
+        for (size_t i = 0; i < ast->nb_child; i++)
+        {
+            ast_eval(ast->children[i]);
+        }
     }
     return 1;
 }

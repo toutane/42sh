@@ -10,7 +10,8 @@
 enum ast_type
 {
     AST_SIMPLE_COMMAND,
-    AST_CONDITION
+    AST_CONDITION,
+    AST_COMMAND_LIST
     /*
     AST_MUL,
     AST_DIV,
@@ -24,8 +25,8 @@ struct ast
     enum ast_type type; ///< The kind of node we're dealing with
     char **argv; ///< Content of the AST_SIMPLE_COMMAND
     size_t nb_args; ///< Size of argv field (NULL included)
-    struct ast *left; ///< The left branch if any, unuary or binary
-    struct ast *right; ///< The right branch of the binary node
+    struct ast **children; ///< The children list of the node if any
+    size_t nb_child; ///< The number of node's children
 };
 
 /**

@@ -26,6 +26,15 @@ void fill_sc_node(struct ast *sc_node, struct lexer *lexer)
     }
 }
 
+void fill_list_node(struct ast *list_node, struct ast *sc_node)
+{
+    list_node->nb_child += 1;
+    list_node->children = realloc(list_node->children,
+                                  sizeof(struct ast *) * list_node->nb_child);
+    // TODO: Check for NULL after allocation try
+    list_node->children[list_node->nb_child - 1] = sc_node;
+}
+
 enum parser_status parse(struct ast **res, struct lexer *lexer)
 {
     lexer_peek(lexer);
@@ -56,6 +65,34 @@ enum parser_status parse_list(struct ast **res, struct lexer *lexer)
     // | and_or
     if (parse_and_or(res, lexer) == PARSER_OK)
     {
+        // Create list node for AST
+        struct ast *list_node = calloc(1, sizeof(struct ast));
+        list_node->type = AST_COMMAND_LIST;
+
+        // Add previously parsed `and_or` to AST
+        fill_list_node(list_node, *res);
+
+        // { ';' and_or } [ ';' ] ;
+        while (lexer_peek(lexer).type == TOKEN_SEMICOLON)
+        {
+            // Consume ';' token
+            lexer_pop(lexer);
+
+            if (parse_and_or(res, lexer) == PARSER_OK)
+            {
+                // { ';' and_or } case
+                // Add previously parsed `and_or` to AST
+                fill_list_node(list_node, *res);
+            }
+            else
+            {
+                // [ ';' ] case
+                break;
+            }
+        }
+        // Replace AST by list node
+        *res = list_node;
+
         return PARSER_OK;
     }
     return PARSER_UNEXPECTED_TOKEN;

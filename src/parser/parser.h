@@ -27,7 +27,7 @@ enum parser_status parse(struct ast **res, struct lexer *lexer);
 /**
  * @brief Parse a and_or
  *
- * list =           and_or ;
+ * list =           and_or { ';' and_or } [ ';' ] ;
  */
 enum parser_status parse_list(struct ast **res, struct lexer *lexer);
 
@@ -48,7 +48,9 @@ enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer);
 /**
  * @brief Parse a simple_command
  *
- * command =        simple_command ;
+ * command =        simple_command
+                  | shell_command
+                  ;
  */
 enum parser_status parse_command(struct ast **res, struct lexer *lexer);
 
