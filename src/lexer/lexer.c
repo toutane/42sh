@@ -53,7 +53,7 @@ void fill_token(struct token *tok, enum token_type type, char *value)
     tok->value = value;
 }
 
-void append_char_to_token_value(struct token *tok, char c)
+static void append_char_to_token_value(struct token *tok, char c)
 {
     if (tok == NULL)
     {
@@ -74,49 +74,34 @@ void append_char_to_token_value(struct token *tok, char c)
     tok->value[len + 1] = '\0';
 }
 
-struct token handle_end_of_file(struct lexer *lexer)
+static void handle_end_of_file(struct lexer *lexer)
 {
     if (lexer->cur_tok.type == TOKEN_NONE)
     {
         fill_token(&lexer->cur_tok, TOKEN_EOF, NULL);
         stream_pop(lexer->stream);
-        return lexer->cur_tok;
-    }
-    else
-    {
-        return lexer->cur_tok;
     }
 }
 
-struct token handle_newline(struct lexer *lexer)
+static void handle_newline(struct lexer *lexer)
 {
     if (lexer->cur_tok.type == TOKEN_NONE)
     {
         fill_token(&lexer->cur_tok, TOKEN_NEWLINE, NULL);
         stream_pop(lexer->stream);
-        return lexer->cur_tok;
-    }
-    else
-    {
-        return lexer->cur_tok;
     }
 }
 
-struct token handle_semicolon(struct lexer *lexer)
+static void handle_semicolon(struct lexer *lexer)
 {
     if (lexer->cur_tok.type == TOKEN_NONE)
     {
         fill_token(&lexer->cur_tok, TOKEN_SEMICOLON, NULL);
         stream_pop(lexer->stream);
-        return lexer->cur_tok;
-    }
-    else
-    {
-        return lexer->cur_tok;
     }
 }
 
-struct token parse_input_for_tok(struct lexer *lexer)
+static void delimit_token(struct lexer *lexer)
 {
     struct stream_info *stream = lexer->stream;
 
@@ -129,20 +114,23 @@ struct token parse_input_for_tok(struct lexer *lexer)
         // Token Recognition Algorithm Rule 1
         if (cur_char == EOF)
         {
-            return handle_end_of_file(lexer);
+            handle_end_of_file(lexer);
+            return;
         }
 
         // Token Recognition Algorithm Rule 7 (modified)
         if (cur_char == '\n')
         {
-            return handle_newline(lexer);
+            handle_newline(lexer);
+            return;
         }
 
         // Token Recognition Algorithm Rule 7.1 (added, used to recognize
         // semicolon)
         if (cur_char == ';')
         {
-            return handle_semicolon(lexer);
+            handle_semicolon(lexer);
+            return;
         }
 
         // Token Recognition Algorithm Rule 8
@@ -151,7 +139,7 @@ struct token parse_input_for_tok(struct lexer *lexer)
             stream_pop(stream);
             if (lexer->cur_tok.type == TOKEN_WORD)
             {
-                return lexer->cur_tok;
+                return;
             }
             continue;
         }
@@ -170,6 +158,41 @@ struct token parse_input_for_tok(struct lexer *lexer)
         stream_pop(stream);
         continue;
     }
+}
+
+static void categorize_token(struct lexer *lexer)
+{
+    char *val = lexer->cur_tok.value;
+    if (lexer->cur_tok.type == TOKEN_WORD)
+    {
+        if (strcmp(val, "if") == 0)
+        {
+            lexer->cur_tok.type = TOKEN_IF;
+        }
+        else if (strcmp(val, "then") == 0)
+        {
+            lexer->cur_tok.type = TOKEN_THEN;
+        }
+        else if (strcmp(val, "else") == 0)
+        {
+            lexer->cur_tok.type = TOKEN_ELSE;
+        }
+        else if (strcmp(val, "elif") == 0)
+        {
+            lexer->cur_tok.type = TOKEN_ELIF;
+        }
+        else if (strcmp(val, "fi") == 0)
+        {
+            lexer->cur_tok.type = TOKEN_FI;
+        }
+    }
+}
+
+struct token parse_input_for_tok(struct lexer *lexer)
+{
+    delimit_token(lexer);
+    categorize_token(lexer);
+    return lexer->cur_tok;
 }
 
 struct token lexer_peek(struct lexer *lexer)
@@ -192,5 +215,6 @@ struct token lexer_pop(struct lexer *lexer)
 {
     lexer_peek(lexer);
     lexer->must_parse_next_tok = 1;
+
     return lexer->cur_tok;
 }
