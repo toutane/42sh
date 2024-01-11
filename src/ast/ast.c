@@ -81,6 +81,10 @@ int eval_sc_node(struct ast *ast)
 
 int ast_eval(struct ast *ast)
 {
+    if (!ast)
+    {
+        return 1;
+    }
     if (ast->type == AST_SIMPLE_COMMAND)
     {
         return eval_sc_node(ast);
