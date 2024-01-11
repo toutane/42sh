@@ -8,6 +8,7 @@ enum token_type
     TOKEN_WORD, // a word
     TOKEN_NEWLINE, // '\n'
     TOKEN_SEMICOLON, // ';'
+    TOKEN_NONE, // no token
     TOKEN_EOF, // end of input marker
 };
 

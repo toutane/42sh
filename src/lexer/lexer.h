@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 
+#include "../io_backend/io_backend.h"
 #include "token.h"
 
 /**
@@ -21,16 +22,15 @@
 
 struct lexer
 {
-    const char *input; // The input data
-    size_t pos; // The current offset inside the input data
+    struct stream_info *stream; // The input stream
     struct token cur_tok; // The next token, if processed
-    int must_parse_next_tok; // 1 if the next token must be parsed, 0 otherwise 
+    int must_parse_next_tok; // 1 if the next token must be parsed, 0 otherwise
 };
 
 /**
  * @brief Creates a new lexer given an input string.
  */
-struct lexer *lexer_new(const char *input);
+struct lexer *lexer_new(struct stream_info *stream);
 
 /**
  ** @brief Free the given lexer, but not its input.
@@ -38,13 +38,18 @@ struct lexer *lexer_new(const char *input);
 void lexer_free(struct lexer *lexer);
 
 /**
- * @brief Returns a token from the input string
+ * @brief Returns a token from the input stream
  * This function goes through the input string character by character and
- * builds a token. lexer_peek and lexer_pop should call it. If the input is
- * invalid, you must print something on stderr and return the appropriate token.
- */
+ * builds a token.
+ *
+ * It implements the Token Recognition Algorithm from the SCL standard:
+ * https://pubs.opengroup.org/onlinepubs/009604499/utilities/xcu_chap02.html#tag_02_
+ *
+ * The rule 7 is modified to recognize newlines as tokens.
+ * The rule 7.1 is added to recognize semicolons as tokens.
+ *
+ **/
 struct token parse_input_for_tok(struct lexer *lexer);
-
 /**
  * @brief Returns the next token, but doesn't move forward: calling lexer_peek
  * multiple times in a row always returns the same result. This functions is
@@ -58,4 +63,4 @@ struct token lexer_peek(struct lexer *lexer);
  */
 struct token lexer_pop(struct lexer *lexer);
 
-#endif /* !LEXER_H */
+#endif /* ! LEXER_H */

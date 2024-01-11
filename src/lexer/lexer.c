@@ -8,19 +8,31 @@
 
 #include "token.h"
 
-struct lexer *lexer_new(const char *input)
+struct lexer *lexer_new(struct stream_info *stream)
 {
     struct lexer *lexer = calloc(1, sizeof(struct lexer));
+    if (lexer == NULL)
+    {
+        fprintf(stderr, "lexer_new: calloc failed\n");
+        return NULL;
+    }
 
-    lexer->input = input;
-    lexer->pos = 0;
+    lexer->stream = stream;
+    lexer->cur_tok.type = TOKEN_NONE;
     lexer->cur_tok.value = NULL;
+    lexer->must_parse_next_tok = 1;
 
     return lexer;
 }
 
 void lexer_free(struct lexer *lexer)
 {
+    if (lexer == NULL)
+    {
+        printf("lexer_free: lexer is NULL\n");
+        return;
+    }
+
     if (lexer->cur_tok.value != NULL)
     {
         free(lexer->cur_tok.value); // Free the current token value if any
@@ -31,82 +43,138 @@ void lexer_free(struct lexer *lexer)
 
 void fill_token(struct token *tok, enum token_type type, char *value)
 {
+    if (tok == NULL)
+    {
+        fprintf(stderr, "fill_token: tok is NULL\n");
+        return;
+    }
+
     tok->type = type;
     tok->value = value;
 }
 
-/**
- * @brief Returns a token from the input string
- * This function goes through the input string character by character and
- * builds a token. lexer_peek and lexer_pop should call it. If the input is
- * invalid, you must print something on stderr and return the appropriate token.
- */
-struct token parse_input_for_tok(struct lexer *lexer)
+void append_char_to_token_value(struct token *tok, char c)
 {
-    // Skip whitespace
-    while (isspace(lexer->input[lexer->pos])
-           && lexer->input[lexer->pos] != '\n')
+    if (tok == NULL)
     {
-        lexer->pos++;
+        fprintf(stderr, "append_char_to_token_value: tok is NULL\n");
+        return;
     }
 
-    // Check for a '\n'
-    if (lexer->input[lexer->pos] == '\n')
+    if (tok->value == NULL)
     {
-        lexer->pos++;
-        fill_token(&lexer->cur_tok, TOKEN_NEWLINE, NULL);
-        return lexer->cur_tok;
+        tok->value = calloc(2, sizeof(char));
+        tok->value[0] = c;
+        tok->value[1] = '\0';
+        return;
     }
-
-    // Check for end of input
-    if (lexer->input[lexer->pos] == '\0')
-    {
-        fill_token(&lexer->cur_tok, TOKEN_EOF, NULL);
-        return lexer->cur_tok;
-    }
-
-    // Check for a ';'
-    if (lexer->input[lexer->pos] == ';')
-    {
-        lexer->pos++;
-        fill_token(&lexer->cur_tok, TOKEN_SEMICOLON, NULL);
-        return lexer->cur_tok;
-    }
-
-    // Check for a word
-    size_t len = 0;
-    while (!isspace(lexer->input[lexer->pos]))
-    {
-        len++;
-        lexer->pos++;
-
-        if (lexer->input[lexer->pos]
-            == ';') // Check for a ';' at the end of the word
-        {
-            break;
-        }
-    }
-
-    if (len > 0)
-    {
-        char *value = calloc(len + 1, sizeof(char));
-        memcpy(value, lexer->input + lexer->pos - len, len);
-
-        fill_token(&lexer->cur_tok, TOKEN_WORD, value);
-        return lexer->cur_tok;
-    }
-
-    return lexer->cur_tok;
+    size_t len = strlen(tok->value);
+    tok->value = realloc(tok->value, len + 2);
+    tok->value[len] = c;
+    tok->value[len + 1] = '\0';
 }
 
-/**
- * @brief Returns the next token, but doesn't move forward: calling lexer_peek
- * multiple times in a row always returns the same result. This functions is
- * meant to help the parser check if the next token matches some rule.
- */
+struct token handle_end_of_file(struct lexer *lexer)
+{
+    if (lexer->cur_tok.type == TOKEN_NONE)
+    {
+        fill_token(&lexer->cur_tok, TOKEN_EOF, NULL);
+        stream_pop(lexer->stream);
+        return lexer->cur_tok;
+    }
+    else
+    {
+        return lexer->cur_tok;
+    }
+}
+
+struct token handle_newline(struct lexer *lexer)
+{
+    if (lexer->cur_tok.type == TOKEN_NONE)
+    {
+        fill_token(&lexer->cur_tok, TOKEN_NEWLINE, NULL);
+        stream_pop(lexer->stream);
+        return lexer->cur_tok;
+    }
+    else
+    {
+        return lexer->cur_tok;
+    }
+}
+
+struct token handle_semicolon(struct lexer *lexer)
+{
+    if (lexer->cur_tok.type == TOKEN_NONE)
+    {
+        fill_token(&lexer->cur_tok, TOKEN_SEMICOLON, NULL);
+        stream_pop(lexer->stream);
+        return lexer->cur_tok;
+    }
+    else
+    {
+        return lexer->cur_tok;
+    }
+}
+
+struct token parse_input_for_tok(struct lexer *lexer)
+{
+    struct stream_info *stream = lexer->stream;
+
+    lexer->cur_tok.type = TOKEN_NONE;
+
+    while (1)
+    {
+        char cur_char = stream_peek(stream);
+
+        // Token Recognition Algorithm Rule 1
+        if (cur_char == EOF)
+        {
+            return handle_end_of_file(lexer);
+        }
+
+        // Token Recognition Algorithm Rule 7 (modified)
+        if (cur_char == '\n')
+        {
+            return handle_newline(lexer);
+        }
+
+        // Token Recognition Algorithm Rule 7.1 (added, used to recognize
+        // semicolon)
+        if (cur_char == ';')
+        {
+            return handle_semicolon(lexer);
+        }
+
+        // Token Recognition Algorithm Rule 8
+        if (isspace(cur_char))
+        {
+            stream_pop(stream);
+            if (lexer->cur_tok.type == TOKEN_WORD)
+            {
+                return lexer->cur_tok;
+            }
+            continue;
+        }
+
+        // Token Recognition Algorithm Rule 9
+        if (lexer->cur_tok.type == TOKEN_WORD)
+        {
+            append_char_to_token_value(&lexer->cur_tok, cur_char);
+            stream_pop(stream);
+            continue;
+        }
+
+        // Token Recognition Algorithm Rule 11
+        fill_token(&lexer->cur_tok, TOKEN_WORD, NULL);
+        append_char_to_token_value(&lexer->cur_tok, cur_char);
+        stream_pop(stream);
+        continue;
+    }
+}
+
 struct token lexer_peek(struct lexer *lexer)
 {
-    if (lexer->pos == 0 || lexer->must_parse_next_tok)
+    if (lexer->must_parse_next_tok)
     {
         if (lexer->cur_tok.value != NULL)
         {
@@ -120,10 +188,6 @@ struct token lexer_peek(struct lexer *lexer)
     return lexer->cur_tok;
 }
 
-/**
- * @brief Returns the next token, and removes it from the stream:
- *   calling lexer_pop in a loop will iterate over all tokens until EOF.
- */
 struct token lexer_pop(struct lexer *lexer)
 {
     lexer_peek(lexer);
