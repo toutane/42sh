@@ -54,3 +54,4 @@ Makefile
 # and this file
 configure~
 build/*
+debug/*

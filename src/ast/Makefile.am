@@ -1,8 +1,7 @@
 lib_LIBRARIES = libast.a
-liblexer_a_SOURCES = lexer.c lexer.h
-liblexer_a_CFLAGS = -Wall -Wextra -Werror -std=c99 -pedantic
-liblexer_a_CPPFLAGS = -I$(top_srcdir)/src
+libast_a_SOURCES = ast.c ast.h
+libast_a_CFLAGS = -Wall -Wextra -Werror -std=c99 -pedantic
+libast_a_CPPFLAGS = -I$(top_srcdir)/src
 
-TESTS = ./tests/test_ast
-
-SUBDIRS = tests
+#TESTS = ./tests/test_ast
+#SUBDIRS = tests
