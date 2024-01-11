@@ -139,6 +139,7 @@ run_testsuite()
 {
   for category in $@; do
     [ $category = "." ] && continue
+    [ $category = $SCRIPT_LOCATION ] && continue
 
     echo -e "$TURQUOISE==========================================="
     printf "$WHITE%-36s $TURQUOISE%s\n" "${category#*/}"
@@ -153,7 +154,8 @@ run_testsuite()
 #### MAIN ####
 
 # tests that need to be run by the testsuite
-TEST_TO_RUN=$(find . -type d)
+SCRIPT_LOCATION="$(dirname "$0")"
+TEST_TO_RUN=$(find $SCRIPT_LOCATION -type d)
 
 # if tests is specified run only thoses tests
 if [ $# -ne 0 ]; then
