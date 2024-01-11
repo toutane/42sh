@@ -32,11 +32,18 @@ int main(int argc, char *argv[])
     struct lexer *lexer = lexer_new(stream);
     struct ast *ast = NULL;
 
-    parse(&ast, lexer);
+    if (parse(&ast, lexer) != PARSER_OK)
+    {
+        ast_free(ast);
+        lexer_free(lexer);
+        stream_free(stream);
+        return EXIT_FAILURE;
+    }
 
     ast_print(ast);
     ast_eval(ast);
 
+    // Clean
     ast_free(ast);
     lexer_free(lexer);
     stream_free(stream);

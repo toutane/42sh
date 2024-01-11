@@ -135,6 +135,7 @@ enum parser_status parse(struct ast **res, struct lexer *lexer)
             return PARSER_OK;
         }
     }
+    fprintf(stderr, "Syntax Error !\n");
     return PARSER_UNEXPECTED_TOKEN;
 }
 
