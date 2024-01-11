@@ -3,8 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "ast/ast.h"
 #include "lexer/lexer.h"
 #include "lexer/token.h"
+#include "parser/parser.h"
 
 char tab[] = { [TOKEN_SEMICOLON] = ';', [TOKEN_NEWLINE] = 'N' };
 
@@ -16,6 +18,12 @@ int main(void)
     getline(&input, &len, stdin);
 
     struct lexer *lexer = lexer_new(input);
+    struct ast *ast = NULL;
+    parse(&ast, lexer);
+    ast_print(ast);
+    ast_eval(ast);
+
+    /*
     struct token token = lexer_pop(lexer);
 
     while (token.type != TOKEN_EOF)
@@ -30,6 +38,9 @@ int main(void)
     if (token.type == TOKEN_EOF)
         printf("EOF\n");
 
+    */
+
+    ast_free(ast);
     lexer_free(lexer);
     free(input);
 
