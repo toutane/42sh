@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "ast/ast.h"
+#include "io_backend/io_backend.h"
 #include "lexer/lexer.h"
 #include "lexer/token.h"
 #include "parser/parser.h"
@@ -12,37 +13,19 @@ char tab[] = { [TOKEN_SEMICOLON] = ';', [TOKEN_NEWLINE] = 'N' };
 
 int main(void)
 {
-    // Read input from stdin
-    char *input = NULL;
-    size_t len = 0;
-    getline(&input, &len, stdin);
+    struct stream_info *stream = stream_new(NULL, "echo toto; echo tata");
 
-    struct lexer *lexer = lexer_new(input);
+    struct lexer *lexer = lexer_new(stream);
     struct ast *ast = NULL;
+
     parse(&ast, lexer);
+
     ast_print(ast);
     ast_eval(ast);
 
-    /*
-    struct token token = lexer_pop(lexer);
-
-    while (token.type != TOKEN_EOF)
-    {
-        if (token.type == TOKEN_WORD)
-            printf("%s\n", token.value);
-        else
-            printf("%c\n", tab[token.type]);
-        token = lexer_pop(lexer);
-    }
-
-    if (token.type == TOKEN_EOF)
-        printf("EOF\n");
-
-    */
-
     ast_free(ast);
     lexer_free(lexer);
-    free(input);
+    stream_free(stream);
 
     return EXIT_SUCCESS;
 }
