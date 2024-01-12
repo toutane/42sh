@@ -13,11 +13,10 @@ void ast_print(struct ast *ast)
         {
             printf(" %s", ast->argv[i]);
         }
-        printf("\n");
     }
     else if (ast->type == AST_COMMAND_LIST)
     {
-        printf("List(\n");
+        printf("List(");
         if (ast->nb_child > 0)
         {
             for (size_t i = 0; i < ast->nb_child; i++)
@@ -26,6 +25,23 @@ void ast_print(struct ast *ast)
             }
         }
         printf(")\n");
+    }
+    else if (ast->type == AST_CONDITION)
+    {
+        printf("If(\n");
+        if (ast->nb_child > 0)
+        {
+            printf("cond: ");
+            ast_print(ast->children[0]);
+            printf("then: ");
+            ast_print(ast->children[1]);
+            if (ast->nb_child > 2)
+            {
+                printf("else: ");
+                ast_print(ast->children[2]);
+            }
+        }
+        printf(")");
     }
 }
 
@@ -59,6 +75,17 @@ void ast_free(struct ast *ast)
             ast->children = NULL;
         }
     }
+    else if (ast->type == AST_CONDITION)
+    {
+        ast_free(ast->children[0]);
+        ast_free(ast->children[1]);
+        if (ast->nb_child > 2)
+        {
+            ast_free(ast->children[2]);
+        }
+        free(ast->children);
+        ast->children = NULL;
+    }
     free(ast);
 }
 
@@ -81,16 +108,32 @@ int eval_sc_node(struct ast *ast)
 
 int ast_eval(struct ast *ast)
 {
+    if (!ast)
+    {
+        return 0;
+    }
+    int status = 0;
     if (ast->type == AST_SIMPLE_COMMAND)
     {
-        return eval_sc_node(ast);
+        status = eval_sc_node(ast);
     }
     else if (ast->type == AST_COMMAND_LIST)
     {
         for (size_t i = 0; i < ast->nb_child; i++)
         {
-            ast_eval(ast->children[i]);
+            status = ast_eval(ast->children[i]);
         }
     }
-    return 1;
+    else if (ast->type == AST_CONDITION)
+    {
+        if (ast_eval(ast->children[0]) == EXIT_SUCCESS)
+        {
+            status = ast_eval(ast->children[1]);
+        }
+        else if (ast->nb_child > 2)
+        {
+            status = ast_eval(ast->children[2]);
+        }
+    }
+    return status;
 }
