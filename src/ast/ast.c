@@ -91,6 +91,10 @@ void ast_free(struct ast *ast)
 
 int eval_sc_node(struct ast *ast)
 {
+    if (is_builtin_word(ast->argv[0]))
+    {
+        return (builtin_fun(ast->argv[0]))(ast->nb_args - 1, ast->argv);
+    }
     int status = 0;
     int pid = fork();
     if (pid == 0)
