@@ -161,7 +161,7 @@ else
 fi
 
 # tests that need to be run by the testsuite
-SCRIPT_LOCATION="$(dirname "$0")"
+SCRIPT_LOCATION="$(dirname "$0")/categories"
 TEST_TO_RUN=$(find $SCRIPT_LOCATION -type d)
 
 # if tests is specified run only thoses tests
