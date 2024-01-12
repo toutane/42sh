@@ -1,1 +1,2 @@
 if echo toto; then echo tata; else echo tutu; fi
+if false; then echo tutu; elif echo toto; then echo tata; else echo toto titit tit; fi

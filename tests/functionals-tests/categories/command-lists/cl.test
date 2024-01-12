@@ -1,0 +1,12 @@
+echo toto; echo tata
+echo toto; echo tata;
+echo toto ; echo tata   ;
+echo  toto;echo  tata;
+echo toto ;echo tata  ;
+echo toto     ;echo tata;
+echo  toto;    echo tata ;
+   echo toto   ;   echo tata;
+echo;echo;echo;
+ls; echo tata; echo toto ls echo; echo;
+ls; echo  tata; echo toto ls echo; echo;
+cat ../../working-dir/foo ; echo toto; ls

@@ -1,0 +1,10 @@
+ls
+pwd        
+ls -a
+ls -a -l
+man printf
+echo toto
+echo toto   tata tutu
+head ../../working-dir/foo
+   cat ../../working-dir/foo    ../../working-dir/foo
+cat     -e ../../working-dir/foo ../../working-dir/foo
