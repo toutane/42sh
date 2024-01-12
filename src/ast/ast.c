@@ -130,7 +130,7 @@ int ast_eval(struct ast *ast)
         {
             status = ast_eval(ast->children[1]);
         }
-        else if (ast->nb_args > 2)
+        else if (ast->nb_child > 2)
         {
             status = ast_eval(ast->children[2]);
         }
