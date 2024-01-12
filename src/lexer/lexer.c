@@ -121,6 +121,16 @@ static void handle_single_quote(struct lexer *lexer, int *is_inside_quotes)
     }
 }
 
+static void handle_comment(struct lexer *lexer)
+{
+    struct stream_info *stream = lexer->stream;
+    stream_pop(stream);
+    while (stream_peek(stream) != '\n')
+    {
+        stream_pop(stream);
+    }
+}
+
 static void delimit_token(struct lexer *lexer)
 {
     int is_inside_quotes = 0;
@@ -178,6 +188,13 @@ static void delimit_token(struct lexer *lexer)
         {
             append_char_to_token_value(&lexer->cur_tok, cur_char);
             stream_pop(stream);
+            continue;
+        }
+
+        // Token Recognition Algorithm Rule 10
+        if (cur_char == '#')
+        {
+            handle_comment(lexer);
             continue;
         }
 
