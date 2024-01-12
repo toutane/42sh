@@ -1,3 +1,0 @@
-TESTS =
-
-SUBDIRS = functionals-tests
