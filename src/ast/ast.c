@@ -137,3 +137,67 @@ int ast_eval(struct ast *ast)
     }
     return status;
 }
+
+static void ast_pretty_print_aux(struct ast *ast)
+{
+    if (ast == NULL)
+    {
+        fprintf(stderr, "ast_pretty_print: ast is NULL\n");
+        return;
+    }
+
+    enum ast_type type = ast->type;
+    switch (type)
+    {
+    case AST_SIMPLE_COMMAND:
+        printf("command");
+        printf(" \"%s\"", ast->argv[0]); // Print command value
+        for (size_t i = 1; i < ast->nb_args - 1; i++)
+        {
+            printf(" \"%s\"", ast->argv[i]); // Print arguments values
+        }
+        break;
+    case AST_COMMAND_LIST:
+        if (ast->nb_child > 0)
+        {
+            ast_pretty_print_aux(ast->children[0]);
+            for (size_t i = 1; i < ast->nb_child; i++)
+            {
+                printf("; ");
+                ast_pretty_print_aux(ast->children[i]);
+            }
+        }
+        break;
+    case AST_CONDITION:
+        if (ast->nb_child > 0)
+        {
+            printf("if { ");
+            ast_pretty_print_aux(ast->children[0]);
+            printf(" }; then { ");
+            ast_pretty_print_aux(ast->children[1]);
+            printf(" }");
+            if (ast->nb_child > 2)
+            {
+                printf("; else { ");
+                ast_pretty_print_aux(ast->children[2]);
+                printf(" }");
+            }
+        }
+        break;
+    default:
+        fprintf(stderr, "ast_pretty_print: ast type is invalid\n");
+        break;
+    }
+}
+
+void ast_pretty_print(struct ast *ast)
+{
+    if (ast == NULL)
+    {
+        return;
+    }
+
+    printf("AST pretty print========================\n\n");
+    ast_pretty_print_aux(ast);
+    printf("\n\n========================================\n");
+}

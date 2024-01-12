@@ -5,14 +5,14 @@
 
 #include "ast/ast.h"
 #include "io_backend/io_backend.h"
-#include "options/opt_parser.h"
 #include "lexer/lexer.h"
 #include "lexer/token.h"
+#include "options/opt_parser.h"
 #include "parser/parser.h"
 
 int main(int argc, char *argv[])
 {
-    int status;
+    int status; // Gather error status, passed to functions
 
     // Parse command line options
     struct options options = { .command = 0, .pretty_print = 0, .verbose = 0 };
@@ -23,10 +23,12 @@ int main(int argc, char *argv[])
     }
 
     // Get input stream according to options
-    struct stream_info *stream = get_stream(argc, argv, &options);
+    struct stream_info *stream = get_stream(argc, argv, &options, &status);
     if (stream == NULL)
     {
-        return EXIT_FAILURE;
+        return status != 0 ? EXIT_FAILURE
+                           : EXIT_SUCCESS; // If the input string is NULL, the
+                                           // program should exit with success
     }
 
     struct lexer *lexer = lexer_new(stream);
@@ -40,7 +42,11 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    //ast_print(ast);
+    if (options.pretty_print)
+    {
+        ast_pretty_print(ast);
+    }
+
     ast_eval(ast);
 
     // Clean
