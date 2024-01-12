@@ -15,6 +15,7 @@ AC_CONFIG_FILES([
    src/ast/Makefile
    src/io_backend/Makefile
    src/options/Makefile
+   src/builtins/Makefile
 ])
 
 AC_OUTPUT
