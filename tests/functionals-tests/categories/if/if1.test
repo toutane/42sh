@@ -1,0 +1,5 @@
+if true; then
+  echo coucou;
+else
+  echo tata;
+fi

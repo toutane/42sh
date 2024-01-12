@@ -274,7 +274,8 @@ static enum parser_status parse_rule_if(struct ast **res, struct lexer *lexer)
                 }
             }
         }
-        free(if_node);
+        // ast_free(if_node);
+        *res = if_node;
     }
     return PARSER_UNEXPECTED_TOKEN;
 }
@@ -325,7 +326,8 @@ static enum parser_status parse_else_clause(struct ast **res,
                 return PARSER_OK;
             }
         }
-        free(elif_node);
+        // ast_free(elif_node);
+        *res = elif_node;
     }
     return PARSER_UNEXPECTED_TOKEN;
 }

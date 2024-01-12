@@ -1,0 +1,6 @@
+if true; then
+  echo hi;
+true; then
+  echo ha;
+else
+  echo hu;

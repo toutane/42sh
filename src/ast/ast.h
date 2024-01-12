@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 
+#include "../builtins/builtins.h"
 #include "../lexer/token.h"
 
 enum ast_type
@@ -50,4 +51,4 @@ int ast_eval(struct ast *ast);
  */
 void ast_pretty_print(struct ast *ast);
 
-#endif /* !AST_H */
+#endif /* ! AST_H */
