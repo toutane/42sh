@@ -137,9 +137,10 @@ run_testsuite()
   for category in $@; do
     [ $category = "." ] && continue
     [ $category = $SCRIPT_LOCATION ] && continue
+    filename=$(basename $category)
 
     echo -e "$TURQUOISE==========================================="
-    printf "$WHITE%-36s $TURQUOISE%s\n" "${category#*/}"
+    printf "$WHITE%-36s $TURQUOISE%s\n" "${filename#*/}"
     echo -e "$TURQUOISE-------------------------------------------"
 
     run_category $category
