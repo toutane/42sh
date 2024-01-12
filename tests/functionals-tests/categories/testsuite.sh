@@ -12,9 +12,6 @@ WHITE="\e[0m"
 TOTAL_RUN=0
 TOTAL_FAIL=0
 
-# binary location - for us ../../42sh
-BINARY=bash
-
 # redirect files
 ref_stdout=/tmp/.ref_stdout
 ref_stderr=/tmp/.ref_stderr
@@ -152,6 +149,15 @@ run_testsuite()
 
 
 #### MAIN ####
+
+# path tho program
+if [ $# -eq 0 ]; then
+    echo -e "${RED}ERROR, no program where given$WHITE"
+    exit 1
+else
+    BINARY="$1"
+    shift
+fi
 
 # tests that need to be run by the testsuite
 SCRIPT_LOCATION="$(dirname "$0")"
