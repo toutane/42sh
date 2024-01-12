@@ -45,4 +45,10 @@ void ast_free(struct ast *ast);
  */
 int ast_eval(struct ast *ast);
 
+/**
+ * @brief Pretty prints the ast.
+ * @param ast The ast to pretty print.
+ */
+void ast_pretty_print(struct ast *ast);
+
 #endif /* ! AST_H */
