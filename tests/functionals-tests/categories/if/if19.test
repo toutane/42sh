@@ -1,0 +1,7 @@
+if false; then
+  echo hi;
+elif false; then
+  echo hu;
+else
+  echo ha;
+fi

@@ -16,3 +16,5 @@ run_test_file if14.test
 run_test_file if15.test
 run_test_file if16.test
 run_test_file if17.test
+run_test_file if18.test
+run_test_file if19.test
