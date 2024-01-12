@@ -29,8 +29,8 @@ char *token_type_to_str(enum token_type type)
     }
 }
 
-int is_token_reserved_word(struct token *token)
+int is_reserved_word(struct token token)
 {
-    enum token_type type = token->type;
+    enum token_type type = token.type;
     return type == TOKEN_IF || type == TOKEN_THEN || type == TOKEN_ELSE || type == TOKEN_ELIF || type == TOKEN_FI;
 }

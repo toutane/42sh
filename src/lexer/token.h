@@ -41,6 +41,6 @@ char *token_type_to_str(enum token_type type);
 /*
  * @brief Return true if the token is a reserved word
  */
-int is_token_reserved_word(struct token *token);
+int is_reserved_word(struct token token);
 
 #endif /* !TOKEN_H */

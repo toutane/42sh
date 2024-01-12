@@ -6,6 +6,7 @@
 
 #include "../ast/ast.h"
 #include "../lexer/lexer.h"
+#include "../lexer/token.h"
 
 enum parser_status
 {
