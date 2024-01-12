@@ -1,3 +1,1 @@
-echo toto
-echo hi
-allo d
+if echo toto; then echo tata; else echo tutu; fi

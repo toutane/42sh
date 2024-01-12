@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    ast_print(ast);
+    //ast_print(ast);
     ast_eval(ast);
 
     // Clean

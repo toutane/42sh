@@ -1,4 +1,4 @@
-if false; true; then
+if true; false; then
   echo a
   echo b; echo c;
 fi
