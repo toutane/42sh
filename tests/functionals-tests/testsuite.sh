@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # colors for display
 RED="\e[31m"
