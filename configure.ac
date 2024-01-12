@@ -18,7 +18,12 @@ AC_CONFIG_FILES([
 
    tests/Makefile
    tests/functionals-tests/Makefile
-   tests/ast/Makefile
+   tests/units-tests/lexer/Makefile
+   tests/units-tests/parser/Makefile
+   tests/units-tests/ast/Makefile
+   tests/units-tests/io_backend/Makefile
+   tests/units-tests/options/Makefile
+   tests/units-tests/utils/Makefile
 ])
 
 AC_OUTPUT
