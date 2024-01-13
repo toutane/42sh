@@ -9,8 +9,8 @@ cd build
 ../configure
 cd -
 
-# create a debug deirectory, like build but add debug flags and gcover flags
+# create a debug deirectory, like build but add debug flags
 mkdir debug
 cd debug
-../configure CFLAGS="-g3 -fsanitize=address" LDFLAGS="-fsanitize=address"
+../configure CFLAGS="-g3 -fsanitize=address" LDFLAGS="-fsanitize=address" --enable-gcov
 cd -

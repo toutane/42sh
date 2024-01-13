@@ -13,6 +13,8 @@ AX_COMPILER_FLAGS([], [], [], [-Wall -Wextra -Werror -std=c99 -pedantic])
 AM_PROG_AR
 AC_PROG_RANLIB
 
+AC_CONFIG_MACRO_DIR([m4])
+
 ###########################
 # gcov coverage reporting
 ###########################
