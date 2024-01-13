@@ -76,6 +76,7 @@ run_test_file()
   else
     echo -ne "$YELLOW\n$1$WHITE"
     [ -s $( realpath $1.diff ) ] && echo -ne "\n$(cat $(realpath $1.diff))$WHITE"
+    [ $REF_CODE != $MY_CODE ] && echo -ne "\nref return code: $REF_CODE\nmy return code: $MY_CODE"
     echo
     TOTAL_FAIL=$((TOTAL_FAIL + 1))
     rm -f $1.diff
@@ -130,6 +131,7 @@ run_test()
     else
       echo -ne "$YELLOW\n$line$WHITE"
       [ -s $( realpath $1_$counter.diff ) ] && echo -ne "\n$(cat $(realpath $1_$counter.diff))$WHITE"
+      [ $REF_CODE != $MY_CODE ] && echo -ne "\nref return code: $REF_CODE\nmy return code: $MY_CODE"
       echo
       TOTAL_FAIL=$((TOTAL_FAIL + 1))
       rm -f $1_$counter.diff

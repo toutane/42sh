@@ -100,14 +100,15 @@ int eval_sc_node(struct ast *ast)
     if (pid == 0)
     {
         execvp(ast->argv[0], ast->argv);
-        fprintf(stderr, "Failed exec\n");
+        fprintf(stderr, "42sh: failed exec\n");
         return 127;
     }
     else
     {
         waitpid(pid, &status, 0);
     }
-    return status;
+
+    return WEXITSTATUS(status);
 }
 
 int ast_eval(struct ast *ast)
