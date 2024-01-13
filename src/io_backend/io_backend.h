@@ -3,20 +3,28 @@
 
 #include <stdio.h>
 
-struct stream_info {
-	FILE *fp;
+#include "../options/opt_parser.h"
+
+struct stream_info
+{
+    FILE *fp;
 };
 
 /*
+ * @brief Get a stream_info object from the command line arguments
+ */
+struct stream_info *get_stream(int argc, char *argv[], struct options *opts,
+                               int *err);
+
+/*
  * @brief Create a new stream_info object
- * @param path The path to the file to open if any
- * @return A pointer to the newly created stream_info object
  *
  * If the input mode is stdin, the path must be set to null, as the buffer
- * If the input mode is file, the path must be set to the path of the file, and the buffer to null
- * If the input is a string, the path must be set to null, and the buffer to the string
+ * If the input mode is file, the path must be set to the path of the file, and
+ * the buffer to null If the input is a string, the path must be set to null,
+ * and the buffer to the string
  */
-struct stream_info *stream_new(const char *path, char *buf);
+struct stream_info *stream_new(const char *path, char *buf, int *err);
 
 /*
  * @brief Free a stream_info object

@@ -4,28 +4,52 @@
 #include <stdlib.h>
 
 #include "ast/ast.h"
+#include "error_handling/error_handling.h"
 #include "io_backend/io_backend.h"
 #include "lexer/lexer.h"
 #include "lexer/token.h"
+#include "options/opt_parser.h"
 #include "parser/parser.h"
 
-char tab[] = { [TOKEN_SEMICOLON] = ';', [TOKEN_NEWLINE] = 'N' };
-
-int main(void)
+int main(int argc, char *argv[])
 {
-    struct stream_info *stream = stream_new(NULL, "echo toto; echo tata");
+    int status; // Gather error status, passed to functions
+
+    // Parse command line options
+    struct options options = { .command = 0, .pretty_print = 0, .verbose = 0 };
+    status = parse_options(argc, argv, &options);
+    if (status != 0)
+    {
+        return EXIT_FAILURE;
+    }
+
+    // get input stream according to options
+    struct stream_info *stream = get_stream(argc, argv, &options, &status);
+    if (stream == NULL)
+    {
+        return status != 0 ? EXIT_FAILURE
+                           : EXIT_SUCCESS; // If the input string is NULL, the
+                                           // program should exit with success
+    }
 
     struct lexer *lexer = lexer_new(stream);
     struct ast *ast = NULL;
 
-    parse(&ast, lexer);
+    if (parse(&ast, lexer) != PARSER_OK)
+    {
+        error(ast, lexer, stream, "42sh: grammar error during parsing");
+        return GRAMMAR_ERROR;
+    }
 
-    ast_print(ast);
-    ast_eval(ast);
+    if (options.pretty_print)
+    {
+        ast_pretty_print(ast);
+    }
 
-    ast_free(ast);
-    lexer_free(lexer);
-    stream_free(stream);
+    status = ast_eval(ast);
 
-    return EXIT_SUCCESS;
+    // clean
+    free_all(ast, lexer, stream);
+
+    return status;
 }

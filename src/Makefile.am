@@ -8,11 +8,15 @@ bin_PROGRAMS = 42sh
 				$(top_builddir)/src/parser/libparser.a \
 				$(top_builddir)/src/ast/libast.a \
 				$(top_builddir)/src/io_backend/libio_backend.a \
-				$(top_builddir)/src/options/liboptions.a
+				$(top_builddir)/src/options/liboptions.a \
+				$(top_builddir)/src/error_handling/liberrorhandling.a \
+				$(top_builddir)/src/builtins/libbuiltins.a
 
 
 SUBDIRS = 	lexer \
 			parser \
 			ast \
 			io_backend \
-			options
+			options \
+			error_handling \
+			builtins

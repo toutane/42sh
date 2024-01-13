@@ -1,0 +1,5 @@
+if true; then
+  echo hi;
+elif true; then
+  echo ha;
+else

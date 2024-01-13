@@ -15,6 +15,8 @@ AC_CONFIG_FILES([
    src/ast/Makefile
    src/io_backend/Makefile
    src/options/Makefile
+   src/builtins/Makefile
+   src/error_handling/Makefile
 
    tests/Makefile
    tests/functionals-tests/Makefile

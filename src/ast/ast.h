@@ -5,13 +5,14 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 
+#include "../builtins/builtins.h"
 #include "../lexer/token.h"
 
 enum ast_type
 {
     AST_SIMPLE_COMMAND,
+    AST_COMMAND_LIST,
     AST_CONDITION,
-    AST_COMMAND_LIST
     /*
     AST_MUL,
     AST_DIV,
@@ -44,4 +45,10 @@ void ast_free(struct ast *ast);
  */
 int ast_eval(struct ast *ast);
 
-#endif /* !AST_H */
+/**
+ * @brief Pretty prints the ast.
+ * @param ast The ast to pretty print.
+ */
+void ast_pretty_print(struct ast *ast);
+
+#endif /* ! AST_H */

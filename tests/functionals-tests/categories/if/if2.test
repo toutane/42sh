@@ -1,5 +1,6 @@
 if true; then
-  echo coucou;
+  echo coucou
+  echo hi
 else
   echo tata;
 fi
