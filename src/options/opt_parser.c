@@ -13,6 +13,7 @@ int parse_options(int argc, char *argv[], struct options *options)
     static struct option long_options[] = { { "verbose", no_argument, 0, 'v' },
                                             { "pretty-print", no_argument, 0,
                                               'p' },
+                                            { "ast-dot", no_argument, 0, 'a' },
                                             { 0, 0, 0, 0 } };
 
     while ((opt = getopt_long(argc, argv, "c", long_options, &option_index))
@@ -20,14 +21,17 @@ int parse_options(int argc, char *argv[], struct options *options)
     {
         switch (opt)
         {
+        case 'a':
+            options->ast_dot = 1;
+            break;
         case 'c':
             options->command = 1;
             break;
-        case 'v':
-            options->verbose = 1;
-            break;
         case 'p':
             options->pretty_print = 1;
+            break;
+        case 'v':
+            options->verbose = 1;
             break;
         default:
             status = 1;
