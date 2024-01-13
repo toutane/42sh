@@ -124,6 +124,9 @@ int builtin_echo(int argc, char *argv[])
         start_index++;
     }
 
+    // store if printf returned an error
+    int status = EXIT_SUCCESS;
+
     // Print the non-oprion arguments
     for (int i = start_index; i < argc; i++)
     {
@@ -134,20 +137,35 @@ int builtin_echo(int argc, char *argv[])
         }
         else
         {
-            printf("%s", argv[i]);
+            if (printf("%s", argv[i]) == EOF)
+            {
+                status = EXIT_FAILURE;
+            }
         }
 
         // Print a space between arguments
         if (i < argc - 1)
         {
-            printf(" ");
+            if (printf(" ") == EOF)
+            {
+                status = EXIT_FAILURE;
+            }
         }
     }
 
     if (!nflag)
     {
-        printf("\n");
+        if (printf("\n") == EOF)
+        {
+            status = EXIT_FAILURE;
+        }
     }
 
-    return 0;
+    if (status)
+    {
+        fprintf(stdout, "42sh: writing error during echo");
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }
