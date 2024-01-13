@@ -1,0 +1,14 @@
+echo -ne test -p
+echo -n test -ep
+echo -n test -pe
+echo -n -p test -fe
+echo -en hello
+echo -enf hey
+echo -epn hey
+echo -n -e ksjdf -z -E -p
+echo -e -n - - E - l f- lsf 
+echo lkfj s- fs asij 0=4wu0 /c -i  
+echo -n -e -E -e -E -e 'hello/n/n//n////n/t/slk ls f/n//oc:'
+echo hlelo////e//n/n//t//t////t/t/ '/t//t///n/nsdf//n'
+echo -enenenk hello /tmp
+echo -e hello'/t//t/n'
