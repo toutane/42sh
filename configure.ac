@@ -16,6 +16,7 @@ AC_CONFIG_FILES([
    src/io_backend/Makefile
    src/options/Makefile
    src/builtins/Makefile
+   src/error_handling/Makefile
 ])
 
 AC_OUTPUT

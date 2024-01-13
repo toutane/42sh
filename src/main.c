@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "ast/ast.h"
+#include "error_handling/error_handling.h"
 #include "io_backend/io_backend.h"
 #include "lexer/lexer.h"
 #include "lexer/token.h"
@@ -22,7 +23,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    // Get input stream according to options
+    // get input stream according to options
     struct stream_info *stream = get_stream(argc, argv, &options, &status);
     if (stream == NULL)
     {
@@ -36,10 +37,8 @@ int main(int argc, char *argv[])
 
     if (parse(&ast, lexer) != PARSER_OK)
     {
-        ast_free(ast);
-        lexer_free(lexer);
-        stream_free(stream);
-        return EXIT_FAILURE;
+        error(ast, lexer, stream, "42sh: grammar error during parsing");
+        return GRAMMAR_ERROR;
     }
 
     if (options.pretty_print)
@@ -47,12 +46,10 @@ int main(int argc, char *argv[])
         ast_pretty_print(ast);
     }
 
-    ast_eval(ast);
+    status = ast_eval(ast);
 
-    // Clean
-    ast_free(ast);
-    lexer_free(lexer);
-    stream_free(stream);
+    // clean
+    free_all(ast, lexer, stream);
 
-    return EXIT_SUCCESS;
+    return status;
 }
