@@ -6,10 +6,10 @@ int execvp_error(int err)
     switch (err)
     {
     case EACCES:
-        fprintf(stderr, "42sh: command is not an executable utility");
+        fprintf(stderr, "42sh: command is not an executable utility\n");
         return 126;
     default:
-        fprintf(stderr, "42sh: command error");
+        fprintf(stderr, "42sh: command error\n");
         return 127;
     }
 }

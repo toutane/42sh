@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 
     if (parse(&ast, lexer) != PARSER_OK)
     {
-        error(ast, lexer, stream, "42sh: grammar error during parsing");
+        error(ast, lexer, stream, "42sh: grammar error during parsing\n");
         return GRAMMAR_ERROR;
     }
 

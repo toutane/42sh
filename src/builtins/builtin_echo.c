@@ -163,7 +163,7 @@ int builtin_echo(int argc, char *argv[])
 
     if (status)
     {
-        fprintf(stdout, "42sh: writing error during echo");
+        fprintf(stdout, "42sh: writing error during echo\n");
         return EXIT_FAILURE;
     }
 
