@@ -127,6 +127,12 @@ run_test()
 
 run_category()
 {
+  # check if file exist
+  if [ ! -e $1 ]; then
+    echo -e "${RED}UNKNOWN directory tests \"$1\"$WHITE"
+    return
+  fi
+
   cd $1
   source ./testsuite.sh
   cd - >/dev/null
@@ -153,27 +159,34 @@ run_testsuite()
 
 # path tho program
 if [ $# -eq 0 ]; then
-    echo -e "${RED}ERROR, no program where given$WHITE"
-    exit 1
+  echo -e "${RED}ERROR, no program where given$WHITE"
+  exit 1
 else
-    BINARY="$1"
-    shift
+  BINARY="$1"
+  shift
 fi
 
-# tests that need to be run by the testsuite
+# path to the script
 SCRIPT_LOCATION="$(dirname "$0")/categories"
-TEST_TO_RUN=$(find $SCRIPT_LOCATION -type d)
+cd $SCRIPT_LOCATION
+
+# tests relative path
+TEST_TO_RUN=$(find . -type d)
 
 # if tests is specified run only thoses tests
 if [ $# -ne 0 ]; then
-    TEST_TO_RUN=$*
+  TEST_TO_RUN=$*
 fi
 
 # run the testsuite
 run_testsuite $TEST_TO_RUN
 
 # display results
-PERCENT_SUCCES=$(((TOTAL_RUN - TOTAL_FAIL)*100/TOTAL_RUN))
+if [ $TOTAL_RUN -eq 0 ]; then
+    PERCENT_SUCCES=0 
+else
+    PERCENT_SUCCES=$(((TOTAL_RUN - TOTAL_FAIL)*100/TOTAL_RUN))
+fi
 
 echo -e "$BLUE==========================================="
 echo -e "$WHITE RECAP: $([ $PERCENT_SUCCES = 100 ] && echo $GREEN || echo $RED) $PERCENT_SUCCES%"
