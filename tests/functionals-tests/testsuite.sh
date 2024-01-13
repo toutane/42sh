@@ -12,6 +12,9 @@ WHITE="\e[0m"
 TOTAL_RUN=0
 TOTAL_FAIL=0
 
+# grep regex to match memory leaks
+GREP_PATTERN="LeakSanitizer"
+
 # redirect files
 ref_stdout=/tmp/.ref_stdout
 ref_stderr=/tmp/.ref_stderr
@@ -25,6 +28,7 @@ run_test_file()
 
   TOTAL_RUN=$((TOTAL_RUN + 1))
 
+  # Run ref and our program
   echo -ne "$BLUE-->>$WHITE $1 - test on file $1...$WHITE"
   bash --posix "$1" > $ref_stdout 2> $ref_stderr
   REF_CODE=$?
@@ -32,8 +36,12 @@ run_test_file()
   $BINARY "$1" > $my_stdout 2> $my_stderr
   MY_CODE=$?
 
+  # Compare ref and our program return stdout stderr
   diff --color=always -u $ref_stdout $my_stdout > $1.diff
   DIFF_CODE=$?
+
+  grep -q $GREP_PATTERN $my_stderr
+  GREP_CODE=$?
 
   # check if the error code is the same
   if [ $REF_CODE != $MY_CODE ]; then
@@ -53,6 +61,13 @@ run_test_file()
       echo -ne "$RED STDERR$WHITE"
       sucess=false
   fi
+
+  #check memory leaks
+  if [ $GREP_CODE -eq 1 ]; then
+      echo -ne "$RED MEMORY_LEAKS$WHITE"
+      sucess=false
+  fi
+
 
   # check if tests were sucess or not
   if $sucess; then
