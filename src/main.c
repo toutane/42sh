@@ -23,14 +23,14 @@ int main(int argc, char *argv[])
     status = parse_options(argc, argv, &options);
     if (status != 0)
     {
-        return EXIT_FAILURE;
+        return status;
     }
 
     // get input stream according to options
-    struct stream_info *stream = get_stream(argc, argv, &options, &status);
+    struct stream_info *stream = get_stream(argc, &options, &status);
     if (stream == NULL)
     {
-        return status != 0 ? EXIT_FAILURE
+        return status != 0 ? status
                            : EXIT_SUCCESS; // If the input string is NULL, the
                                            // program should exit with success
     }

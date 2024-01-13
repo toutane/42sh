@@ -10,6 +10,7 @@ struct options
     int command;
     int pretty_print;
     int verbose;
+    char *input;
 };
 
 /*

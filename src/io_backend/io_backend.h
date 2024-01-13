@@ -13,8 +13,7 @@ struct stream_info
 /*
  * @brief Get a stream_info object from the command line arguments
  */
-struct stream_info *get_stream(int argc, char *argv[], struct options *opts,
-                               int *err);
+struct stream_info *get_stream(int argc, struct options *opts, int *err);
 
 /*
  * @brief Create a new stream_info object

@@ -8,19 +8,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct stream_info *get_stream(int argc, char *argv[], struct options *opts,
-                               int *err)
+struct stream_info *get_stream(int argc, struct options *opts, int *err)
 {
     // Input from string (with '-c' option)
     if (opts->command)
     {
-        if (argc <= optind)
+        if (opts->input == NULL)
         {
             fprintf(stderr, "42sh: -c: option requires an argument\n");
-            *err = 1;
+            *err = 2;
             return NULL;
         }
-        return stream_new(NULL, argv[optind], err);
+        return stream_new(NULL, opts->input, err);
     }
 
     // Input from stdin
@@ -30,7 +29,7 @@ struct stream_info *get_stream(int argc, char *argv[], struct options *opts,
     }
 
     // Input from file
-    return stream_new(argv[optind], NULL, err);
+    return stream_new(opts->input, NULL, err);
 }
 
 struct stream_info *stream_new(const char *path, char *buf, int *err)
