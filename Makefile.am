@@ -1,4 +1,6 @@
-SUBDIRS = src
+SUBDIRS = src \
+		  tests
 
-check:
-	./$(top_srcdir)/tests/functionals-tests/categories/testsuite.sh $(abs_top_builddir)/src/42sh
+clang:
+	clang-format -n $$(find $(top_srcdir) -name *.[ch])
+	clang-format -i $$(find $(top_srcdir) -name *.[ch])

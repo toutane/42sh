@@ -1,4 +1,5 @@
 #define NB_BUILTINS 3
+#define BUILTIN_ERROR 2
 
 #include "builtins.h"
 
@@ -49,19 +50,5 @@ int builtin_true(int argc, char *argv[])
     {
         return 0;
     }
-    return 0;
-}
-
-int builtin_echo(int argc, char *argv[])
-{
-    for (int i = 1; i < argc - 1; i++)
-    {
-        printf("%s ", argv[i]);
-    }
-    if (argc > 1)
-    {
-        printf("%s", argv[argc - 1]);
-    }
-    printf("\n");
     return 0;
 }

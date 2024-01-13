@@ -4,6 +4,7 @@ void ast_print(struct ast *ast)
 {
     if (!ast)
     {
+        printf("NULL");
         return;
     }
     if (ast->type == AST_SIMPLE_COMMAND)
@@ -29,18 +30,12 @@ void ast_print(struct ast *ast)
     else if (ast->type == AST_CONDITION)
     {
         printf("If(\n");
-        if (ast->nb_child > 0)
-        {
-            printf("cond: ");
-            ast_print(ast->children[0]);
-            printf("then: ");
-            ast_print(ast->children[1]);
-            if (ast->nb_child > 2)
-            {
-                printf("else: ");
-                ast_print(ast->children[2]);
-            }
-        }
+        printf("cond: ");
+        ast_print(ast->children[0]);
+        printf("then: ");
+        ast_print(ast->children[1]);
+        printf("else: "); // Potentially put condition to print else if not NULL
+        ast_print(ast->children[2]);
         printf(")");
     }
 }
@@ -79,10 +74,7 @@ void ast_free(struct ast *ast)
     {
         ast_free(ast->children[0]);
         ast_free(ast->children[1]);
-        if (ast->nb_child > 2)
-        {
-            ast_free(ast->children[2]);
-        }
+        ast_free(ast->children[2]);
         free(ast->children);
         ast->children = NULL;
     }
@@ -91,23 +83,27 @@ void ast_free(struct ast *ast)
 
 int eval_sc_node(struct ast *ast)
 {
+    int status = 0;
     if (is_builtin_word(ast->argv[0]))
     {
-        return (builtin_fun(ast->argv[0]))(ast->nb_args - 1, ast->argv);
+        status = (builtin_fun(ast->argv[0]))(ast->nb_args - 1, ast->argv);
+        fflush(stdout); // Flush stdout to avoid mixing output
+        return status;
     }
-    int status = 0;
+
     int pid = fork();
     if (pid == 0)
     {
         execvp(ast->argv[0], ast->argv);
-        fprintf(stderr, "Failed exec\n");
+        fprintf(stderr, "42sh: failed exec\n");
         return 127;
     }
     else
     {
         waitpid(pid, &status, 0);
     }
-    return status;
+
+    return WEXITSTATUS(status);
 }
 
 int ast_eval(struct ast *ast)
@@ -134,7 +130,7 @@ int ast_eval(struct ast *ast)
         {
             status = ast_eval(ast->children[1]);
         }
-        else if (ast->nb_child > 2)
+        else if (ast->children[2] != NULL)
         {
             status = ast_eval(ast->children[2]);
         }
