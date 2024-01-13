@@ -16,12 +16,19 @@ AC_PROG_RANLIB
 AC_CONFIG_MACRO_DIR([m4])
 
 ###########################
+# debug reporting
+###########################
+m4_include([m4/debug.m4])
+AC_TDD_DEBUG
+AC_SUBST(DEBUG_CFLAGS)
+AC_SUBST(DEBUG_LDFLAGS)
+
+###########################
 # gcov coverage reporting
 ###########################
 m4_include([m4/gcov.m4])
 AC_TDD_GCOV
 AC_SUBST(COVERAGE_CFLAGS)
-AC_SUBST(COVERAGE_CXXFLAGS)
 AC_SUBST(COVERAGE_LDFLAGS)
 
 ###########################

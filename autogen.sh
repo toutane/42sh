@@ -12,5 +12,5 @@ cd -
 # create a debug deirectory, like build but add debug flags
 mkdir debug
 cd debug
-../configure CFLAGS="-g3 -fsanitize=address" LDFLAGS="-fsanitize=address" --enable-gcov
+../configure --enable-debug --enable-gcov
 cd -
