@@ -104,47 +104,50 @@ run_test()
         diff --color=always -u $ref_stdout $my_stdout > $1_$counter.diff
         DIFF_CODE=$?
 
-    # check if the error code is the same
-    if [ $REF_CODE != $MY_CODE ]; then
-        echo -ne "$RED RETURN$WHITE"
-        sucess=false
-    fi
+        grep -q $GREP_PATTERN $my_stderr
+        GREP_CODE=$?
 
-    # check if stdout is the same
-    if [ $DIFF_CODE != 0 ]; then
-        echo -ne "$RED STDOUT$WHITE"
-        sucess=false
-    fi
-
-    # check if stderr exists
-    if { [ -s $ref_stderr ] && [ ! -s $my_stderr ]; } ||
-        { [ ! -s $ref_stderr ] && [ -s $my_stderr ]; }; then
-            echo -ne "$RED STDERR$WHITE"
+        # check if the error code is the same
+        if [ $REF_CODE != $MY_CODE ]; then
+            echo -ne "$RED RETURN$WHITE"
             sucess=false
-    fi
+        fi
 
-    #check memory leaks
-    if [ $GREP_CODE -eq 0 ]; then
-        echo -ne "$RED MEMORY_LEAKS$WHITE"
-        sucess=false
-    fi
+        # check if stdout is the same
+        if [ $DIFF_CODE != 0 ]; then
+            echo -ne "$RED STDOUT$WHITE"
+            sucess=false
+        fi
 
-    # check if tests were sucess or not
-    if $sucess; then
-        echo -e "$GREEN OK$WHITE"
-        rm -f $1_$counter.diff
-    else
-        echo -ne "$YELLOW\n$line$WHITE"
-        [ -s $( realpath $1_$counter.diff ) ] && echo -ne "\n$(cat $(realpath $1_$counter.diff))$WHITE"
-        [ $REF_CODE != $MY_CODE ] && echo -ne "\nref return code: $REF_CODE\nmy return code: $MY_CODE"
-        echo
-        TOTAL_FAIL=$((TOTAL_FAIL + 1))
-        rm -f $1_$counter.diff
-    fi
+        # check if stderr exists
+        if { [ -s $ref_stderr ] && [ ! -s $my_stderr ]; } ||
+            { [ ! -s $ref_stderr ] && [ -s $my_stderr ]; }; then
+                echo -ne "$RED STDERR$WHITE"
+                sucess=false
+        fi
 
-    counter=$((counter + 1))
-done < "$1"
-echo
+        #check memory leaks
+        if [ $GREP_CODE -eq 0 ]; then
+            echo -ne "$RED MEMORY_LEAKS$WHITE"
+            sucess=false
+        fi
+
+        # check if tests were sucess or not
+        if $sucess; then
+            echo -e "$GREEN OK$WHITE"
+            rm -f $1_$counter.diff
+        else
+            echo -ne "$YELLOW\n$line$WHITE"
+            [ -s $( realpath $1_$counter.diff ) ] && echo -ne "\n$(cat $(realpath $1_$counter.diff))$WHITE"
+            [ $REF_CODE != $MY_CODE ] && echo -ne "\nref return code: $REF_CODE\nmy return code: $MY_CODE"
+            echo
+            TOTAL_FAIL=$((TOTAL_FAIL + 1))
+            rm -f $1_$counter.diff
+        fi
+
+        counter=$((counter + 1))
+    done < "$1"
+    echo
 }
 
 run_category()
