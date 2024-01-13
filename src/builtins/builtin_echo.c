@@ -1,6 +1,3 @@
-#define _POSIX_C_SOURCE 2
-
-#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,7 +20,8 @@ static int is_char_in_string(char c, char *str)
 /*
  * @brief: Check if argv is an option, and set the corresponding flag if it is
  */
-static int parse_options(char *argv, char *optionString, int *nflag, int *interpret)
+static int parse_options(char *argv, char *optionString, int *nflag,
+                         int *interpret)
 {
     if (argv == NULL)
     {
@@ -35,8 +33,9 @@ static int parse_options(char *argv, char *optionString, int *nflag, int *interp
 
     if (argv[j] == '-')
     {
-        // We check if all the characters in the argument are in the option string
-        // We don't want '-npe' to be interpreted as '-n -e', but as a non option argument (because 'p' is not in the option string)
+        // We check if all the characters in the argument are in the option
+        // string We don't want '-npe' to be interpreted as '-n -e', but as a
+        // non option argument (because 'p' is not in the option string)
         j++;
         while (argv[j] != '\0' && is_char_in_string(argv[j], optionString))
         {
@@ -50,18 +49,18 @@ static int parse_options(char *argv, char *optionString, int *nflag, int *interp
                 char c = argv[i];
                 switch (c)
                 {
-                    case 'n':
-                        *nflag = 1;
-                        break;
-                    case 'e':
-                        *interpret = 1;
-                        break;
-                    case 'E':
-                        *interpret = 0;
-                        break;
-                    default:
-                        // Should not happen
-                        break;
+                case 'n':
+                    *nflag = 1;
+                    break;
+                case 'e':
+                    *interpret = 1;
+                    break;
+                case 'E':
+                    *interpret = 0;
+                    break;
+                default:
+                    // Should not happen
+                    break;
                 }
             }
         }
@@ -75,7 +74,6 @@ static int parse_options(char *argv, char *optionString, int *nflag, int *interp
  */
 void interpret_print(char *str)
 {
-
     int len = strlen(str);
     for (int j = 0; j < len; j++)
     {
@@ -83,18 +81,18 @@ void interpret_print(char *str)
         {
             switch (str[j + 1])
             {
-                case 'n':
-                    printf("\n");
-                    break;
-                case 't':
-                    printf("\t");
-                    break;
-                case '\\':
-                    printf("\\");
-                    break;
-                default:
-                    printf("\\%c", str[j + 1]);
-                    break;
+            case 'n':
+                printf("\n");
+                break;
+            case 't':
+                printf("\t");
+                break;
+            case '\\':
+                printf("\\");
+                break;
+            default:
+                printf("\\%c", str[j + 1]);
+                break;
             }
             j++;
         }
