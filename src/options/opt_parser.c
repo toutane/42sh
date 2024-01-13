@@ -7,33 +7,45 @@ int parse_options(int argc, char *argv[], struct options *options)
 {
     int status = 0;
     int opt;
-    int option_index = 0;
 
-    // Define long options structure
-    static struct option long_options[] = { { "verbose", no_argument, 0, 'v' },
-                                            { "pretty-print", no_argument, 0,
-                                              'p' },
-                                            { 0, 0, 0, 0 } };
+    opterr = 0; // Disable getopt error messages
 
-    while ((opt = getopt_long(argc, argv, "c", long_options, &option_index))
-           != -1)
+    // Parse positional arguments
+    while ((opt = getopt(argc, argv, "acpv")) != -1)
     {
         switch (opt)
         {
+        case 'a':
+            options->ast_dot = 1;
+            break;
         case 'c':
             options->command = 1;
-            break;
-        case 'v':
-            options->verbose = 1;
             break;
         case 'p':
             options->pretty_print = 1;
             break;
+        case 'v':
+            options->verbose = 1;
+            break;
+        case '?':
+            status = 2;
+            fprintf(stderr, "42sh: -%c: invalid option\n", optopt);
+            break;
         default:
-            status = 1;
+            // Should never happen
+            status = 2;
             break;
         }
     }
+
+    // Skip '-' arguments
+    while (argc > optind && argv[optind][0] == '-')
+    {
+        optind++;
+    }
+
+    // Put first positional argument in options->input
+    options->input = argv[optind];
 
     return status;
 }

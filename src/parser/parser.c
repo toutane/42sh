@@ -117,13 +117,31 @@ static void fill_list_node(struct ast *list_node, struct ast *sc_node)
     list_node->children[list_node->nb_child - 1] = sc_node;
 }
 
+static void init_if_node(struct ast *if_node)
+{
+    // Init if_node
+    if_node->type = AST_CONDITION;
+    if_node->nb_child = 3;
+    if_node->children = calloc(if_node->nb_child, sizeof(struct ast *));
+    // TODO: Check for NULL after allocation try
+}
+
 static void fill_if_node(struct ast *if_node, struct ast *node)
 {
-    if_node->nb_child += 1;
-    if_node->children =
-        realloc(if_node->children, sizeof(struct ast *) * if_node->nb_child);
-    // TODO: Check for NULL after allocation try
-    if_node->children[if_node->nb_child - 1] = node;
+    if (if_node->nb_child == 0)
+    {
+        fprintf(stderr, "Uninitialized if_node");
+        return;
+    }
+    for (size_t i = 0; i < if_node->nb_child; i++)
+    {
+        if (!if_node->children[i])
+        {
+            if_node->children[i] = node;
+            return;
+        }
+    }
+    fprintf(stderr, "If node can't have more than 3 children\n");
 }
 
 enum parser_status parse(struct ast **res, struct lexer *lexer)
@@ -243,38 +261,41 @@ static enum parser_status parse_rule_if(struct ast **res, struct lexer *lexer)
     {
         // Create IF node
         struct ast *if_node = calloc(1, sizeof(struct ast));
-        if_node->type = AST_CONDITION;
+        init_if_node(if_node);
 
         // Pop 'if'
         lexer_pop(lexer);
 
-        if (parse_compound_list(res, lexer) == PARSER_OK
-            && (lexer_peek(lexer).type == TOKEN_THEN))
+        if (parse_compound_list(res, lexer) == PARSER_OK)
         {
             fill_if_node(if_node, *res);
-
-            // Pop 'then'
-            lexer_pop(lexer);
-
-            if (parse_compound_list(res, lexer) == PARSER_OK)
+            if (lexer_peek(lexer).type == TOKEN_THEN)
             {
-                fill_if_node(if_node, *res);
+                // Pop 'then'
+                lexer_pop(lexer);
 
-                if (parse_else_clause(res, lexer) == PARSER_OK)
+                if (parse_compound_list(res, lexer) == PARSER_OK)
                 {
                     fill_if_node(if_node, *res);
-                }
-                if (lexer_peek(lexer).type == TOKEN_FI)
-                {
-                    // Pop 'fi'
-                    lexer_pop(lexer);
 
-                    *res = if_node;
-                    return PARSER_OK;
+                    if (parse_else_clause(res, lexer) == PARSER_OK)
+                    {
+                        fill_if_node(if_node, *res);
+                    }
+                    if (lexer_peek(lexer).type == TOKEN_FI)
+                    {
+                        // Pop 'fi'
+                        lexer_pop(lexer);
+
+                        *res = if_node;
+                        return PARSER_OK;
+                    }
                 }
             }
         }
-        free(if_node);
+        ast_free(if_node);
+        *res = NULL;
+        // *res = if_node;
     }
     return PARSER_UNEXPECTED_TOKEN;
 }
@@ -299,33 +320,36 @@ static enum parser_status parse_else_clause(struct ast **res,
     {
         // Create IF node
         struct ast *elif_node = calloc(1, sizeof(struct ast));
-        elif_node->type = AST_CONDITION;
+        init_if_node(elif_node);
 
         // Pop 'elif'
         lexer_pop(lexer);
 
-        if (parse_compound_list(res, lexer) == PARSER_OK
-            && lexer_peek(lexer).type == TOKEN_THEN)
+        if (parse_compound_list(res, lexer) == PARSER_OK)
         {
             fill_if_node(elif_node, *res);
-
-            // Pop 'then'
-            lexer_pop(lexer);
-
-            if (parse_compound_list(res, lexer) == PARSER_OK)
+            if (lexer_peek(lexer).type == TOKEN_THEN)
             {
-                fill_if_node(elif_node, *res);
+                // Pop 'then'
+                lexer_pop(lexer);
 
-                if (parse_else_clause(res, lexer) == PARSER_OK)
+                if (parse_compound_list(res, lexer) == PARSER_OK)
                 {
                     fill_if_node(elif_node, *res);
-                }
 
-                *res = elif_node;
-                return PARSER_OK;
+                    if (parse_else_clause(res, lexer) == PARSER_OK)
+                    {
+                        fill_if_node(elif_node, *res);
+                    }
+
+                    *res = elif_node;
+                    return PARSER_OK;
+                }
             }
         }
-        free(elif_node);
+        ast_free(elif_node);
+        *res = NULL;
+        // *res = elif_node;
     }
     return PARSER_UNEXPECTED_TOKEN;
 }
@@ -380,7 +404,6 @@ static enum parser_status parse_compound_list(struct ast **res,
         *res = list_node;
         return PARSER_OK;
     }
-
     return PARSER_UNEXPECTED_TOKEN;
 }
 

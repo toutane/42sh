@@ -1,0 +1,11 @@
+if false; then
+  echo coucou
+  echo hi
+elif false; then
+  echo tata;
+        echo tata           
+  echo hu;      echo ha;
+else
+  echo k; echo hi;
+  echo hi
+fi

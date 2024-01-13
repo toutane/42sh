@@ -1,4 +1,5 @@
-if false; true; then
-  echo a
-  echo b; echo c;
+if true; then
+  echo coucou;
+else
+  echo tata;
 fi
