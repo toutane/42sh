@@ -1,11 +1,13 @@
 #ifndef AST_H
 #define AST_H
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 
 #include "../builtins/builtins.h"
+#include "../error_handling/error_handling_execvp.h"
 #include "../lexer/token.h"
 
 enum ast_type
