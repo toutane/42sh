@@ -52,25 +52,3 @@ int builtin_true(int argc, char *argv[])
     }
     return 0;
 }
-
-int builtin_echo(int argc, char *argv[])
-{
-    // here we check if there is a writing error - case when some words are
-    // writen and other not is not tyet implemented
-    for (int i = 1; i < argc - 1; i++)
-    {
-        printf("%s ", argv[i]);
-    }
-    if (argc > 1)
-    {
-        printf("%s", argv[argc - 1]);
-    }
-
-    int status = printf("\n");
-    if (status == EOF)
-    {
-        fprintf(stderr, "42sh: writing error");
-    }
-
-    return status == EOF ? EXIT_FAILURE : EXIT_SUCCESS;
-}
