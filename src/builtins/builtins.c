@@ -1,4 +1,5 @@
 #define NB_BUILTINS 3
+#define BUILTIN_ERROR 2
 
 #include "builtins.h"
 
