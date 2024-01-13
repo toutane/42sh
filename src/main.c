@@ -10,13 +10,16 @@
 #include "lexer/token.h"
 #include "options/opt_parser.h"
 #include "parser/parser.h"
+#include "utils/utils.h"
 
 int main(int argc, char *argv[])
 {
     int status; // Gather error status, passed to functions
 
     // Parse command line options
-    struct options options = { .command = 0, .pretty_print = 0, .verbose = 0 };
+    struct options options = {
+        .ast_dot = 0, .command = 0, .pretty_print = 0, .verbose = 0
+    };
     status = parse_options(argc, argv, &options);
     if (status != 0)
     {
@@ -44,6 +47,16 @@ int main(int argc, char *argv[])
     if (options.pretty_print)
     {
         ast_pretty_print(ast);
+    }
+
+    if (options.ast_dot)
+    {
+        status = create_dot_file(ast, "ast.dot");
+        if (status != 0)
+        {
+            free_all(ast, lexer, stream);
+            return EXIT_FAILURE;
+        }
     }
 
     status = ast_eval(ast);
