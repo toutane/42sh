@@ -10,24 +10,27 @@
 #include "lexer/token.h"
 #include "options/opt_parser.h"
 #include "parser/parser.h"
+#include "utils/utils.h"
 
 int main(int argc, char *argv[])
 {
     int status; // Gather error status, passed to functions
 
     // Parse command line options
-    struct options options = { .command = 0, .pretty_print = 0, .verbose = 0 };
+    struct options options = {
+        .ast_dot = 0, .command = 0, .pretty_print = 0, .verbose = 0
+    };
     status = parse_options(argc, argv, &options);
     if (status != 0)
     {
-        return EXIT_FAILURE;
+        return status;
     }
 
     // get input stream according to options
-    struct stream_info *stream = get_stream(argc, argv, &options, &status);
+    struct stream_info *stream = get_stream(argc, &options, &status);
     if (stream == NULL)
     {
-        return status != 0 ? EXIT_FAILURE
+        return status != 0 ? status
                            : EXIT_SUCCESS; // If the input string is NULL, the
                                            // program should exit with success
     }
@@ -37,13 +40,23 @@ int main(int argc, char *argv[])
 
     if (parse(&ast, lexer) != PARSER_OK)
     {
-        error(ast, lexer, stream, "42sh: grammar error during parsing");
+        error(ast, lexer, stream, "42sh: grammar error during parsing\n");
         return GRAMMAR_ERROR;
     }
 
     if (options.pretty_print)
     {
         ast_pretty_print(ast);
+    }
+
+    if (options.ast_dot)
+    {
+        status = create_dot_file(ast, "ast.dot");
+        if (status != 0)
+        {
+            free_all(ast, lexer, stream);
+            return EXIT_FAILURE;
+        }
     }
 
     status = ast_eval(ast);

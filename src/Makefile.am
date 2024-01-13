@@ -10,6 +10,7 @@ bin_PROGRAMS = 42sh
 				$(top_builddir)/src/ast/libast.a \
 				$(top_builddir)/src/io_backend/libio_backend.a \
 				$(top_builddir)/src/options/liboptions.a \
+			 	$(top_builddir)/src/utils/libutils.a \
 				$(top_builddir)/src/error_handling/liberrorhandling.a \
 				$(top_builddir)/src/builtins/libbuiltins.a
 42sh_LDFLAGS =	$(DEBUG_LDFLAGS) \
@@ -21,5 +22,6 @@ SUBDIRS = 	lexer \
 			ast \
 			io_backend \
 			options \
+			utils \
 			error_handling \
 			builtins

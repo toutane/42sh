@@ -173,7 +173,7 @@ static void delimit_token(struct lexer *lexer)
         }
 
         // Token Recognition Algorithm Rule 8
-        if (isspace(cur_char) && !is_inside_quotes)
+        if (isblank(cur_char) && !is_inside_quotes)
         {
             stream_pop(stream);
             if (lexer->cur_tok.type == TOKEN_WORD)

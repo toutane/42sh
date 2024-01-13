@@ -6,9 +6,11 @@
  */
 struct options
 {
+    int ast_dot;
     int command;
     int pretty_print;
     int verbose;
+    char *input;
 };
 
 /*
