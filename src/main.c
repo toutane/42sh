@@ -54,9 +54,7 @@ int main(int argc, char *argv[])
         status = create_dot_file(ast, "ast.dot");
         if (status != 0)
         {
-            ast_free(ast);
-            lexer_free(lexer);
-            stream_free(stream);
+            free_all(ast, lexer, stream);
             return EXIT_FAILURE;
         }
     }
