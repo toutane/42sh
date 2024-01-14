@@ -7,10 +7,10 @@
 #include "error_handling/error_handling.h"
 #include "io_backend/io_backend.h"
 #include "lexer/lexer.h"
-#include "lexer/token.h"
+#include "utils/token/token.h"
 #include "options/opt_parser.h"
 #include "parser/parser.h"
-#include "utils/utils.h"
+#include "utils/dot_file/dot_file.h"
 
 int main(int argc, char *argv[])
 {

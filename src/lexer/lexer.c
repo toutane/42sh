@@ -6,8 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "token.h"
-
 struct lexer *lexer_new(struct stream_info *stream)
 {
     struct lexer *lexer = calloc(1, sizeof(struct lexer));

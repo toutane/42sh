@@ -6,9 +6,9 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 
-#include "../builtins/builtins.h"
-#include "../error_handling/error_handling_execvp.h"
-#include "../lexer/token.h"
+#include "builtins/builtins.h"
+#include "error_handling/error_handling_execvp.h"
+#include "utils/token/token.h"
 
 enum ast_type
 {

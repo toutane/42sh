@@ -3,8 +3,8 @@
 
 #include <stddef.h>
 
-#include "../io_backend/io_backend.h"
-#include "token.h"
+#include "io_backend/io_backend.h"
+#include "utils/token/token.h"
 
 /**
  * @file lexer.h
