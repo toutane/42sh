@@ -1,1 +1,0 @@
-run_test simple_commands_1.test
