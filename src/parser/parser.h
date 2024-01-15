@@ -14,6 +14,14 @@ enum parser_status
     PARSER_UNEXPECTED_TOKEN,
 };
 
+void fill_sc_node(struct ast *sc_node, struct lexer *lexer);
+
+void fill_list_node(struct ast *list_node, struct ast *sc_node);
+
+void init_if_node(struct ast *if_node);
+
+void fill_if_node(struct ast *if_node, struct ast *node);
+
 /**
  * @brief Parse either a list, or newline
  *
