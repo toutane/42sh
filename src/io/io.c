@@ -1,6 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
 
-#include "io_backend.h"
+#include "io.h"
 
 #include <errno.h>
 #include <getopt.h>
@@ -10,6 +10,13 @@
 
 struct stream_info *get_stream(int argc, struct options *opts, int *err)
 {
+    if (argc < 0 || opts == NULL || err == NULL)
+    {
+        fprintf(stderr, "42sh: get_stream: invalid arguments\n");
+        *err = 1;
+        return NULL;
+    }
+
     // Input from string (with '-c' option)
     if (opts->command)
     {
@@ -19,16 +26,30 @@ struct stream_info *get_stream(int argc, struct options *opts, int *err)
             *err = 2;
             return NULL;
         }
+
+        if (opts->verbose)
+        {
+            printf("Input from string: \"%s\"\n", opts->input);
+        }
+
         return stream_new(NULL, opts->input, err);
     }
 
     // Input from stdin
-    if (argc < 2)
+    if (opts->input == NULL)
     {
+        if (opts->verbose)
+        {
+            printf("Input from stdin\n");
+        }
         return stream_new(NULL, NULL, err);
     }
 
     // Input from file
+    if (opts->verbose)
+    {
+        printf("Input from file: \"%s\"\n", opts->input);
+    }
     return stream_new(opts->input, NULL, err);
 }
 

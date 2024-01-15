@@ -5,28 +5,31 @@
 
 #include "ast/ast.h"
 #include "error_handling/error_handling.h"
-#include "io_backend/io_backend.h"
+#include "io/io.h"
 #include "lexer/lexer.h"
 #include "utils/token/token.h"
 #include "options/opt_parser.h"
 #include "parser/parser.h"
 #include "utils/dot_file/dot_file.h"
+#include "utils/printers/printers.h"
 
 int main(int argc, char *argv[])
 {
     int status; // Gather error status, passed to functions
 
-    // Parse command line options
+    // Options structure, filled by parse_options
     struct options options = {
         .ast_dot = 0, .command = 0, .pretty_print = 0, .verbose = 0
     };
+
+    // Parse command line options
     status = parse_options(argc, argv, &options);
     if (status != 0)
     {
         return status;
     }
 
-    // get input stream according to options
+    // Get input stream according to options
     struct stream_info *stream = get_stream(argc, &options, &status);
     if (stream == NULL)
     {
@@ -35,7 +38,7 @@ int main(int argc, char *argv[])
                                            // program should exit with success
     }
 
-    struct lexer *lexer = lexer_new(stream);
+    struct lexer *lexer = lexer_new(stream, &options);
     struct ast *ast = NULL;
 
     if (parse(&ast, lexer) != PARSER_OK)
@@ -61,7 +64,6 @@ int main(int argc, char *argv[])
 
     status = ast_eval(ast);
 
-    // clean
     free_all(ast, lexer, stream);
 
     return status;

@@ -3,8 +3,9 @@
 
 #include <stddef.h>
 
-#include "io_backend/io_backend.h"
-#include "utils/token/token.h"
+#include "../options/opt_parser.h"
+#include "../io/io.h"
+#include "../utils/token/token.h"
 
 /**
  * @file lexer.h
@@ -22,6 +23,7 @@
 
 struct lexer
 {
+    struct options *opts; // The options of the program
     struct stream_info *stream; // The input stream
     struct token cur_tok; // The next token, if processed
     int must_parse_next_tok; // 1 if the next token must be parsed, 0 otherwise
@@ -30,7 +32,7 @@ struct lexer
 /**
  * @brief Creates a new lexer given an input string.
  */
-struct lexer *lexer_new(struct stream_info *stream);
+struct lexer *lexer_new(struct stream_info *stream, struct options *opts);
 
 /**
  ** @brief Free the given lexer, but not its input.

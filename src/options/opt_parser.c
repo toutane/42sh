@@ -1,7 +1,21 @@
 #include "opt_parser.h"
+#include "../utils/printers/printers.h"
 
 #include <getopt.h>
 #include <stdio.h>
+
+/*
+ * Print usage message
+ */
+static void print_usage()
+{
+    printf("Usage: 42sh [options] [script] [arguments...]\n");
+    printf("Options:\n");
+    printf("  -a: Output AST in dot format\n");
+    printf("  -c: Execute input as a command\n");
+    printf("  -p: Pretty print AST\n");
+    printf("  -v: Verbose mode\n");
+}
 
 int parse_options(int argc, char *argv[], struct options *options)
 {
@@ -36,6 +50,12 @@ int parse_options(int argc, char *argv[], struct options *options)
             status = 2;
             break;
         }
+
+        if (status != 0)
+        {
+            print_usage();
+            return status;
+        }
     }
 
     // Skip '-' arguments
@@ -47,5 +67,9 @@ int parse_options(int argc, char *argv[], struct options *options)
     // Put first positional argument in options->input
     options->input = argv[optind];
 
+    if (options->verbose)
+    {
+        options_print(options);
+    }
     return status;
 }

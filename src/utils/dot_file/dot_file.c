@@ -70,7 +70,7 @@ static void generate_dot_file(struct ast *node, FILE *file)
 
 int create_dot_file(struct ast *ast, char *filename)
 {
-    printf("42sh: Generate dot formated AST in \"%s\"\n", filename);
+    printf("Output AST in dot format (in \"%s\")\n", filename);
     FILE *file = fopen(filename, "w");
     if (file == NULL)
     {
