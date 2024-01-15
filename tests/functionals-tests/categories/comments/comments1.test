@@ -7,3 +7,11 @@ hu ;;;;;;# hi #
 hu ############# hi 
 echo                                ############# hi 
 echo \#escaped "#"quoted not#first #commented
+# first part of a line
+#sljf
+#!/bin/sh
+    #ljaflsjf asljf sl fecho echo toto; echo toto lala lalla / sh
+echo '#un commentaire dans des quoted'
+echo 'hel'#lsaf
+echo 'hel' #lsaf
+#
