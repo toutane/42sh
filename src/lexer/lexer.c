@@ -166,6 +166,10 @@ static void delimit_token(struct lexer *lexer)
         if (cur_char == EOF)
         {
             handle_end_of_file(lexer);
+            if (is_inside_quotes)
+            {
+                lexer->cur_tok.type = TOKEN_ERROR; // Unexpected EOF while looking for matching single quote
+            }
             return;
         }
 
