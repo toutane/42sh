@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "dot_file.h"
 
 #define LIGHT_BLUE "#b0d5f5"
 #define DARK_BLUE "#1588ed"

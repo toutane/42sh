@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#include "../ast/ast.h"
+#include "ast/ast.h"
 
 /*
  * @brief Create a dot file from an ast

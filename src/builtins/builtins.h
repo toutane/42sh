@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../ast/ast.h"
-#include "../lexer/token.h"
+#include "ast/ast.h"
+#include "utils/token/token.h"
 
 struct builtin_matchs
 {
