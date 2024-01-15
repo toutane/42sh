@@ -9,6 +9,7 @@
 enum token_type
 {
     TOKEN_NONE, // no token
+    TOKEN_ERROR, // error token (when a character is unexpected)
 
     TOKEN_WORD, // a word
     TOKEN_NEWLINE, // '\n'
