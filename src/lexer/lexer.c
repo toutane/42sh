@@ -6,7 +6,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct lexer *lexer_new(struct stream_info *stream)
+#define PRINT_TOKEN(verbose, tok, action) if (verbose) \
+{ \
+    printf("[LEXER] "action" token: %s\n", token_type_to_str(tok.type)); \
+}
+
+struct lexer *lexer_new(struct stream_info *stream, struct options *opts)
 {
     struct lexer *lexer = calloc(1, sizeof(struct lexer));
     if (lexer == NULL)
@@ -15,10 +20,16 @@ struct lexer *lexer_new(struct stream_info *stream)
         return NULL;
     }
 
+    lexer->opts = opts;
     lexer->stream = stream;
     lexer->cur_tok.type = TOKEN_NONE;
     lexer->cur_tok.value = NULL;
     lexer->must_parse_next_tok = 1;
+
+    if (lexer->opts->verbose)
+    {
+        printf("[LEXER] Lexer created\n");
+    }
 
     return lexer;
 }
@@ -36,7 +47,14 @@ void lexer_free(struct lexer *lexer)
         free(lexer->cur_tok.value); // Free the current token value if any
     }
 
+    int is_verbose = lexer->opts->verbose;
+
     free(lexer);
+
+    if (is_verbose)
+    {
+        printf("[LEXER] Lexer freed\n");
+    }
 }
 
 void fill_token(struct token *tok, enum token_type type, char *value)
@@ -282,6 +300,8 @@ struct token parse_input_for_tok(struct lexer *lexer)
 
 struct token lexer_peek(struct lexer *lexer)
 {
+    int is_verbose = lexer->opts->verbose;
+
     if (lexer->must_parse_next_tok)
     {
         if (lexer->cur_tok.value != NULL)
@@ -290,15 +310,22 @@ struct token lexer_peek(struct lexer *lexer)
         }
 
         lexer->must_parse_next_tok = 0;
-        return parse_input_for_tok(lexer);
+        parse_input_for_tok(lexer); // Update the current token
+        PRINT_TOKEN(is_verbose, lexer->cur_tok, "Peek");
+        return lexer->cur_tok;
     }
 
+    PRINT_TOKEN(is_verbose, lexer->cur_tok, "Peek");
     return lexer->cur_tok;
 }
 
 struct token lexer_pop(struct lexer *lexer)
 {
     lexer_peek(lexer);
+
+    // Print the token if verbose mode is enabled
+    PRINT_TOKEN(lexer->opts->verbose, lexer->cur_tok, "Pop");
+
     lexer->must_parse_next_tok = 1;
     return lexer->cur_tok;
 }

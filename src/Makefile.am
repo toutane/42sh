@@ -8,7 +8,7 @@ bin_PROGRAMS = 42sh
 42sh_LDADD = 	$(top_builddir)/src/lexer/liblexer.a \
 				$(top_builddir)/src/parser/libparser.a \
 				$(top_builddir)/src/ast/libast.a \
-				$(top_builddir)/src/io_backend/libio_backend.a \
+				$(top_builddir)/src/io/libio.a \
 				$(top_builddir)/src/options/liboptions.a \
 			 	$(top_builddir)/src/utils/libutils.a \
 				$(top_builddir)/src/error_handling/liberrorhandling.a \
@@ -20,7 +20,7 @@ bin_PROGRAMS = 42sh
 SUBDIRS = 	lexer \
 			parser \
 			ast \
-			io_backend \
+			io \
 			options \
 			utils \
 			error_handling \
