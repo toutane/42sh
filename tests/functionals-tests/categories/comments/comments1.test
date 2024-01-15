@@ -1,0 +1,9 @@
+echo hi# HELLO WORLD
+echo hi## HELLO WORLD
+echo hi # hi # HELLO WORLD
+echo # hi # HELLO WORLD
+hu # hi # 
+hu ;;;;;;# hi # 
+hu ############# hi 
+echo                                ############# hi 
+echo \#escaped "#"quoted not#first #commented
