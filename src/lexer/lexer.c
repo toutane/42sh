@@ -6,10 +6,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define PRINT_TOKEN(verbose, tok, action) if (verbose) \
-{ \
-    printf("[LEXER] "action" token: %s\n", token_type_to_str(tok.type)); \
-}
+#define PRINT_TOKEN(verbose, tok, action)                                      \
+    if (verbose)                                                               \
+    {                                                                          \
+        printf("[LEXER] " action " token: %s\n", token_type_to_str(tok.type)); \
+    }
 
 struct lexer *lexer_new(struct stream_info *stream, struct options *opts)
 {
@@ -141,7 +142,7 @@ static void handle_comment(struct lexer *lexer)
 {
     struct stream_info *stream = lexer->stream;
     stream_pop(stream);
-    while (stream_peek(stream) != '\n')
+    while (stream_peek(stream) != '\n' && stream_peek(stream) != EOF)
     {
         stream_pop(stream);
     }
@@ -159,7 +160,9 @@ static void delimit_token(struct lexer *lexer)
     {
         char cur_char = stream_peek(stream);
 
-        // Token Recognition Algorithm Rule 1
+        /* Token Recognition Algorithm Rule 1
+         * If the end of the input stream is encountered, the current token
+         * shall be delimited. */
         if (cur_char == EOF)
         {
             handle_end_of_file(lexer);
@@ -188,7 +191,7 @@ static void delimit_token(struct lexer *lexer)
             return;
         }
 
-        // Token Recognition Algorithm Rule 8
+        // Token Recognition Algorithm Rule 7.2
         if (isblank(cur_char) && !is_inside_quotes)
         {
             stream_pop(stream);
@@ -199,7 +202,9 @@ static void delimit_token(struct lexer *lexer)
             continue;
         }
 
-        // Token Recognition Algorithm Rule 9
+        /* Token Recognition Algorithm Rule 8
+         * If the previous token is part of a word, the current character is
+         * appended to the that word. */
         if (lexer->cur_tok.type == TOKEN_WORD)
         {
             append_char_to_token_value(&lexer->cur_tok, cur_char);
@@ -207,14 +212,19 @@ static void delimit_token(struct lexer *lexer)
             continue;
         }
 
-        // Token Recognition Algorithm Rule 10
+        /* Token Recognition Algorithm Rule 9
+         * If the current character is a '#', it and all subsequent characters
+         * up to, but excluding, the next <newline> shall be discarded as a
+         * comment. The <newline> that ends the line is not considered part of
+         * the comment. */
         if (cur_char == '#')
         {
             handle_comment(lexer);
             continue;
         }
 
-        // Token Recognition Algorithm Rule 11
+        /* Token Recognition Algorithm Rule 10
+         * The current character is used as the start of a new word. */
         fill_token(&lexer->cur_tok, TOKEN_WORD, NULL);
         append_char_to_token_value(&lexer->cur_tok, cur_char);
         stream_pop(stream);
