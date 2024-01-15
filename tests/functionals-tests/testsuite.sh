@@ -21,67 +21,78 @@ ref_stderr=/tmp/.ref_stderr
 my_stdout=/tmp/.my_stdout
 my_stderr=/tmp/.my_stderr
 
+timeout_time=2s
+
 run_test_file()
 {
     [ -e $1 ] || echo "Missing file $1" 1>&2
     sucess=true
 
     TOTAL_RUN=$((TOTAL_RUN + 1))
+    WAS_TIMEOUT=0
 
-  # Run ref and our program
-  echo -ne "$BLUE-->>$WHITE $1 - test on file $1...$WHITE"
-  bash --posix "$1" > $ref_stdout 2> $ref_stderr
-  REF_CODE=$?
+      # Run ref and our program
+      echo -ne "$BLUE-->>$WHITE $1 - test on file $1...$WHITE"
+      bash --posix "$1" > $ref_stdout 2> $ref_stderr
+      REF_CODE=$?
 
-  $BINARY "$1" > $my_stdout 2> $my_stderr
-  MY_CODE=$?
+      MY_CODE=-1
+      timeout $timeout_time $BINARY "$1" > $my_stdout 2> $my_stderr
+      MY_CODE=$?
+      [ $MY_CODE -eq 124 ] && WAS_TIMEOUT=1
 
-  # Compare ref and our program return stdout stderr
-  diff --color=always -u $ref_stdout $my_stdout > $1.diff
-  DIFF_CODE=$?
+      # Compare ref and our program return stdout stderr
+      diff --color=always -u $ref_stdout $my_stdout > $1.diff
+      DIFF_CODE=$?
 
-  grep -q $GREP_PATTERN $my_stderr
-  GREP_CODE=$?
+      grep -q $GREP_PATTERN $my_stderr
+      GREP_CODE=$?
 
-  # check if the error code is the same
-  if [ $REF_CODE != $MY_CODE ]; then
-      echo -ne "$RED RETURN$WHITE"
-      sucess=false
-  fi
-
-  # check if stdout is the same
-  if [ $DIFF_CODE != 0 ]; then
-      echo -ne "$RED STDOUT$WHITE"
-      sucess=false
-  fi
-
-  # check if stderr exists
-  if { [ -s $ref_stderr ] && [ ! -s $my_stderr ]; } ||
-      { [ ! -s $ref_stderr ] && [ -s $my_stderr ]; }; then
-          echo -ne "$RED STDERR$WHITE"
+      #check timeout
+      if [ $WAS_TIMEOUT -eq 1 ]; then
+          echo -ne "$RED TIMEOUT$WHITE"
           sucess=false
-  fi
+      fi
 
-  #check memory leaks
-  if [ $GREP_CODE -eq 0 ]; then
-      echo -ne "$RED MEMORY_LEAKS$WHITE"
-      sucess=false
-  fi
+      # check if the error code is the same
+      if { [ $REF_CODE != $MY_CODE ] && [ $WAS_TIMEOUT -eq 0 ]; }; then
+          echo -ne "$RED RETURN$WHITE"
+          sucess=false
+      fi
 
-  # check if tests were sucess or not
-  if $sucess; then
-      echo -e "$GREEN OK$WHITE"
-      rm -f $1.diff
-  else
-      echo -ne "$YELLOW\n$1$WHITE"
-      [ -s $( realpath $1.diff ) ] && echo -ne "\n$(cat $(realpath $1.diff))$WHITE"
-      [ $REF_CODE != $MY_CODE ] && echo -ne "\nref return code: $REF_CODE\nmy return code: $MY_CODE"
+      # check if stdout is the same
+      if { [ $DIFF_CODE != 0 ] && [ $WAS_TIMEOUT -eq 0 ]; }; then
+          echo -ne "$RED STDOUT$WHITE"
+          sucess=false
+      fi
+
+      # check if stderr exists
+      if { [ -s $ref_stderr ] && [ ! -s $my_stderr ] && [ $WAS_TIMEOUT -eq 0 ]; } ||
+          { [ ! -s $ref_stderr ] && [ -s $my_stderr ]; }; then
+              echo -ne "$RED STDERR$WHITE"
+              sucess=false
+      fi
+
+      #check memory leaks
+      if [ $GREP_CODE -eq 0 ]; then
+          echo -ne "$RED MEMORY_LEAKS$WHITE"
+          sucess=false
+      fi
+
+      # check if tests were sucess or not
+      if $sucess; then
+          echo -e "$GREEN OK$WHITE"
+          rm -f $1.diff
+      else
+          echo -ne "$YELLOW\n$1$WHITE"
+          [ -s $( realpath $1.diff ) ] && echo -ne "\n$(cat $(realpath $1.diff))$WHITE"
+          [ $REF_CODE != $MY_CODE ] && echo -ne "\nref return code: $REF_CODE\nmy return code: $MY_CODE"
+          echo
+          TOTAL_FAIL=$((TOTAL_FAIL + 1))
+          rm -f $1.diff
+      fi
+
       echo
-      TOTAL_FAIL=$((TOTAL_FAIL + 1))
-      rm -f $1.diff
-  fi
-
-  echo
 }
 
 run_test()
@@ -92,14 +103,16 @@ run_test()
     counter=1
 
     while read line; do
+        WAS_TIMEOUT=0
         TOTAL_RUN=$((TOTAL_RUN + 1))
 
         echo -ne "$BLUE-->>$WHITE $1 - test $counter...$WHITE"
         bash --posix -c "$line" > $ref_stdout 2> $ref_stderr
         REF_CODE=$?
 
-        $BINARY -c "$line" > $my_stdout 2> $my_stderr
+        timeout $timeout_time $BINARY -c "$line" > $my_stdout 2> $my_stderr
         MY_CODE=$?
+        [ $MY_CODE -eq 124 ] && WAS_TIMEOUT=1
 
         diff --color=always -u $ref_stdout $my_stdout > $1_$counter.diff
         DIFF_CODE=$?
@@ -107,20 +120,26 @@ run_test()
         grep -q $GREP_PATTERN $my_stderr
         GREP_CODE=$?
 
+        # check timeouts
+        if [ $WAS_TIMEOUT -eq 1 ]; then
+            echo -ne "$RED TIMEOUT$WHITE"
+            sucess=false
+        fi
+
         # check if the error code is the same
-        if [ $REF_CODE != $MY_CODE ]; then
+        if { [ $REF_CODE != $MY_CODE ] && [ $WAS_TIMEOUT -eq 0 ]; }; then
             echo -ne "$RED RETURN$WHITE"
             sucess=false
         fi
 
         # check if stdout is the same
-        if [ $DIFF_CODE != 0 ]; then
+        if { [ $DIFF_CODE != 0 ] && [ $WAS_TIMEOUT -eq 0 ]; }; then
             echo -ne "$RED STDOUT$WHITE"
             sucess=false
         fi
 
         # check if stderr exists
-        if { [ -s $ref_stderr ] && [ ! -s $my_stderr ]; } ||
+        if { [ -s $ref_stderr ] && [ ! -s $my_stderr ] && [ $WAS_TIMEOUT -eq 0 ]; } ||
             { [ ! -s $ref_stderr ] && [ -s $my_stderr ]; }; then
                 echo -ne "$RED STDERR$WHITE"
                 sucess=false
