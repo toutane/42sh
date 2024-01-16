@@ -2,7 +2,7 @@
 
 int execution_loop(struct options *opts, struct stream_info *stream)
 {
-    int status;
+    int status = 0;
 
     // Create the lexer
     struct lexer *lexer = lexer_new(stream, opts);
