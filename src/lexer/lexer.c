@@ -298,71 +298,6 @@ static void delimit_token(struct lexer *lexer)
     }
 }
 
-static void categorize_token(struct lexer *lexer)
-{
-    char *val = lexer->cur_tok.value;
-    // TODO: refactor that with a table
-    if (lexer->cur_tok.type == TOKEN_WORD)
-    {
-        if (strcmp(val, "if") == 0)
-        {
-            lexer->cur_tok.type = TOKEN_IF;
-        }
-        else if (strcmp(val, "then") == 0)
-        {
-            lexer->cur_tok.type = TOKEN_THEN;
-        }
-        else if (strcmp(val, "else") == 0)
-        {
-            lexer->cur_tok.type = TOKEN_ELSE;
-        }
-        else if (strcmp(val, "elif") == 0)
-        {
-            lexer->cur_tok.type = TOKEN_ELIF;
-        }
-        else if (strcmp(val, "fi") == 0)
-        {
-            lexer->cur_tok.type = TOKEN_FI;
-        }
-    }
-
-    if (lexer->cur_tok.type == TOKEN_OPERATOR)
-    {
-        if (strcmp(val, ">") == 0)
-        {
-            lexer->cur_tok.type = TOKEN_GREAT;
-        }
-        else if (strcmp(val, "<") == 0)
-        {
-            lexer->cur_tok.type = TOKEN_LESS;
-        }
-        else if (strcmp(val, ">>") == 0)
-        {
-            lexer->cur_tok.type = TOKEN_DGREAT;
-        }
-        // else if (strcmp(val, "<<") == 0) // Not implemented yet
-        //{
-        // lexer->cur_tok.type = TOKEN_DLESS;
-        //}
-        else if (strcmp(val, ">&") == 0)
-        {
-            lexer->cur_tok.type = TOKEN_GREATAND;
-        }
-        else if (strcmp(val, "<&") == 0)
-        {
-            lexer->cur_tok.type = TOKEN_LESSAND;
-        }
-        else if (strcmp(val, "<>") == 0)
-        {
-            lexer->cur_tok.type = TOKEN_LESSGREAT;
-        }
-        else if (strcmp(val, ">|") == 0)
-        {
-            lexer->cur_tok.type = TOKEN_CLOBBER;
-        }
-    }
-}
-
 static void single_quote_expansion(struct lexer *lexer)
 {
     if (lexer->cur_tok.type != TOKEN_WORD)
@@ -406,7 +341,7 @@ static void single_quote_expansion(struct lexer *lexer)
 struct token parse_input_for_tok(struct lexer *lexer)
 {
     delimit_token(lexer);
-    categorize_token(lexer);
+    categorize_token(&(lexer->cur_tok));
     single_quote_expansion(lexer);
     return lexer->cur_tok;
 }

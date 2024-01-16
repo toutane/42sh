@@ -22,7 +22,6 @@ enum token_type
     TOKEN_GREAT, // '>'
     TOKEN_LESS, // '<'
     TOKEN_DGREAT, // '>>'
-    // TOKEN_DLESS, // '<<'
     TOKEN_LESSAND, // '<&'
     TOKEN_GREATAND, // '>&'
     TOKEN_LESSGREAT, // '<>'
@@ -50,6 +49,11 @@ struct token
  * @brief Return the string representation of a token type
  */
 char *token_type_to_str(enum token_type type);
+
+/*
+ * @brief Update the type of the given token based on its value
+ */
+void categorize_token(struct token *tok);
 
 /*
  * @brief Return true if the token is a reserved word

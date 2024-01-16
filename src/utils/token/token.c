@@ -1,50 +1,95 @@
 #include "token.h"
 
+#include <string.h>
+
+struct token_map_str
+{
+    enum token_type type;
+    char *str;
+};
+
+struct token_map_int
+{
+    char *value;
+    int type;
+};
+
+static struct token_map_int word_map[] = {
+    { "if", TOKEN_IF },     { "then", TOKEN_THEN },
+    { "else", TOKEN_ELSE }, { "elif", TOKEN_ELIF },
+    { "fi", TOKEN_FI },     { NULL, 0 } // End of array marker
+};
+
+static struct token_map_int operator_map[] = {
+    { ">", TOKEN_GREAT },      { "<", TOKEN_LESS },
+    { ">>", TOKEN_DGREAT },    { ">&", TOKEN_GREATAND },
+    { "<&", TOKEN_LESSAND },   { ">|", TOKEN_CLOBBER },
+    { "<>", TOKEN_LESSGREAT }, { NULL, 0 } // End of array marker
+};
+
+void categorize_token(struct token *tok)
+{
+    char *val = tok->value;
+    struct token_map_int *map;
+
+    if (tok->type == TOKEN_WORD)
+    {
+        map = word_map;
+    }
+    else if (tok->type == TOKEN_OPERATOR)
+    {
+        map = operator_map;
+    }
+    else
+    {
+        return;
+    }
+
+    for (; map->value != NULL; map++)
+    {
+        if (strcmp(val, map->value) == 0)
+        {
+            tok->type = map->type;
+            break;
+        }
+    }
+}
+
+static struct token_map_str token_map[] = {
+    { TOKEN_NONE, "TOKEN_NONE" },
+    { TOKEN_WORD, "TOKEN_WORD" },
+    { TOKEN_NEWLINE, "TOKEN_NEWLINE" },
+    { TOKEN_SEMICOLON, "TOKEN_SEMICOLON" },
+    { TOKEN_EOF, "TOKEN_EOF" },
+    { TOKEN_IF, "TOKEN_IF" },
+    { TOKEN_THEN, "TOKEN_THEN" },
+    { TOKEN_ELSE, "TOKEN_ELSE" },
+    { TOKEN_ELIF, "TOKEN_ELIF" },
+    { TOKEN_FI, "TOKEN_FI" },
+    { TOKEN_OPERATOR, "TOKEN_OPERATOR" },
+    { TOKEN_LESS, "TOKEN_LESS" },
+    { TOKEN_GREAT, "TOKEN_GREAT" },
+    { TOKEN_DGREAT, "TOKEN_DGREAT" },
+    { TOKEN_LESSAND, "TOKEN_LESSAND" },
+    { TOKEN_GREATAND, "TOKEN_GREATAND" },
+    { TOKEN_LESSGREAT, "TOKEN_LESSGREAT" },
+    { TOKEN_CLOBBER, "TOKEN_CLOBBER" },
+    { 0, "TOKEN_UNKNOWN" } // End of array marker
+};
+
 char *token_type_to_str(enum token_type type)
 {
-    switch (type)
+    struct token_map_str *map;
+
+    for (map = token_map; map->str != NULL; map++)
     {
-    case TOKEN_NONE:
-        return "TOKEN_NONE";
-    case TOKEN_WORD:
-        return "TOKEN_WORD";
-    case TOKEN_NEWLINE:
-        return "TOKEN_NEWLINE";
-    case TOKEN_SEMICOLON:
-        return "TOKEN_SEMICOLON";
-    case TOKEN_EOF:
-        return "TOKEN_EOF";
-    case TOKEN_IF:
-        return "TOKEN_IF";
-    case TOKEN_THEN:
-        return "TOKEN_THEN";
-    case TOKEN_ELSE:
-        return "TOKEN_ELSE";
-    case TOKEN_ELIF:
-        return "TOKEN_ELIF";
-    case TOKEN_FI:
-        return "TOKEN_FI";
-    case TOKEN_OPERATOR:
-        return "TOKEN_OPERATOR";
-    case TOKEN_LESS:
-        return "TOKEN_LESS";
-    case TOKEN_GREAT:
-        return "TOKEN_GREAT";
-    case TOKEN_DGREAT:
-        return "TOKEN_DGREAT";
-    // case TOKEN_DLESS: // Not implemented yet
-    // return "TOKEN_DLESS";
-    case TOKEN_LESSAND:
-        return "TOKEN_LESSAND";
-    case TOKEN_GREATAND:
-        return "TOKEN_GREATAND";
-    case TOKEN_LESSGREAT:
-        return "TOKEN_LESSGREAT";
-    case TOKEN_CLOBBER:
-        return "TOKEN_CLOBBER";
-    default:
-        return "TOKEN_UNKNOWN";
+        if (type == map->type)
+        {
+            return map->str;
+        }
     }
+
+    return "TOKEN_UNKNOWN";
 }
 
 int is_reserved_word(struct token token)
