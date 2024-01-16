@@ -5,7 +5,7 @@
 #include <string.h>
 
 #include "../ast/ast.h"
-#include "utils/token/token.h"
+#include "../utils/token/token.h"
 
 struct builtin_matchs
 {

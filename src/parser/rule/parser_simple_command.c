@@ -7,8 +7,7 @@
  */
 enum parser_status parse_element(struct ast **res, struct lexer *lexer);
 
-enum parser_status parse_simple_command(struct ast **res,
-                                               struct lexer *lexer)
+enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
 {
     // | WORD { element }
     lexer_peek(lexer);

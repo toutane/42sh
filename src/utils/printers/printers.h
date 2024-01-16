@@ -1,8 +1,8 @@
 #ifndef PRINTERS_H
 #define PRINTERS_H
 
-#include "../../options/opt_parser.h"
 #include "../../ast/ast.h"
+#include "../../options/opt_parser.h"
 
 /*
  * @brief Prints set options (called when verbose mode is enabled)

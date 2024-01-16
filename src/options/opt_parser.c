@@ -1,8 +1,9 @@
 #include "opt_parser.h"
-#include "../utils/printers/printers.h"
 
 #include <getopt.h>
 #include <stdio.h>
+
+#include "../utils/printers/printers.h"
 
 /*
  * Print usage message

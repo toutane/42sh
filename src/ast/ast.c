@@ -6,6 +6,7 @@ void ast_free(struct ast *ast)
     {
         return;
     }
+
     if (ast->type == AST_SIMPLE_COMMAND)
     {
         if (ast->nb_args > 0)
@@ -38,6 +39,7 @@ void ast_free(struct ast *ast)
         free(ast->children);
         ast->children = NULL;
     }
+
     free(ast);
 }
 

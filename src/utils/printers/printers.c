@@ -2,7 +2,8 @@
 
 #include <stdio.h>
 
-#define PRINT_OPTIONS(str) printf("  " #str ": %s\n", opts->str ? "active" : "inactive") 
+#define PRINT_OPTIONS(str)                                                     \
+    printf("  " #str ": %s\n", opts->str ? "active" : "inactive")
 
 void options_print(struct options *opts)
 {
