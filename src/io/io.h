@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#include "options/opt_parser.h"
+#include "../options/opt_parser.h"
 
 struct stream_info
 {

@@ -3,8 +3,8 @@
 
 #include <stddef.h>
 
-#include "../options/opt_parser.h"
 #include "../io/io.h"
+#include "../options/opt_parser.h"
 #include "../utils/token/token.h"
 
 /**
