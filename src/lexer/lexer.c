@@ -159,6 +159,12 @@ static void delimit_token(struct lexer *lexer)
     while (1)
     {
         char cur_char = stream_peek(stream);
+        if (lexer->opts->verbose)
+        {
+            printf("[LEXER] Current token: %s\n",
+                   token_type_to_str(lexer->cur_tok.type));
+            printf("[LEXER] Current character: %c\n", cur_char);
+        }
 
         /* Token Recognition Algorithm Rule 1
          * If the end of the input stream is encountered, the current token
@@ -166,12 +172,38 @@ static void delimit_token(struct lexer *lexer)
         if (cur_char == EOF)
         {
             handle_end_of_file(lexer);
+            // TODO: put this logic insinde handle_end_of_file func
             if (is_inside_quotes)
             {
-                lexer->cur_tok.type =
-                    TOKEN_ERROR; // Unexpected EOF while looking for matching
-                                 // single quote
+                // Unexpected EOF while looking for matching single quote
+                lexer->cur_tok.type = TOKEN_ERROR;
             }
+            return;
+        }
+
+        /* Token Recognition Algorithm Rule 2
+         * If the previous character was used as part of an operator and the
+         * current character is not quoted and can be used with the previous
+         * characters to form an operator, it shall be used as part of that
+         * (operator) token. */
+        size_t len = strlen(lexer->cur_tok.value);
+        char prev_char = lexer->cur_tok.value[len - 1];
+
+        if (lexer->cur_tok.type == TOKEN_OPERATOR && !is_inside_quotes
+            && len == 1 && can_be_second_in_ope(prev_char, cur_char))
+        {
+            append_char_to_token_value(&lexer->cur_tok, cur_char);
+            stream_pop(stream);
+            continue;
+        }
+
+        /* Token Recognition Algorithm Rule 3 */
+        // TODO: here we assume that if the current token is an operator, it has
+        // at least one and at most one characters (this is because for now the
+        // operators are two characters long at most).
+        if (lexer->cur_tok.type == TOKEN_OPERATOR
+            && (!can_be_second_in_ope(prev_char, cur_char) || len == 2))
+        {
             return;
         }
 
@@ -180,6 +212,26 @@ static void delimit_token(struct lexer *lexer)
         {
             handle_single_quote(lexer, &is_inside_quotes);
             continue;
+        }
+
+        /* Token Recognition Algorithm Rule 6 */
+        if (!is_inside_quotes && can_be_first_in_ope(cur_char))
+        {
+            if (lexer->cur_tok.type == TOKEN_NONE)
+            {
+                fill_token(&lexer->cur_tok, TOKEN_OPERATOR, NULL);
+                append_char_to_token_value(&lexer->cur_tok, cur_char);
+                stream_pop(stream);
+                continue;
+            }
+            else
+            {
+                // TODO: we must set the first character of the next (operator)
+                // token here. It seems that it don't break anything if it is
+                // not implemented. It will be implemented if we found a case
+                // where it is needed.
+                return;
+            }
         }
 
         // Token Recognition Algorithm Rule 7 (modified)
@@ -241,6 +293,7 @@ static void delimit_token(struct lexer *lexer)
 static void categorize_token(struct lexer *lexer)
 {
     char *val = lexer->cur_tok.value;
+    // TODO: refactor that with a table
     if (lexer->cur_tok.type == TOKEN_WORD)
     {
         if (strcmp(val, "if") == 0)
@@ -262,6 +315,42 @@ static void categorize_token(struct lexer *lexer)
         else if (strcmp(val, "fi") == 0)
         {
             lexer->cur_tok.type = TOKEN_FI;
+        }
+    }
+
+    if (lexer->cur_tok.type == TOKEN_OPERATOR)
+    {
+        if (strcmp(val, ">") == 0)
+        {
+            lexer->cur_tok.type = TOKEN_GREAT;
+        }
+        else if (strcmp(val, "<") == 0)
+        {
+            lexer->cur_tok.type = TOKEN_LESS;
+        }
+        else if (strcmp(val, ">>") == 0)
+        {
+            lexer->cur_tok.type = TOKEN_DGREAT;
+        }
+        // else if (strcmp(val, "<<") == 0) // Not implemented yet
+        //{
+        // lexer->cur_tok.type = TOKEN_DLESS;
+        //}
+        else if (strcmp(val, ">&") == 0)
+        {
+            lexer->cur_tok.type = TOKEN_GREATAND;
+        }
+        else if (strcmp(val, "<&") == 0)
+        {
+            lexer->cur_tok.type = TOKEN_LESSAND;
+        }
+        else if (strcmp(val, "<>") == 0)
+        {
+            lexer->cur_tok.type = TOKEN_LESSGREAT;
+        }
+        else if (strcmp(val, ">|") == 0)
+        {
+            lexer->cur_tok.type = TOKEN_CLOBBER;
         }
     }
 }
