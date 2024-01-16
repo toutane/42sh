@@ -55,8 +55,7 @@ struct stream_info *get_stream(int argc, struct options *opts, int *err)
 
 struct stream_info *stream_new(const char *path, char *buf, int *err)
 {
-    // maybe useless to set err value to 0, allready made in main func
-    //*err = 0;
+    *err = 0;
     struct stream_info *stream = calloc(1, sizeof(struct stream_info));
     if (stream == NULL)
     {
@@ -109,7 +108,6 @@ struct stream_info *stream_new(const char *path, char *buf, int *err)
     }
 
     // Should never reach here
-    free(stream);
     return NULL;
 }
 

@@ -20,9 +20,8 @@ struct stream_info *get_stream(int argc, struct options *opts, int *err);
  *
  * If the input mode is stdin, the path must be set to null, as the buffer
  * If the input mode is file, the path must be set to the path of the file, and
- * the buffer to null
- * If the input is a string, the path must be set to null, and the buffer
- * to the string
+ * the buffer to null If the input is a string, the path must be set to null,
+ * and the buffer to the string
  */
 struct stream_info *stream_new(const char *path, char *buf, int *err);
 

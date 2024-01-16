@@ -25,7 +25,7 @@ struct lexer *lexer_new(struct stream_info *stream, struct options *opts)
     lexer->stream = stream;
     lexer->cur_tok.type = TOKEN_NONE;
     lexer->cur_tok.value = NULL;
-    lexer->must_parse_next_tok = true;
+    lexer->must_parse_next_tok = 1;
 
     if (lexer->opts->verbose)
     {
