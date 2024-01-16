@@ -1,1 +1,1 @@
-run_test sq.test
+run_test_line sq.test

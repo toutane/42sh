@@ -141,7 +141,7 @@ run_test_file()
     fi
 }
 
-run_test()
+run_test_line()
 {
     [ -e $1 ] || echo "Missing file $1" 1>&2
 

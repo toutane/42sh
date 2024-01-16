@@ -1,1 +1,1 @@
-run_test echo1.test
+run_test_line echo1.test
