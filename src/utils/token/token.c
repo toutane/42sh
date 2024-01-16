@@ -76,3 +76,11 @@ int can_be_second_in_ope(char prev, char cur)
         return 0;
     }
 }
+
+int is_redirection_operator(struct token token)
+{
+    enum token_type type = token.type;
+    return type == TOKEN_LESS || type == TOKEN_GREAT || type == TOKEN_DGREAT
+        || type == TOKEN_LESSAND || type == TOKEN_GREATAND
+        || type == TOKEN_LESSGREAT || type == TOKEN_CLOBBER;
+}

@@ -67,4 +67,9 @@ int can_be_first_in_ope(char c);
  */
 int can_be_second_in_ope(char prev, char cur);
 
+/*
+ * @brief Return true if the token is an redirection operator
+ */
+int is_redirection_operator(struct token token);
+
 #endif /* !TOKEN_H */
