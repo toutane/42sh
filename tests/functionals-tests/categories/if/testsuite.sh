@@ -19,3 +19,4 @@ run_test_file if17.test
 run_test_file if18.test
 run_test_file if19.test
 run_test_file if20.test
+run_test_file if21.test

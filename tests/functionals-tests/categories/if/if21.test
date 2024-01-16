@@ -1,0 +1,10 @@
+if true; then
+    echo first
+else
+    echo not first;
+fi
+if false; then
+    echo first
+else
+    echo second;
+fi
