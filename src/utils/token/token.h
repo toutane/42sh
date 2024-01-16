@@ -34,6 +34,7 @@ enum token_type
     TOKEN_ELSE, // 'else'
     TOKEN_ELIF, // 'elif'
     TOKEN_FI, // 'fi'
+    TOKEN_NEG, // '!'
 };
 
 /*

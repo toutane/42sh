@@ -15,9 +15,13 @@ struct token_map_int
 };
 
 static struct token_map_int word_map[] = {
-    { "if", TOKEN_IF },     { "then", TOKEN_THEN },
-    { "else", TOKEN_ELSE }, { "elif", TOKEN_ELIF },
-    { "fi", TOKEN_FI },     { NULL, 0 } // End of array marker
+    { "if", TOKEN_IF },
+    { "then", TOKEN_THEN },
+    { "else", TOKEN_ELSE },
+    { "elif", TOKEN_ELIF },
+    { "fi", TOKEN_FI },
+    { "!", TOKEN_NEG },
+    { NULL, 0 } // End of array marker
 };
 
 static struct token_map_int operator_map[] = {
@@ -61,11 +65,18 @@ static struct token_map_str token_map[] = {
     { TOKEN_NEWLINE, "TOKEN_NEWLINE" },
     { TOKEN_SEMICOLON, "TOKEN_SEMICOLON" },
     { TOKEN_EOF, "TOKEN_EOF" },
+
+    /* Reserved words */
+
     { TOKEN_IF, "TOKEN_IF" },
     { TOKEN_THEN, "TOKEN_THEN" },
     { TOKEN_ELSE, "TOKEN_ELSE" },
     { TOKEN_ELIF, "TOKEN_ELIF" },
     { TOKEN_FI, "TOKEN_FI" },
+    { TOKEN_NEG, "TOKEN_NEG" },
+
+    /* Operators */
+
     { TOKEN_OPERATOR, "TOKEN_OPERATOR" },
     { TOKEN_LESS, "TOKEN_LESS" },
     { TOKEN_GREAT, "TOKEN_GREAT" },
