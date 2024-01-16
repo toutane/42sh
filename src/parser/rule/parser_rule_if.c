@@ -5,7 +5,7 @@ enum parser_status parse_compound_list(struct ast **res, struct lexer *lexer);
 enum parser_status parse_else_clause(struct ast **res, struct lexer *lexer);
 
 /**
- * @brief Parse a rule_if
+ * @brief Parse a condition statement
  *
  * rule_if =        'if' compound_list 'then' compound_list [else_clause] 'fi' ;
  */
