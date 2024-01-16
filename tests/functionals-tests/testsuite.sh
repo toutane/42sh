@@ -105,7 +105,7 @@ check_diff()
 
     # check if tests fail
     if ! $sucess; then
-        echo -e "\n$YELLOW$1$WHITE"
+        echo -e "\n$YELLOW$2$WHITE"
         [ $REF_CODE != $MY_CODE ] && echo -e "ref return code: $REF_CODE\nmy return code: $MY_CODE"
         [ -s $( realpath $1.diff ) ] && echo -e "$(cat $(realpath $1.diff))$WHITE"
 
@@ -127,13 +127,13 @@ run_test_file()
 
     sucess=true
     run_string "$file_to_string"
-    check_diff "$1"
+    check_diff "$1" "$1"
     if $sucess; then
         run_file "$1"
-        check_diff "$1"
+        check_diff "$1" "$1"
         if $sucess; then
-            run_stdin "$file_to_string"
-            check_diff "$1"
+            run_stdin "$file_to_string" 
+            check_diff "$1" "$1"
             if $sucess; then
                 echo -e "$GREEN OK$WHITE"
             fi
@@ -156,13 +156,13 @@ run_test_line()
 
         sucess=true
         run_string "$line"
-        check_diff "$1_$counter"
+        check_diff "$1_$counter" "$line"
         if $sucess; then
             run_file "$string_to_file"
-            check_diff "$1_$counter"
+            check_diff "$1_$counter" "$line"
             if $sucess; then
                 run_stdin "$line"
-                check_diff "$1_$counter"
+                check_diff "$1_$counter" "$line"
                 if $sucess; then
                     echo -e "$GREEN OK$WHITE"
                 fi
