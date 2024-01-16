@@ -1,4 +1,4 @@
-run_test if.test
+run_test_line if.test
 run_test_file if1.test
 run_test_file if2.test
 run_test_file if3.test

@@ -16,7 +16,6 @@ bin_PROGRAMS = 42sh
 42sh_LDFLAGS =	$(DEBUG_LDFLAGS) \
 				$(COVERAGE_LDFLAGS)
 
-
 SUBDIRS = 	lexer \
 			parser \
 			ast \

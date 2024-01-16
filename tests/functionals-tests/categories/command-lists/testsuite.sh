@@ -1,1 +1,1 @@
-run_test cl.test
+run_test_line cl.test
