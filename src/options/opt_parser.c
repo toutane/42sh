@@ -21,7 +21,7 @@ static void print_usage()
 int parse_options(int argc, char *argv[], struct options *options)
 {
     int status = 0;
-    int opt;
+    int opt = 0;
 
     opterr = 0; // Disable getopt error messages
 
@@ -31,16 +31,16 @@ int parse_options(int argc, char *argv[], struct options *options)
         switch (opt)
         {
         case 'a':
-            options->ast_dot = 1;
+            options->ast_dot = true;
             break;
         case 'c':
-            options->command = 1;
+            options->command = true;
             break;
         case 'p':
-            options->pretty_print = 1;
+            options->pretty_print = true;
             break;
         case 'v':
-            options->verbose = 1;
+            options->verbose = true;
             break;
         case '?':
             status = 2;

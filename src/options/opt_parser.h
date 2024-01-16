@@ -1,15 +1,17 @@
 #ifndef OPT_PARSER_H
 #define OPT_PARSER_H
 
+#include <stdbool.h>
+
 /*
  * @brief Options structure
  */
 struct options
 {
-    int ast_dot;
-    int command;
-    int pretty_print;
-    int verbose;
+    bool ast_dot;
+    bool command;
+    bool pretty_print;
+    bool verbose;
     char *input;
 };
 

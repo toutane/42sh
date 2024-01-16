@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "ast/ast.h"
 #include "error_handling/error_handling.h"
@@ -15,11 +16,11 @@
 
 int main(int argc, char *argv[])
 {
-    int status; // Gather error status, passed to functions
+    int status = 0; // Gather error status, passed to functions
 
     // Options structure, filled by parse_options
     struct options options = {
-        .ast_dot = 0, .command = 0, .pretty_print = 0, .verbose = 0
+        .ast_dot = false, .command = false, .pretty_print = false, .verbose = false
     };
 
     // Parse command line options
