@@ -26,6 +26,7 @@ enum token_type
     TOKEN_GREATAND, // '>&'
     TOKEN_LESSGREAT, // '<>'
     TOKEN_CLOBBER, // '>|'
+    TOKEN_PIPE, // '|'
 
     /* Reserved words */
 

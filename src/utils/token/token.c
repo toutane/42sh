@@ -25,10 +25,15 @@ static struct token_map_int word_map[] = {
 };
 
 static struct token_map_int operator_map[] = {
-    { ">", TOKEN_GREAT },      { "<", TOKEN_LESS },
-    { ">>", TOKEN_DGREAT },    { ">&", TOKEN_GREATAND },
-    { "<&", TOKEN_LESSAND },   { ">|", TOKEN_CLOBBER },
-    { "<>", TOKEN_LESSGREAT }, { NULL, 0 } // End of array marker
+    { ">", TOKEN_GREAT },
+    { "<", TOKEN_LESS },
+    { ">>", TOKEN_DGREAT },
+    { ">&", TOKEN_GREATAND },
+    { "<&", TOKEN_LESSAND },
+    { ">|", TOKEN_CLOBBER },
+    { "<>", TOKEN_LESSGREAT },
+    { "|", TOKEN_PIPE },
+    { NULL, 0 } // End of array marker
 };
 
 void categorize_token(struct token *tok)
@@ -85,6 +90,8 @@ static struct token_map_str token_map[] = {
     { TOKEN_GREATAND, "TOKEN_GREATAND" },
     { TOKEN_LESSGREAT, "TOKEN_LESSGREAT" },
     { TOKEN_CLOBBER, "TOKEN_CLOBBER" },
+    { TOKEN_PIPE, "TOKEN_PIPE" },
+
     { 0, "TOKEN_UNKNOWN" } // End of array marker
 };
 
@@ -112,7 +119,7 @@ int is_reserved_word(struct token token)
 
 int can_be_first_in_ope(char c)
 {
-    return c == '<' || c == '>';
+    return c == '<' || c == '>' || c == '|';
 }
 
 int can_be_second_in_ope(char prev, char cur)
