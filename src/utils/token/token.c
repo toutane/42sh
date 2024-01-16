@@ -67,6 +67,7 @@ void categorize_token(struct token *tok)
 static struct token_map_str token_map[] = {
     { TOKEN_NONE, "TOKEN_NONE" },
     { TOKEN_WORD, "TOKEN_WORD" },
+    { TOKEN_IONUMBER, "TOKEN_IONUMBER" },
     { TOKEN_NEWLINE, "TOKEN_NEWLINE" },
     { TOKEN_SEMICOLON, "TOKEN_SEMICOLON" },
     { TOKEN_EOF, "TOKEN_EOF" },

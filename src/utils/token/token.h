@@ -13,6 +13,7 @@ enum token_type
 
     TOKEN_WORD, // a word
     TOKEN_OPERATOR, // an operator
+    TOKEN_IONUMBER, // an io number (sequence of digits delimited by '<' or '>')
     TOKEN_NEWLINE, // '\n'
     TOKEN_SEMICOLON, // ';'
     TOKEN_EOF, // end of input marker
