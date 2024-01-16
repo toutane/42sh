@@ -39,15 +39,18 @@ int main(int argc, char *argv[])
                                            // program should exit with success
     }
 
+    // Init lexer and ast structure
     struct lexer *lexer = lexer_new(stream, &options);
     struct ast *ast = NULL;
 
+    // Parse the stream input
     if (parse(&ast, lexer) != PARSER_OK)
     {
         error(ast, lexer, stream, "42sh: grammar error during parsing\n");
         return GRAMMAR_ERROR;
     }
 
+    // If options activated, pretty_print ast and/or create ast dot file
     if (options.pretty_print)
     {
         ast_pretty_print(ast);
@@ -63,6 +66,7 @@ int main(int argc, char *argv[])
         }
     }
 
+    // Evaluate ast
     status = ast_eval(ast);
 
     free_all(ast, lexer, stream);

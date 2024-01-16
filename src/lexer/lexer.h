@@ -2,6 +2,7 @@
 #define LEXER_H
 
 #include <stddef.h>
+#include <stdbool.h>
 
 #include "../io/io.h"
 #include "../options/opt_parser.h"
@@ -26,7 +27,7 @@ struct lexer
     struct options *opts; // The options of the program
     struct stream_info *stream; // The input stream
     struct token cur_tok; // The next token, if processed
-    int must_parse_next_tok; // 1 if the next token must be parsed, 0 otherwise
+    bool must_parse_next_tok; // true if the next token must be parsed, false otherwise
 };
 
 /**
