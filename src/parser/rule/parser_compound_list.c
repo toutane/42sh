@@ -1,14 +1,13 @@
 #include "parser.h"
 
-/**
- * @brief Parse a pipeline
- *
- * and_or =         pipeline ;
- */
 enum parser_status parse_and_or(struct ast **res, struct lexer *lexer);
 
-enum parser_status parse_compound_list(struct ast **res,
-                                              struct lexer *lexer)
+/**
+ * @brief Parse a else_clause
+ *
+ * compound_list =  and_or [';'] {'\n'} ;
+ */
+enum parser_status parse_compound_list(struct ast **res, struct lexer *lexer)
 {
     // RULE:
     // compound_list = {'\n'} and_or { ( ';' | '\n' ) {'\n'} and_or }[';']{'\n'}
