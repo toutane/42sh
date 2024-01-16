@@ -12,13 +12,16 @@ enum parser_status parse_redirection(struct ast **res, struct lexer *lexer)
     if (lexer_peek(lexer).type == TOKEN_IONUMBER)
     {
         /// Get IONUMBER
+        lexer_pop(lexer);
     }
-    if (is_redirection_word(lexer->cur_tok.type))
+    if (is_redirection_word(lexer_peek(lexer).type))
     {
         /// Add redirection to ast
+        lexer_pop(lexer);
         if (lexer_peek(lexer).type == TOKEN_WORD)
         {
             /// Add WORD to ast
+            lexer_pop(lexer);
             return PARSER_OK;
         }
     }
