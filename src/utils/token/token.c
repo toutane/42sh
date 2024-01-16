@@ -61,6 +61,11 @@ int can_be_first_in_ope(char c)
 
 int can_be_second_in_ope(char prev, char cur)
 {
+    if (prev == '\0')
+    {
+        return 0;
+    }
+
     switch (prev)
     {
     case '<':

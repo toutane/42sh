@@ -186,8 +186,16 @@ static void delimit_token(struct lexer *lexer)
          * current character is not quoted and can be used with the previous
          * characters to form an operator, it shall be used as part of that
          * (operator) token. */
-        size_t len = strlen(lexer->cur_tok.value);
-        char prev_char = lexer->cur_tok.value[len - 1];
+        size_t len = 0;
+        if (lexer->cur_tok.type != TOKEN_NONE && lexer->cur_tok.value != NULL)
+        {
+            len = strlen(lexer->cur_tok.value);
+        }
+        char prev_char = '\0';
+        if (lexer->cur_tok.type != TOKEN_NONE && len > 0)
+        {
+            prev_char = lexer->cur_tok.value[len - 1];
+        }
 
         if (lexer->cur_tok.type == TOKEN_OPERATOR && !is_inside_quotes
             && len == 1 && can_be_second_in_ope(prev_char, cur_char))
