@@ -3,6 +3,8 @@
 
 #include <unistd.h>
 
+#define TOKEN_NUMBER 11
+
 /*
  * @brief The different types of tokens
  */

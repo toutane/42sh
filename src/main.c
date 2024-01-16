@@ -7,11 +7,11 @@
 #include "error_handling/error_handling.h"
 #include "io/io.h"
 #include "lexer/lexer.h"
-#include "utils/token/token.h"
 #include "options/opt_parser.h"
 #include "parser/parser.h"
 #include "utils/dot_file/dot_file.h"
 #include "utils/printers/printers.h"
+#include "utils/token/token.h"
 
 int main(int argc, char *argv[])
 {

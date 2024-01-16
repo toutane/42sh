@@ -5,16 +5,14 @@
  *
  * shell_command =  rule_if ;
  */
-enum parser_status parse_shell_command(struct ast **res,
-                                              struct lexer *lexer);
+enum parser_status parse_shell_command(struct ast **res, struct lexer *lexer);
 
 /**
  * @brief Parse a WORD, followed by any number of element
  *
  * simple_command = WORD { element } ;
  */
-enum parser_status parse_simple_command(struct ast **res,
-                                               struct lexer *lexer);
+enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer);
 
 enum parser_status parse_command(struct ast **res, struct lexer *lexer)
 {
