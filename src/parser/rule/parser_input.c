@@ -1,13 +1,17 @@
 #include "parser.h"
 
-/**
- * @brief Parse a and_or
- *
- * list =           and_or { ';' and_or } [ ';' ] ;
- */
 enum parser_status parse_list(struct ast **res, struct lexer *lexer);
 
-enum parser_status parse(struct ast **res, struct lexer *lexer)
+/**
+ * @brief Parse either a list, or newline
+ *
+ * input =     list '\n'
+ *          |  list EOF
+ *          | '\n'
+ *          | EOF
+ *          ;
+ */
+enum parser_status parse_input(struct ast **res, struct lexer *lexer)
 {
     lexer_peek(lexer);
     // | '\n'

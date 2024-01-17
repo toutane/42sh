@@ -1,12 +1,12 @@
 #include "parser.h"
 
-/**
- * @brief Parse a pipeline
- *
- * and_or =         pipeline ;
- */
 enum parser_status parse_and_or(struct ast **res, struct lexer *lexer);
 
+/**
+ * @brief Parse a and_or
+ *
+ * list =           and_or { ';' and_or } [ ';' ] ;
+ */
 enum parser_status parse_list(struct ast **res, struct lexer *lexer)
 {
     // | and_or
