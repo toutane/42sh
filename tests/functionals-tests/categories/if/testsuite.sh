@@ -22,3 +22,6 @@ run_test_file if20.test
 run_test_file if21.test
 run_test_file if22.test
 run_test_file if23.test
+run_test_file if24.test
+run_test_file if25.test
+run_test_file if26.test
