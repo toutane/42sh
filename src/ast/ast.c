@@ -57,7 +57,7 @@ int eval_sc_node(struct ast *ast)
     if (pid == 0)
     {
         execvp(ast->argv[0], ast->argv);
-        return execvp_error(errno);
+        exit(execvp_error(errno));
     }
     else
     {
