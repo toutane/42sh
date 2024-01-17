@@ -35,6 +35,8 @@ run_string()
 
     timeout $timeout_time $BINARY -c "$1" > $my_stdout 2> $my_stderr
     MY_CODE=$?
+    # WARNING, if program return 124 without timeout he will be considered as timeout
+    [ $MY_CODE -eq 124 ] && WAS_TIMEOUT=1
 
     INPUT="string"
 }
@@ -47,6 +49,8 @@ run_file()
 
     timeout $timeout_time $BINARY "$1" > $my_stdout 2> $my_stderr
     MY_CODE=$?
+    # WARNING, if program return 124 without timeout he will be considered as timeout
+    [ $MY_CODE -eq 124 ] && WAS_TIMEOUT=1
 
     INPUT="file"
 }
@@ -59,6 +63,8 @@ run_stdin()
 
     timeout $timeout_time echo "$1" | $BINARY > $my_stdout 2> $my_stderr
     MY_CODE=$?
+    # WARNING, if program return 124 without timeout he will be considered as timeout
+    [ $MY_CODE -eq 124 ] && WAS_TIMEOUT=1
 
     INPUT="stdin"
 }
@@ -105,8 +111,10 @@ check_diff()
 
     # check if tests fail
     if ! $sucess; then
-        echo -e "\n$YELLOW$1$WHITE"
-        [ $REF_CODE != $MY_CODE ] && echo -e "ref return code: $REF_CODE\nmy return code: $MY_CODE"
+        echo -e "\n$YELLOW$2$WHITE"
+        if [ $REF_CODE != $MY_CODE ] && [ $WAS_TIMEOUT -eq 0 ]; then
+            echo -e "ref return code: $REF_CODE\nmy return code: $MY_CODE$WHITE"
+        fi
         [ -s $( realpath $1.diff ) ] && echo -e "$(cat $(realpath $1.diff))$WHITE"
 
         TOTAL_FAIL=$((TOTAL_FAIL + 1))
@@ -127,13 +135,13 @@ run_test_file()
 
     sucess=true
     run_string "$file_to_string"
-    check_diff "$1"
+    check_diff "$1" "$1"
     if $sucess; then
         run_file "$1"
-        check_diff "$1"
+        check_diff "$1" "$1"
         if $sucess; then
-            run_stdin "$file_to_string"
-            check_diff "$1"
+            run_stdin "$file_to_string" 
+            check_diff "$1" "$1"
             if $sucess; then
                 echo -e "$GREEN OK$WHITE"
             fi
@@ -156,13 +164,13 @@ run_test_line()
 
         sucess=true
         run_string "$line"
-        check_diff "$1_$counter"
+        check_diff "$1_$counter" "$line"
         if $sucess; then
             run_file "$string_to_file"
-            check_diff "$1_$counter"
+            check_diff "$1_$counter" "$line"
             if $sucess; then
                 run_stdin "$line"
-                check_diff "$1_$counter"
+                check_diff "$1_$counter" "$line"
                 if $sucess; then
                     echo -e "$GREEN OK$WHITE"
                 fi

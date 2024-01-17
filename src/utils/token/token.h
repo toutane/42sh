@@ -12,9 +12,22 @@ enum token_type
     TOKEN_ERROR, // error token (when a character is unexpected)
 
     TOKEN_WORD, // a word
+    TOKEN_OPERATOR, // an operator
+    TOKEN_IONUMBER, // an io number (sequence of digits delimited by '<' or '>')
     TOKEN_NEWLINE, // '\n'
     TOKEN_SEMICOLON, // ';'
     TOKEN_EOF, // end of input marker
+
+    /* Operators */
+
+    TOKEN_GREAT, // '>'
+    TOKEN_LESS, // '<'
+    TOKEN_DGREAT, // '>>'
+    TOKEN_LESSAND, // '<&'
+    TOKEN_GREATAND, // '>&'
+    TOKEN_LESSGREAT, // '<>'
+    TOKEN_CLOBBER, // '>|'
+    TOKEN_PIPE, // '|'
 
     /* Reserved words */
 
@@ -23,6 +36,7 @@ enum token_type
     TOKEN_ELSE, // 'else'
     TOKEN_ELIF, // 'elif'
     TOKEN_FI, // 'fi'
+    TOKEN_NEG, // '!'
 };
 
 /*
@@ -40,8 +54,29 @@ struct token
 char *token_type_to_str(enum token_type type);
 
 /*
+ * @brief Update the type of the given token based on its value
+ */
+void categorize_token(struct token *tok);
+
+/*
  * @brief Return true if the token is a reserved word
  */
 int is_reserved_word(struct token token);
+
+/*
+ * @brief Return true if the character can be the first character of an operator
+ */
+int can_be_first_in_ope(char c);
+
+/*
+ * @brief Return true if the character can be the second character of the
+ * current operator based on the previous character
+ */
+int can_be_second_in_ope(char prev, char cur);
+
+/*
+ * @brief Return true if the token is an redirection operator
+ */
+int is_redirection_operator(struct token token);
 
 #endif /* !TOKEN_H */

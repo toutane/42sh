@@ -1,0 +1,10 @@
+digraph AST {
+splines=false;
+node [fontname=helvetica, shape=record];
+edge [fontname=helvetica];
+node0x6040000000d0 [label=LIST, color="#2b8f31", style=filled, fillcolor="#b0f5b4"]
+node0x6040000000d0 -> node0x604000000090 [label=" Child"];
+node0x604000000090 [label=CMD, color="#1588ed", style=filled, fillcolor="#b0d5f5"]
+node0x604000000090argv [fontsize=17, margin=0.2, label="echo|hi|(null)"];
+node0x604000000090 -> node0x604000000090argv [label=" Argv",headport=nw];
+}

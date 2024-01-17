@@ -6,9 +6,8 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 
-#include "../builtins/builtins.h"
-#include "error_handling/error_handling_execvp.h"
-#include "utils/token/token.h"
+#include "../error_handling/error_handling_execvp.h"
+#include "../utils/token/token.h"
 
 enum ast_type
 {
@@ -38,10 +37,5 @@ struct ast
  * @brief Frees the ast.
  */
 void ast_free(struct ast *ast);
-
-/**
- * @brief Evals the ast.
- */
-int ast_eval(struct ast *ast);
 
 #endif /* ! AST_H */

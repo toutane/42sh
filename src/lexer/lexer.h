@@ -3,8 +3,9 @@
 
 #include <stddef.h>
 
-#include "../options/opt_parser.h"
 #include "../io/io.h"
+#include "../options/opt_parser.h"
+#include "../utils/strings/strings.h"
 #include "../utils/token/token.h"
 
 /**
@@ -64,5 +65,13 @@ struct token lexer_peek(struct lexer *lexer);
  *   calling lexer_pop in a loop will iterate over all tokens until EOF.
  */
 struct token lexer_pop(struct lexer *lexer);
+
+/*
+ * @brief Single quote expansion.
+ * If the current token is word token and it contains single quotes,
+ * the single quotes are removed. This is a very basic expansion that seems to
+ * work for step 1.
+ */
+void single_quote_expansion(struct lexer *lexer);
 
 #endif /* ! LEXER_H */

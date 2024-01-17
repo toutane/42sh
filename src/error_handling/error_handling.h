@@ -5,12 +5,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "ast/ast.h"
-#include "io/io.h"
-#include "lexer/lexer.h"
-#include "utils/token/token.h"
-#include "options/opt_parser.h"
-#include "parser/parser.h"
+#include "../ast/ast.h"
+#include "../io/io.h"
+#include "../lexer/lexer.h"
+#include "../options/opt_parser.h"
+#include "../parser/parser.h"
+#include "../utils/token/token.h"
 
 #define GRAMMAR_ERROR 2;
 

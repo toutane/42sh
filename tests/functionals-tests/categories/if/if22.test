@@ -1,0 +1,5 @@
+if weproiewrupoi; then
+    echo hi;
+else
+    echo hu;
+fi
