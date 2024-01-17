@@ -44,7 +44,7 @@ enum parser_status parse_rule_for(struct ast **res, struct lexer *lexer)
                 }
                 else
                 {
-                    return PARSER_UNEXPECTED_TOKEN
+                    return PARSER_UNEXPECTED_TOKEN;
                 }
                 while (lexer_peek(lexer).type == TOKEN_WORD)
                 {

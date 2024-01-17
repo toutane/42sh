@@ -18,7 +18,7 @@ enum parser_status parse_redirection(struct ast **res, struct lexer *lexer)
         fill_redirection_node(redir_node, 2, lexer->cur_tok.value);
         lexer_pop(lexer);
     }
-    if (is_redirection_word(lexer_peek(lexer).type))
+    if (is_redirection_operator(lexer_peek(lexer)))
     {
         /// Add redirection to ast
         fill_redirection_node(redir_node, 0, lexer->cur_tok.value);

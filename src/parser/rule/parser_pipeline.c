@@ -34,6 +34,8 @@ enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
             if (parse_command(res, lexer) == PARSER_OK)
             {
                 fill_pipeline_node(pipe_node, *res);
+                *res = pipe_node;
+
                 continue;
             }
             // Free node(s)
@@ -42,7 +44,6 @@ enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
         }
         // Assign to possible negation node
         // then on AST
-        *res = pipe_node;
         return PARSER_OK;
     }
     // Free node(s)

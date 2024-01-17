@@ -22,6 +22,14 @@ void init_if_node(struct ast *if_node);
 
 void fill_if_node(struct ast *if_node, struct ast *node);
 
+void init_redirection_node(struct ast *redirection_node);
+
+void fill_redirection_node(struct ast *redirection_node, size_t position, char *str);
+
+void init_pipeline_node(struct ast *if_node);
+
+void fill_pipeline_node(struct ast *if_node, struct ast *node);
+
 /**
  * @brief Parse either a list, or newline
  *
