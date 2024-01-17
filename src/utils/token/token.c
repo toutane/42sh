@@ -115,7 +115,7 @@ int is_reserved_word(struct token token)
 {
     enum token_type type = token.type;
     return type == TOKEN_IF || type == TOKEN_THEN || type == TOKEN_ELSE
-        || type == TOKEN_ELIF || type == TOKEN_FI;
+        || type == TOKEN_ELIF || type == TOKEN_FI || type == TOKEN_NEG;
 }
 
 int can_be_first_in_ope(char c)
