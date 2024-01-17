@@ -12,3 +12,11 @@ echo -n -e -E -e -E -e 'hello/n/n//n////n/t/slk ls f/n//oc:'
 echo hlelo////e//n/n//t//t////t/t/ '/t//t///n/nsdf//n'
 echo -enenenk hello /tmp
 echo -e hello'/t//t/n'
+echo -e toto\ntata
+echo -e toto\ttata
+echo -e toto\@tata
+echo -n -e -E -e -E -e 'hello\n\n\\n\\\\n\t\slk ls f\n\\oc:'
+echo hlelo\\\\\\n\n\\t\\t\\\\t\t\ '\t\\t\\\n\nsdf\\n'
+echo -enenenk hello \tmp
+echo -e hello'\t\\t\n'
+echo -e toto\\tata
