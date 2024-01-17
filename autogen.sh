@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # autotools preset makefiles
 autoreconf --install
