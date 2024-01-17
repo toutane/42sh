@@ -4,7 +4,7 @@ typedef int (*eval_type)(struct ast *ast);
 
 int eval_ast(struct ast *ast)
 {
-    if (ast == NULL)
+    if (!ast)
     {
         return 0;
     }
@@ -13,6 +13,8 @@ int eval_ast(struct ast *ast)
         [AST_SIMPLE_COMMAND] = &eval_simple_command,
         [AST_COMMAND_LIST] = &eval_list,
         [AST_CONDITION] = &eval_condition,
+        //[AST_REDIRECTION] = &eval_redirection,
+        //[AST_PIPELINE] = &eval_pipeline,
     };
 
     return (*functions[ast->type])(ast);
@@ -70,11 +72,6 @@ int execution_loop(struct options *opts, struct stream_info *stream)
 
         // Evaluate the AST
         status = eval_ast(ast);
-        if (status != 0)
-        {
-            free_all(ast, lexer, stream);
-            return status;
-        }
 
         // Free the AST
         ast_free(ast);

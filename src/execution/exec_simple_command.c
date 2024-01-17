@@ -3,18 +3,20 @@
 int eval_simple_command(struct ast *ast)
 {
     int status = 0;
+    struct ast_cmd *ast_cmd = (struct ast_cmd *)ast;
 
-    if (is_builtin_word(ast->argv[0]))
+    if (is_builtin_word(ast_cmd->argv[0]))
     {
-        status = (builtin_fun(ast->argv[0]))(ast->nb_args - 1, ast->argv);
-        fflush(stdout); // Flush stdout to avoid mixing output
+        status =
+            (builtin_fun(ast_cmd->argv[0]))(ast_cmd->argc - 1, ast_cmd->argv);
+        fflush(NULL); // Flush stdout to avoid mixing output
         return status;
     }
 
     int pid = fork();
     if (pid == 0)
     {
-        execvp(ast->argv[0], ast->argv);
+        execvp(ast_cmd->argv[0], ast_cmd->argv);
         exit(execvp_error(errno));
     }
     else
