@@ -21,6 +21,12 @@ static struct token_map_int word_map[] = {
     { "elif", TOKEN_ELIF },
     { "fi", TOKEN_FI },
     { "!", TOKEN_NEG },
+    { "for", TOKEN_FOR },
+    { "in", TOKEN_IN },
+    { "while", TOKEN_WHILE },
+    { "until", TOKEN_UNTIL },
+    { "do", TOKEN_DO },
+    { "done", TOKEN_DONE },
     { NULL, 0 } // End of array marker
 };
 
@@ -33,6 +39,8 @@ static struct token_map_int operator_map[] = {
     { ">|", TOKEN_CLOBBER },
     { "<>", TOKEN_LESSGREAT },
     { "|", TOKEN_PIPE },
+    { "||", TOKEN_OR },
+    { "&&", TOKEN_AND },
     { NULL, 0 } // End of array marker
 };
 
@@ -80,6 +88,12 @@ static struct token_map_str token_map[] = {
     { TOKEN_ELIF, "TOKEN_ELIF" },
     { TOKEN_FI, "TOKEN_FI" },
     { TOKEN_NEG, "TOKEN_NEG" },
+    { TOKEN_FOR, "TOKEN_FOR" },
+    { TOKEN_IN, "TOKEN_IN" },
+    { TOKEN_WHILE, "TOKEN_WHILE" },
+    { TOKEN_UNTIL, "TOKEN_UNTIL" },
+    { TOKEN_DO, "TOKEN_DO" },
+    { TOKEN_DONE, "TOKEN_DONE" },
 
     /* Operators */
 
@@ -92,6 +106,8 @@ static struct token_map_str token_map[] = {
     { TOKEN_LESSGREAT, "TOKEN_LESSGREAT" },
     { TOKEN_CLOBBER, "TOKEN_CLOBBER" },
     { TOKEN_PIPE, "TOKEN_PIPE" },
+    { TOKEN_OR, "TOKEN_OR" },
+    { TOKEN_AND, "TOKEN_AND" },
 
     { 0, "TOKEN_UNKNOWN" } // End of array marker
 };
@@ -115,12 +131,14 @@ int is_reserved_word(struct token token)
 {
     enum token_type type = token.type;
     return type == TOKEN_IF || type == TOKEN_THEN || type == TOKEN_ELSE
-        || type == TOKEN_ELIF || type == TOKEN_FI || type == TOKEN_NEG;
+        || type == TOKEN_ELIF || type == TOKEN_FI || type == TOKEN_NEG
+        || type == TOKEN_FOR || type == TOKEN_IN || type == TOKEN_WHILE
+        || type == TOKEN_UNTIL || type == TOKEN_DO || type == TOKEN_DONE;
 }
 
 int can_be_first_in_ope(char c)
 {
-    return c == '<' || c == '>' || c == '|';
+    return c == '<' || c == '>' || c == '|' || c == '&';
 }
 
 int can_be_second_in_ope(char prev, char cur)
@@ -136,6 +154,10 @@ int can_be_second_in_ope(char prev, char cur)
         return cur == '&' || cur == '>';
     case '>':
         return cur == '>' || cur == '&' || cur == '|';
+    case '|':
+        return cur == '|';
+    case '&':
+        return cur == '&';
     default:
         return 0;
     }

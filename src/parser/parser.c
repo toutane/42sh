@@ -70,7 +70,8 @@ void init_redirection_node(struct ast *redirection_node)
     // TODO CHECK if calloc failed
 }
 
-void fill_redirection_node(struct ast *redirection_node, size_t position, char *str)
+void fill_redirection_node(struct ast *redirection_node, size_t position,
+                           char *str)
 {
     redirection_node->argv[position] = strdup(str);
 }
