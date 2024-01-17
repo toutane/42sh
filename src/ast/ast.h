@@ -14,6 +14,8 @@ enum ast_type
     AST_SIMPLE_COMMAND,
     AST_COMMAND_LIST,
     AST_CONDITION,
+    AST_REDIRECTION,
+    AST_PIPELINE,
     /*
     AST_MUL,
     AST_DIV,

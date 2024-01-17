@@ -12,6 +12,7 @@ enum token_type
     TOKEN_ERROR, // error token (when a character is unexpected)
 
     TOKEN_WORD, // a word
+    TOKEN_ASSIGNMENT_WORD, // an assignement word
     TOKEN_OPERATOR, // an operator
     TOKEN_IONUMBER, // an io number (sequence of digits delimited by '<' or '>')
     TOKEN_NEWLINE, // '\n'
@@ -28,6 +29,8 @@ enum token_type
     TOKEN_LESSGREAT, // '<>'
     TOKEN_CLOBBER, // '>|'
     TOKEN_PIPE, // '|'
+    TOKEN_AND, // '&&'
+    TOKEN_OR, // '||'
 
     /* Reserved words */
 
@@ -37,6 +40,12 @@ enum token_type
     TOKEN_ELIF, // 'elif'
     TOKEN_FI, // 'fi'
     TOKEN_NEG, // '!'
+    TOKEN_FOR, // 'for'
+    TOKEN_IN, // 'in'
+    TOKEN_WHILE, // 'while'
+    TOKEN_UNTIL, // 'until'
+    TOKEN_DO, // 'do'
+    TOKEN_DONE, // 'done'
 };
 
 /*

@@ -1,12 +1,14 @@
 #include "parser.h"
 
+enum parser_status parse_compound_list(struct ast **res, struct lexer *lexer);
+
 /**
  * @brief Parse a else_clause
  *
- * compound_list =  and_or [';'] {'\n'} ;
+ * else_clause =    'else' compound_list
+ *                | 'elif' compound_list 'then' compound_list [else_clause]
+ *                ;
  */
-enum parser_status parse_compound_list(struct ast **res, struct lexer *lexer);
-
 enum parser_status parse_else_clause(struct ast **res, struct lexer *lexer)
 {
     // 'else' compound_list

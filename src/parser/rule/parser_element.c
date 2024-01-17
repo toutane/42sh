@@ -1,5 +1,14 @@
 #include "parser.h"
 
+enum parser_status parse_redirection(struct ast **res, struct lexer *lexer);
+
+/**
+ * @brief Parse a WORD
+ *
+ * element =        WORD
+ *                  | redirection
+ *                  ;
+ */
 enum parser_status parse_element(struct ast **res, struct lexer *lexer)
 {
     // | WORD
@@ -12,6 +21,10 @@ enum parser_status parse_element(struct ast **res, struct lexer *lexer)
         // Pop element
         lexer_pop(lexer);
 
+        return PARSER_OK;
+    }
+    else if (parse_redirection(res, lexer) == PARSER_OK)
+    {
         return PARSER_OK;
     }
     return PARSER_UNEXPECTED_TOKEN;
