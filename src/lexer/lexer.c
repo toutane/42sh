@@ -24,11 +24,80 @@ void fill_token(struct token *tok, enum token_type type, char *value)
     tok->value = value;
 }
 
-static void handle_one_char_token(struct lexer *lexer, enum token_type type)
+/*
+ * @brief: Set the previous char to the last character of the current token
+ * value, and len to the current token value length.
+ */
+static void set_len_and_prev_char(struct lexer *lexer, char *prev_char,
+                                  size_t *len)
 {
+    *len = 0;
+    if (lexer->cur_tok.type != TOKEN_NONE && lexer->cur_tok.value != NULL)
+    {
+        *len = strlen(lexer->cur_tok.value);
+    }
+
+    *prev_char = '\0';
+    if (lexer->cur_tok.type != TOKEN_NONE && *len > 0)
+    {
+        *prev_char = lexer->cur_tok.value[*len - 1];
+    }
+}
+
+/*
+ * @brief: Return 1 if the given char is a delimiter, 0 otherwise.
+ */
+static int is_delimiter(char c)
+{
+    return isblank(c) || c == '\n' || c == ';';
+}
+
+/*
+ * @brief: Append the given character to current token value and
+ * consume it.
+ */
+static void append_consume(struct lexer *lexer, char c)
+{
+    append_char_to_token_value(&lexer->cur_tok, c);
+    stream_pop(lexer->stream);
+}
+
+/*
+ * @brief: Set the current token type to the given type and append
+ * the given character its value.
+ */
+static void set_append_consume(struct lexer *lexer, enum token_type type,
+                               char c)
+{
+    fill_token(&lexer->cur_tok, type, NULL);
+    append_consume(lexer, c);
+}
+
+static void handle_word_delimiter(struct lexer *lexer, char delim)
+{
+    // We discard the current character if it is a <blank> delimiter
+    if (isblank(delim))
+    {
+        stream_pop(lexer->stream);
+        return;
+    }
+
+    // If the current token is TOKEN_NONE, we set the current token type to the
+    // delimiter
     if (lexer->cur_tok.type == TOKEN_NONE)
     {
-        fill_token(&lexer->cur_tok, type, NULL);
+        switch (delim)
+        {
+        case '\n':
+            fill_token(&lexer->cur_tok, TOKEN_NEWLINE, NULL);
+            break;
+        case ';':
+            fill_token(&lexer->cur_tok, TOKEN_SEMICOLON, NULL);
+            break;
+        case EOF:
+            fill_token(&lexer->cur_tok, TOKEN_EOF, NULL);
+            break;
+        }
         stream_pop(lexer->stream);
     }
 }
@@ -42,14 +111,13 @@ static void handle_single_quote(struct lexer *lexer, int *is_inside_quotes)
         {
             fill_token(&lexer->cur_tok, TOKEN_WORD, NULL);
         }
-        append_char_to_token_value(&lexer->cur_tok, '\'');
-        stream_pop(lexer->stream);
+
+        append_consume(lexer, '\'');
     }
     else
     {
         *is_inside_quotes = 0;
-        append_char_to_token_value(&lexer->cur_tok, '\'');
-        stream_pop(lexer->stream);
+        append_consume(lexer, '\'');
     }
 }
 
@@ -64,7 +132,7 @@ static void handle_comment(struct lexer *lexer)
 }
 
 /*
- * @brief: This function updates the current token (inside the lexer struct)
+ * @brief: Updates the current token (inside the lexer struct)
  * according to the input stream. It follows the Token Recognition Algorithm
  * (see the POSIX standard at
  * https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_10)
@@ -74,23 +142,15 @@ static void delimit_token(struct lexer *lexer)
 {
     int is_inside_quotes = 0;
 
-    struct stream_info *stream = lexer->stream;
-
-    // Reset the current token
-    lexer->cur_tok.type = TOKEN_NONE;
+    char prev_char;
+    size_t len;
 
     /* Append characters to the current token until the current token is
      * delimited. */
     while (1)
     {
-        char cur_char = stream_peek(stream);
-
-        if (lexer->opts->verbose)
-        {
-            printf("[LEXER] Current token: %s\n",
-                   token_type_to_str(lexer->cur_tok.type));
-            printf("[LEXER] Current character: %c\n", cur_char);
-        }
+        set_len_and_prev_char(lexer, &prev_char, &len);
+        char cur_char = stream_peek(lexer->stream);
 
         /* Token Recognition Algorithm Rule 1
          * If the end of the input stream is encountered, the current token
@@ -98,11 +158,9 @@ static void delimit_token(struct lexer *lexer)
          * matching single quote the lexer returns a TOKEN_ERROR */
         if (cur_char == EOF)
         {
-            handle_one_char_token(lexer, TOKEN_EOF);
-            if (is_inside_quotes)
-            {
-                lexer->cur_tok.type = TOKEN_ERROR;
-            }
+            handle_word_delimiter(lexer, EOF);
+            lexer->cur_tok.type =
+                is_inside_quotes ? TOKEN_ERROR : lexer->cur_tok.type;
 
             // Delimit the current token
             return;
@@ -113,22 +171,10 @@ static void delimit_token(struct lexer *lexer)
          * current character is not quoted and can be used with the previous
          * characters to form an operator, it shall be used as part of that
          * (operator) token. */
-        size_t len = 0;
-        if (lexer->cur_tok.type != TOKEN_NONE && lexer->cur_tok.value != NULL)
-        {
-            len = strlen(lexer->cur_tok.value);
-        }
-        char prev_char = '\0';
-        if (lexer->cur_tok.type != TOKEN_NONE && len > 0)
-        {
-            prev_char = lexer->cur_tok.value[len - 1];
-        }
-
         if (lexer->cur_tok.type == TOKEN_OPERATOR && !is_inside_quotes
             && len == 1 && can_be_second_in_ope(prev_char, cur_char))
         {
-            append_char_to_token_value(&lexer->cur_tok, cur_char);
-            stream_pop(stream);
+            append_consume(lexer, cur_char);
             continue;
         }
 
@@ -154,53 +200,44 @@ static void delimit_token(struct lexer *lexer)
         {
             if (lexer->cur_tok.type == TOKEN_NONE)
             {
-                fill_token(&lexer->cur_tok, TOKEN_OPERATOR, NULL);
-                append_char_to_token_value(&lexer->cur_tok, cur_char);
-                stream_pop(stream);
+                set_append_consume(lexer, TOKEN_OPERATOR, cur_char);
                 continue;
             }
-            else
+
+            /* If the current token is a word, we check if it is a sequence
+             * of digits, if it is the case, we don't
+             * consider it as a word anymore and we consider it as an
+             * io_number (only if the current char is a '<' or a '>'). */
+            if (lexer->cur_tok.type == TOKEN_WORD
+                && is_str_sequence_of_digits(lexer->cur_tok.value)
+                && (cur_char == '<' || cur_char == '>'))
             {
-                /* If the current token is a word, we check if it is a sequence
-                 * of digits, if it is the case, we don't
-                 * consider it as a word anymore and we consider it as an
-                 * io_number (only if the current char is a '<' or a '>'). */
-                if (lexer->cur_tok.type == TOKEN_WORD
-                    && is_str_sequence_of_digits(lexer->cur_tok.value)
-                    && (cur_char == '<' || cur_char == '>'))
-                {
-                    lexer->cur_tok.type = TOKEN_IONUMBER;
-                }
-                // TODO: we must set the first character of the next (operator)
-                // token here. It seems that it don't break anything if it is
-                // not implemented. It will be implemented if we found a case
-                // where it is needed.
-                return;
+                lexer->cur_tok.type = TOKEN_IONUMBER;
             }
-        }
-
-        /* Token Recognition Algorithm Rule 7 (modified) */
-        if (!is_inside_quotes && (cur_char == '\n' || cur_char == ';'))
-        {
-            /* If the current token is TOKEN_NONE (that means that the current
-             * character is a delimiter and that it delimited the previous
-             * token), we set the current token type to apropriate token. */
-            handle_one_char_token(
-                lexer, cur_char == '\n' ? TOKEN_NEWLINE : TOKEN_SEMICOLON);
-
-            // Delimit the current token
+            // TODO: we must set the first character of the next (operator)
+            // token here. It seems that it don't break anything if it is
+            // not implemented. It will be implemented if we found a case
+            // where it is needed.
             return;
         }
 
-        // Token Recognition Algorithm Rule 7.2
-        if (isblank(cur_char) && !is_inside_quotes)
+        /* Token Recognition Algorithm Rule 7 (modified)
+         * If the current character is an unquoted <blank>, '\n' or ';', any
+         * token containing the previous character is delimited and the current
+         * character shall be discarded if it is a <blank>, for '\n' and ';',
+         * the current token shall be updated to TOKEN_NEWLINE or
+         * TOKEN_SEMICOLON*/
+        if (!is_inside_quotes && is_delimiter(cur_char))
         {
-            stream_pop(stream);
-            if (lexer->cur_tok.type == TOKEN_WORD)
+            handle_word_delimiter(lexer, cur_char);
+
+            if (isblank(cur_char) && lexer->cur_tok.type != TOKEN_WORD)
             {
-                return;
+                continue;
             }
-            continue;
+
+            // Delimit the current token
+            return;
         }
 
         /* Token Recognition Algorithm Rule 8
@@ -208,8 +245,7 @@ static void delimit_token(struct lexer *lexer)
          * appended to the that word. */
         if (lexer->cur_tok.type == TOKEN_WORD)
         {
-            append_char_to_token_value(&lexer->cur_tok, cur_char);
-            stream_pop(stream);
+            append_consume(lexer, cur_char);
             continue;
         }
 
@@ -226,15 +262,15 @@ static void delimit_token(struct lexer *lexer)
 
         /* Token Recognition Algorithm Rule 10
          * The current character is used as the start of a new word. */
-        fill_token(&lexer->cur_tok, TOKEN_WORD, NULL);
-        append_char_to_token_value(&lexer->cur_tok, cur_char);
-        stream_pop(stream);
-        continue;
+        set_append_consume(lexer, TOKEN_WORD, cur_char);
     }
 }
 
 struct token parse_input_for_tok(struct lexer *lexer)
 {
+    // Reset current token
+    lexer->cur_tok.type = TOKEN_NONE;
+
     delimit_token(lexer);
     categorize_token(&(lexer->cur_tok));
     single_quote_expansion(lexer);
