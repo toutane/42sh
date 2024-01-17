@@ -19,7 +19,7 @@ enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
     if (parse_command(res, lexer) == PARSER_OK)
     {
         // { '|' {'\n'} command }
-        while (lexer_peek(peek).type == TOKEN_PIPE)
+        while (lexer_peek(lexer).type == TOKEN_PIPE)
         {
             // Create pipe node
             struct ast *pipe_node = calloc(1, sizeof(struct ast));
@@ -27,7 +27,7 @@ enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
 
             fill_pipeline_node(pipe_node, *res);
             lexer_pop(lexer);
-            while (lexer_peek(peek).type == TOKEN_NEWLINE)
+            while (lexer_peek(lexer).type == TOKEN_NEWLINE)
             {
                 lexer_pop(lexer);
             };

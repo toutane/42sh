@@ -64,7 +64,7 @@ void fill_if_node(struct ast *if_node, struct ast *node)
 
 void init_redirection_node(struct ast *redirection_node)
 {
-    redir_node->type = AST_REDIRECTION
+    redirection_node->type = AST_REDIRECTION;
     redirection_node->nb_args = 3;
     redirection_node->argv = calloc(redirection_node->nb_args, sizeof(char *));
     // TODO CHECK if calloc failed
@@ -75,7 +75,7 @@ void fill_redirection_node(struct ast *redirection_node, size_t position, char *
     redirection_node->argv[position] = strdup(str);
 }
 
-void init_pipeline_node(struct ast *pipeline_node)
+void init_pipeline_node(struct ast *pipe_node)
 {
     pipe_node->type = AST_PIPELINE;
     pipe_node->nb_child = 2;
@@ -83,11 +83,11 @@ void init_pipeline_node(struct ast *pipeline_node)
     // TODO CHECK if calloc failed
 }
 
-void fill_pipeline_node(struct ast *pipe_node, struct ast *ast)
+void fill_pipeline_node(struct ast *pipe_node, struct ast *node)
 {
     for (size_t i = 0; i < pipe_node->nb_child; ++i)
     {
-        if (!pipe->children[i])
+        if (!pipe_node->children[i])
         {
             pipe_node->children[i] = node;
             return;

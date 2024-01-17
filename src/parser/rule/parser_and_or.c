@@ -13,12 +13,12 @@ enum parser_status parse_and_or(struct ast **res, struct lexer *lexer)
     if (parse_pipeline(res, lexer) == PARSER_OK)
     {
         // { ( '&&' | '||' ) {'\n'} pipeline }
-        while (lexer_peek(lexer) == TOKEN_AND || lexer_peek(lexer) == TOKEN_OR)
+        while (lexer_peek(lexer).type == TOKEN_AND || lexer_peek(lexer).type == TOKEN_OR)
         {
             // Create AND/OR node
             lexer_pop(lexer);
 
-            while (lexer_peek(peek).type == TOKEN_NEWLINE)
+            while (lexer_peek(lexer).type == TOKEN_NEWLINE)
             {
                 lexer_pop(lexer);
             };

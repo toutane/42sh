@@ -28,6 +28,8 @@ enum token_type
     TOKEN_LESSGREAT, // '<>'
     TOKEN_CLOBBER, // '>|'
     TOKEN_PIPE, // '|'
+    TOKEN_AND, // '&&'
+    TOKEN_OR, // '||'
 
     /* Reserved words */
 
