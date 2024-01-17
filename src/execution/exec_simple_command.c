@@ -12,6 +12,7 @@ int eval_simple_command(struct ast *ast)
     }
 
     int pid = fork();
+    // TODO: check if fork suceed
     if (pid == 0)
     {
         execvp(ast->argv[0], ast->argv);

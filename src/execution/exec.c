@@ -13,6 +13,7 @@ int eval_ast(struct ast *ast)
         [AST_SIMPLE_COMMAND] = &eval_simple_command,
         [AST_COMMAND_LIST] = &eval_list,
         [AST_CONDITION] = &eval_condition,
+        [AST_PIPELINE] = &eval_pipeline,
     };
 
     return (*functions[ast->type])(ast);

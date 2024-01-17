@@ -1,6 +1,8 @@
 #ifndef EXEC_H
 #define EXEC_H
 
+#include <stdio.h>
+
 #include "../ast/ast.h"
 #include "../builtins/builtins.h"
 #include "../error_handling/error_handling.h"
@@ -26,5 +28,7 @@ int eval_simple_command(struct ast *ast);
 int eval_condition(struct ast *ast);
 
 int eval_list(struct ast *ast);
+
+int eval_pipeline(struct ast *ast);
 
 #endif /* ! EXEC_H */
