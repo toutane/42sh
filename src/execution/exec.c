@@ -1,5 +1,23 @@
 #include "exec.h"
 
+typedef int (*eval_type)(struct ast *ast);
+
+int eval_ast(struct ast *ast)
+{
+    if (ast == NULL)
+    {
+        return 0;
+    }
+
+    static const eval_type functions[] = {
+        [AST_SIMPLE_COMMAND] = &eval_simple_command,
+        [AST_COMMAND_LIST] = &eval_list,
+        [AST_CONDITION] = &eval_condition,
+    };
+
+    return (*functions[ast->type])(ast);
+}
+
 int execution_loop(struct options *opts, struct stream_info *stream)
 {
     int status = 0;
@@ -51,7 +69,7 @@ int execution_loop(struct options *opts, struct stream_info *stream)
         }
 
         // Evaluate the AST
-        status = ast_eval(ast);
+        status = eval_ast(ast);
         if (status != 0)
         {
             free_all(ast, lexer, stream);
