@@ -22,6 +22,10 @@ enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
         while (lexer_peek(peek).type == TOKEN_PIPE)
         {
             // Create pipe node
+            struct ast *pipe_node = calloc(1, sizeof(struct ast));
+            init_pipeline_node(pipe_node);
+
+            fill_pipeline_node(pipe_node, *res);
             lexer_pop(lexer);
             while (lexer_peek(peek).type == TOKEN_NEWLINE)
             {
@@ -29,13 +33,16 @@ enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
             };
             if (parse_command(res, lexer) == PARSER_OK)
             {
+                fill_pipeline_node(pipe_node, *res);
                 continue;
             }
             // Free node(s)
+            ast_free(pipe_node);
             return PARSER_UNEXPECTED_TOKEN;
         }
         // Assign to possible negation node
         // then on AST
+        *res = pipe_node;
         return PARSER_OK;
     }
     // Free node(s)

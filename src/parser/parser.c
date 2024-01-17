@@ -61,3 +61,37 @@ void fill_if_node(struct ast *if_node, struct ast *node)
     }
     fprintf(stderr, "If node can't have more than 3 children\n");
 }
+
+void init_redirection_node(struct ast *redirection_node)
+{
+    redir_node->type = AST_REDIRECTION
+    redirection_node->nb_args = 3;
+    redirection_node->argv = calloc(redirection_node->nb_args, sizeof(char *));
+    // TODO CHECK if calloc failed
+}
+
+void fill_redirection_node(struct ast *redirection_node, size_t position, char *str)
+{
+    redirection_node->argv[position] = strdup(str);
+}
+
+void init_pipeline_node(struct ast *pipeline_node)
+{
+    pipe_node->type = AST_PIPELINE;
+    pipe_node->nb_child = 2;
+    pipe_node->children = calloc(2, sizeof(struct ast *));
+    // TODO CHECK if calloc failed
+}
+
+void fill_pipeline_node(struct ast *pipe_node, struct ast *ast)
+{
+    for (size_t i = 0; i < pipe_node->nb_child; ++i)
+    {
+        if (!pipe->children[i])
+        {
+            pipe_node->children[i] = node;
+            return;
+        }
+    }
+    fprintf(stderr, "42sh: If node can't have more than 2 children\n");
+}

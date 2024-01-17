@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ast/ast.h"
+#include "../ast/ast.h"
 #include "lexer/lexer.h"
 #include "utils/token/token.h"
 
