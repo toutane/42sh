@@ -43,8 +43,8 @@ void free_ast_pipeline(struct ast *ast)
 void free_ast_redir(struct ast *ast)
 {
     struct ast_redirection *ast_redirection = (struct ast_redirection *)ast;
-    if (ast_redirection->data)
-        free(ast_redirection->data);
+    if (ast_redirection->target)
+        free(ast_redirection->target);
     free(ast);
     return;
 }
