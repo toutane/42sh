@@ -29,7 +29,7 @@ int eval_pipeline(struct ast *ast)
             exit(127);
         }
 
-        int res = eval_ast(ast->children[0]);
+        int res = eval_ast(((struct ast_pipeline *)ast)->left);
         close(fds[1]);
         exit(res);
     }
@@ -58,7 +58,7 @@ int eval_pipeline(struct ast *ast)
                 exit(127);
             }
 
-            int res = eval_ast(ast->children[1]);
+            int res = eval_ast(((struct ast_pipeline *)ast)->right);
             close(fds[0]);
             exit(res);
         }
