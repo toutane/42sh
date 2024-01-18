@@ -1,0 +1,28 @@
+#echo
+echo #
+echo '#'
+echo ' # commentaire '
+echo "\$ \` \" \\"
+echo \#escaped "#"quoted not#first #commented
+echo """"
+echo \\\\
+echo "\\ \""\"\"""
+#echo "\" \"kkkl""\" """\"\'#\\'\'\""\\"' #'\''"''"
+#echo hello 'world #commentaire
+
+
+echo hello'
+
+\"\"
+\nn \n \t \\tt\t\\\t
+
+echo
+ec
+
+ek \#sd "#" || "#f   "
+
+#sflsdf
+'
+
+echo toto
+echo hello'
