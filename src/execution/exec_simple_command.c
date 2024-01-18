@@ -7,6 +7,11 @@ int eval_simple_command(struct ast *ast)
     int status = 0;
     struct ast_cmd *ast_cmd = (struct ast_cmd *)ast;
 
+    for (int i = 0; i < ast_cmd->argc; i++)
+    {
+        expand_quoting(&(ast_cmd->argv[i]));
+    }
+
     if (is_builtin_word(ast_cmd->argv[0]))
     {
         status =

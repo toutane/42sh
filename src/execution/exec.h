@@ -12,6 +12,7 @@
 #include "../utils/dot_file/dot_file.h"
 #include "../utils/printers/printers.h"
 #include "../utils/token/token.h"
+#include "lexer/lexer.h"
 
 /*
  * @brief: Executes the program in a loop, reading from the input stream while

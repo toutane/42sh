@@ -373,8 +373,6 @@ struct token parse_input_for_tok(struct lexer *lexer)
 
     categorize_token(&(lexer->cur_tok));
 
-    expand_quoting(&(lexer->cur_tok));
-
     return lexer->cur_tok;
 }
 

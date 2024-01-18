@@ -70,9 +70,9 @@ static void expand_loop(struct stream_info *stream, char **str)
     }
 }
 
-void expand_quoting(struct token *tok)
+void expand_quoting(char **str)
 {
-    if (tok->type != TOKEN_WORD)
+    if (*str == NULL)
     {
         return;
     }
@@ -80,7 +80,7 @@ void expand_quoting(struct token *tok)
     char *expanded_str = NULL;
 
     int err = 0;
-    struct stream_info *stream = stream_new(NULL, tok->value, &err);
+    struct stream_info *stream = stream_new(NULL, *str, &err);
     if (stream == NULL)
     {
         return;
@@ -89,7 +89,7 @@ void expand_quoting(struct token *tok)
     expand_loop(stream, &expanded_str);
 
     stream_free(stream);
-    free(tok->value);
+    free(*str);
 
-    tok->value = expanded_str;
+    *str = expanded_str;
 }

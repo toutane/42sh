@@ -76,6 +76,6 @@ struct token lexer_peek(struct lexer *lexer);
  */
 struct token lexer_pop(struct lexer *lexer);
 
-void expand_quoting(struct token *tok);
+void expand_quoting(char **str);
 
 #endif /* ! LEXER_H */
