@@ -10,7 +10,7 @@ void fill_pipeline_node(struct ast *ast, struct ast *ast_child)
     }
     else
     {
-        ast_pipeline->left = ast_child;
+        ast_pipeline->right = ast_child;
     }
 
     return;
