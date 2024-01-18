@@ -19,23 +19,93 @@ static void append_char_to_str(char **str, char c)
     (*str)[len + 1] = '\0';
 }
 
+static void handle_backslash_quote(char **str, struct stream_info *stream,
+                                   enum QUOTING_CONTEXT *context)
+{
+    if (*context == NONE)
+    {
+        // Discard the backslash
+        stream_pop(stream);
+
+        // Get the character after the backslash
+        char next_char = stream_peek(stream);
+        if (next_char == EOF)
+        {
+            return;
+        }
+
+        // Append the character to the string
+        append_char_to_str(str, next_char);
+        stream_pop(stream);
+    }
+    else
+    {
+        switch (*context)
+        {
+        case SINGLE_QUOTE:
+            append_char_to_str(str, '\\');
+            stream_pop(stream);
+            break;
+        case DOUBLE_QUOTE:
+            stream_pop(stream);
+            char next_char = stream_peek(stream);
+            if (next_char == EOF)
+            {
+                return;
+            }
+            if (next_char == '$' || next_char == '`' || next_char == '"'
+                || next_char == '\\')
+            {
+                append_char_to_str(str, next_char);
+            }
+            else
+            {
+                append_char_to_str(str, '\\');
+                append_char_to_str(str, next_char);
+            }
+            stream_pop(stream);
+            break;
+        default:
+            // Should never happen
+            break;
+        }
+    }
+}
+
 static void handle_single_quote(char **str, struct stream_info *stream,
                                 enum QUOTING_CONTEXT *context)
 {
     if (*context == NONE)
     {
-        if (*context == DOUBLE_QUOTE)
-        {
-            append_char_to_str(str, '\'');
-        }
-        else
-        {
-            *context = SINGLE_QUOTE;
-        }
+        *context = SINGLE_QUOTE;
     }
     else if (*context == SINGLE_QUOTE)
     {
         *context = NONE;
+    }
+    else
+    {
+        // That means where are in a double quote context
+        append_char_to_str(str, '\'');
+    }
+    stream_pop(stream);
+}
+
+static void handle_double_quote(char **str, struct stream_info *stream,
+                                enum QUOTING_CONTEXT *context)
+{
+    if (*context == NONE)
+    {
+        *context = DOUBLE_QUOTE;
+    }
+    else if (*context == DOUBLE_QUOTE)
+    {
+        *context = NONE;
+    }
+    else
+    {
+        // That means where are in a single quote context
+        append_char_to_str(str, '"');
     }
     stream_pop(stream);
 }
@@ -52,9 +122,21 @@ static void expand_loop(struct stream_info *stream, char **str)
             break;
         }
 
+        if (cur_char == '\\')
+        {
+            handle_backslash_quote(str, stream, &context);
+            continue;
+        }
+
         if (cur_char == '\'')
         {
             handle_single_quote(str, stream, &context);
+            continue;
+        }
+
+        if (cur_char == '"')
+        {
+            handle_double_quote(str, stream, &context);
             continue;
         }
 

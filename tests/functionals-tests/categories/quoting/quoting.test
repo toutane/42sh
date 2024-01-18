@@ -1,0 +1,11 @@
+'''''''
+'
+echo abc'abc'abc
+echo a b ' a b c' a b c
+echo a b' a b c 'a b c
+echo a b'a b c'a b c
+echo 'don\'t worry !'
+echo \'\'
+echo '\'\''
+echo "hello world"
+echo " hwllo 'world' "

@@ -102,42 +102,31 @@ static void handle_word_delimiter(struct lexer *lexer, char delim)
     }
 }
 
-static void handle_escape_quote(struct lexer *lexer,
-                                enum QUOTING_CONTEXT *quoting_context)
+static void handle_escape_quote(struct lexer *lexer)
 {
-    if (*quoting_context == NONE)
+    // Consume the <blackslash> to get the next character
+    stream_pop(lexer->stream);
+
+    char next_char = stream_peek(lexer->stream);
+
+    // If a <newline> follows the <backslash>, the shell shall interpret
+    // this as line continuation.
+    if (next_char == '\n')
     {
-        // Consume the <blackslash> to get the next character
         stream_pop(lexer->stream);
-
-        char next_char = stream_peek(lexer->stream);
-
-        // If a <newline> follows the <backslash>, the shell shall interpret
-        // this as line continuation.
-        if (next_char == '\n')
-        {
-            stream_pop(lexer->stream);
-            return;
-        }
-
-        // If the <backslash> is the first character of a word, we start the
-        // word
-        if (lexer->cur_tok.type == TOKEN_NONE)
-        {
-            fill_token(&lexer->cur_tok, TOKEN_WORD, NULL);
-        }
-
-        // We append the <backslash> and the next character to the current token
-        append_char_to_token_value(&lexer->cur_tok, '\\');
-        append_consume(lexer, next_char);
+        return;
     }
-    else
+
+    // If the <backslash> is the first character of a word, we start the
+    // word
+    if (lexer->cur_tok.type == TOKEN_NONE)
     {
-        // If the <backslash> is quoted, we append it to the current token
-        append_consume(lexer, '\\');
+        fill_token(&lexer->cur_tok, TOKEN_WORD, NULL);
     }
 
-    return;
+    // We append the <backslash> and the next character to the current token
+    append_char_to_token_value(&lexer->cur_tok, '\\');
+    append_consume(lexer, next_char);
 }
 
 static void handle_single_quote(struct lexer *lexer,
@@ -198,7 +187,7 @@ static void handle_quoting(struct lexer *lexer, char cur_char,
     switch (cur_char)
     {
     case '\\':
-        handle_escape_quote(lexer, quoting_context);
+        handle_escape_quote(lexer);
         break;
     case '\'':
         handle_single_quote(lexer, quoting_context);
