@@ -49,6 +49,15 @@ void free_ast_redir(struct ast *ast)
     return;
 }
 
+void free_ast_neg(struct ast *ast)
+{
+    struct ast_neg *ast_neg = (struct ast_neg *)ast;
+    if (ast_neg->data)
+        ast_free(ast_neg->data);
+    free(ast);
+    return;
+}
+
 typedef void (*free_type)(struct ast *ast);
 void ast_free(struct ast *ast)
 {
@@ -63,6 +72,7 @@ void ast_free(struct ast *ast)
         [AST_CONDITION] = &free_ast_if,
         [AST_REDIRECTION] = &free_ast_redir,
         [AST_PIPELINE] = &free_ast_pipeline,
+        [AST_NEG] = &free_ast_neg,
     };
     (*functions[ast->type])(ast);
 }

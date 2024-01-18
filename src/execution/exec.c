@@ -14,6 +14,7 @@ int eval_ast(struct ast *ast)
         [AST_COMMAND_LIST] = &eval_list,
         [AST_CONDITION] = &eval_condition,
         [AST_PIPELINE] = &eval_pipeline,
+        [AST_NEG] = &eval_neg,
         //[AST_REDIRECTION] = &eval_redirection,
     };
 
