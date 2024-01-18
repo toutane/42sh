@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "exec.h"
 
 int eval_simple_command(struct ast *ast)

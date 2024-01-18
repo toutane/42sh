@@ -1,104 +1,95 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "io/io.h"
 #include "lexer.h"
 
-void single_quote_expansion(struct lexer *lexer)
+static void append_char_to_str(char **str, char c)
 {
-    if (lexer->cur_tok.type != TOKEN_WORD)
+    if (*str == NULL)
     {
+        *str = calloc(2, sizeof(char));
+        (*str)[0] = c;
         return;
     }
 
-    char *val = lexer->cur_tok.value;
-    size_t len = strlen(val);
-    if (len < 2)
-    {
-        return;
-    }
-
-    // Calculate the number of single quotes in the token value
-    int nb_single_quotes = 0;
-    for (size_t i = 0; i < len; i++)
-    {
-        if (val[i] == '\'')
-        {
-            nb_single_quotes++;
-        }
-    }
-
-    // Remove every single quote from the token value
-    char *new_val = calloc(len - nb_single_quotes + 1, sizeof(char));
-    int j = 0;
-    for (size_t i = 0; i < len; i++)
-    {
-        if (val[i] != '\'')
-        {
-            new_val[j] = val[i];
-            j++;
-        }
-    }
-
-    free(lexer->cur_tok.value);
-    lexer->cur_tok.value = new_val;
+    size_t len = strlen(*str);
+    *str = realloc(*str, (len + 2) * sizeof(char));
+    (*str)[len] = c;
+    (*str)[len + 1] = '\0';
 }
 
-void double_quote_expansion(struct lexer *lexer)
+static void handle_single_quote(char **str, struct stream_info *stream,
+                                enum QUOTING_CONTEXT *context)
 {
-    if (lexer->cur_tok.type != TOKEN_WORD)
+    if (*context == NONE)
     {
-        return;
-    }
-
-    char *val = lexer->cur_tok.value;
-    size_t len = strlen(val);
-    if (len < 2)
-    {
-        return;
-    }
-
-    // Calculate the number of double quotes in the token value
-    int nb_double_quotes = 0;
-    for (size_t i = 0; i < len; i++)
-    {
-        if (val[i] == '"')
+        if (*context == DOUBLE_QUOTE)
         {
-            nb_double_quotes++;
-        }
-    }
-
-    // Remove every double quote from the token value
-    char *new_val = calloc(len - nb_double_quotes + 1, sizeof(char));
-    int j = 0;
-    for (size_t i = 0; i < len; i++)
-    {
-        if (nb_double_quotes > 0 && val[i] == '\\')
-        {
-            if (i + 1 < len && val[i + 1] == '\\')
-            {
-                new_val[j] = '\\';
-                j++;
-                i++;
-            }
-            else
-            {
-                new_val[j] = val[i];
-                j++;
-            }
+            append_char_to_str(str, '\'');
         }
         else
         {
-            if (val[i] != '"')
-            {
-                new_val[j] = val[i];
-                j++;
-            }
+            *context = SINGLE_QUOTE;
         }
     }
-
-    free(lexer->cur_tok.value);
-    lexer->cur_tok.value = new_val;
+    else if (*context == SINGLE_QUOTE)
+    {
+        *context = NONE;
+    }
+    stream_pop(stream);
 }
 
-void expand_str(char **str)
-{}
+static void expand_loop(struct stream_info *stream, char **str)
+{
+    enum QUOTING_CONTEXT context = NONE;
+
+    while (1)
+    {
+        char cur_char = stream_peek(stream);
+        if (cur_char == EOF)
+        {
+            break;
+        }
+
+        if (cur_char == '\'')
+        {
+            handle_single_quote(str, stream, &context);
+            continue;
+        }
+
+        append_char_to_str(str, cur_char);
+        stream_pop(stream);
+    }
+
+    // TODO: fix this wird behaviour that makes the string null
+    if (*str == NULL)
+    {
+        *str = calloc(2, sizeof(char));
+        (*str)[0] = '\0';
+    }
+}
+
+void expand_quoting(struct token *tok)
+{
+    if (tok->type != TOKEN_WORD)
+    {
+        return;
+    }
+
+    char *expanded_str = NULL;
+
+    int err = 0;
+    struct stream_info *stream = stream_new(NULL, tok->value, &err);
+    if (stream == NULL)
+    {
+        return;
+    }
+
+    expand_loop(stream, &expanded_str);
+
+    stream_free(stream);
+    free(tok->value);
+
+    tok->value = expanded_str;
+}

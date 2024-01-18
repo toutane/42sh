@@ -102,6 +102,44 @@ static void handle_word_delimiter(struct lexer *lexer, char delim)
     }
 }
 
+static void handle_escape_quote(struct lexer *lexer,
+                                enum QUOTING_CONTEXT *quoting_context)
+{
+    if (*quoting_context == NONE)
+    {
+        // Consume the <blackslash> to get the next character
+        stream_pop(lexer->stream);
+
+        char next_char = stream_peek(lexer->stream);
+
+        // If a <newline> follows the <backslash>, the shell shall interpret
+        // this as line continuation.
+        if (next_char == '\n')
+        {
+            stream_pop(lexer->stream);
+            return;
+        }
+
+        // If the <backslash> is the first character of a word, we start the
+        // word
+        if (lexer->cur_tok.type == TOKEN_NONE)
+        {
+            fill_token(&lexer->cur_tok, TOKEN_WORD, NULL);
+        }
+
+        // We append the <backslash> and the next character to the current token
+        append_char_to_token_value(&lexer->cur_tok, '\\');
+        append_consume(lexer, next_char);
+    }
+    else
+    {
+        // If the <backslash> is quoted, we append it to the current token
+        append_consume(lexer, '\\');
+    }
+
+    return;
+}
+
 static void handle_single_quote(struct lexer *lexer,
                                 enum QUOTING_CONTEXT *quoting_context)
 {
@@ -159,6 +197,9 @@ static void handle_quoting(struct lexer *lexer, char cur_char,
 {
     switch (cur_char)
     {
+    case '\\':
+        handle_escape_quote(lexer, quoting_context);
+        break;
     case '\'':
         handle_single_quote(lexer, quoting_context);
         break;
@@ -241,10 +282,10 @@ static void delimit_token(struct lexer *lexer,
         }
 
         /* Token Recognition Algorithm Rule 4
-         * If the current character is single-quote, or
+         * If the current character is <backslash>, single-quote, or
          * double-quote and it is not quoted, it shall affect quoting for
          * subsequent characters up to the end of the quoted text. */
-        if (cur_char == '\'' || cur_char == '"')
+        if (cur_char == '\\' || cur_char == '\'' || cur_char == '"')
         {
             handle_quoting(lexer, cur_char, quoting_context);
             continue;
@@ -332,11 +373,7 @@ struct token parse_input_for_tok(struct lexer *lexer)
 
     categorize_token(&(lexer->cur_tok));
 
-    expand_str(&(lexer->cur_tok.value));
-
-    // single_quote_expansion(lexer);
-
-    // double_quote_expansion(lexer);
+    expand_quoting(&(lexer->cur_tok));
 
     return lexer->cur_tok;
 }

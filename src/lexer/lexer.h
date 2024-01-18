@@ -76,16 +76,6 @@ struct token lexer_peek(struct lexer *lexer);
  */
 struct token lexer_pop(struct lexer *lexer);
 
-/*
- * @brief Single quote expansion.
- * If the current token is word token and it contains single quotes,
- * the single quotes are removed. This is a very basic expansion that seems to
- * work for step 1.
- */
-void single_quote_expansion(struct lexer *lexer);
-
-void double_quote_expansion(struct lexer *lexer);
-
-void expand_str(char **str);
+void expand_quoting(struct token *tok);
 
 #endif /* ! LEXER_H */
