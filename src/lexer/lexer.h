@@ -84,4 +84,8 @@ struct token lexer_pop(struct lexer *lexer);
  */
 void single_quote_expansion(struct lexer *lexer);
 
+void double_quote_expansion(struct lexer *lexer);
+
+void expand_str(char **str);
+
 #endif /* ! LEXER_H */

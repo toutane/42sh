@@ -332,7 +332,11 @@ struct token parse_input_for_tok(struct lexer *lexer)
 
     categorize_token(&(lexer->cur_tok));
 
-    single_quote_expansion(lexer);
+    expand_str(&(lexer->cur_tok.value));
+
+    // single_quote_expansion(lexer);
+
+    // double_quote_expansion(lexer);
 
     return lexer->cur_tok;
 }
