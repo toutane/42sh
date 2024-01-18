@@ -1,4 +1,4 @@
-#include "parser.h"
+#include "../parser.h"
 
 /**
  * @brief Parse a pipeline
@@ -13,7 +13,7 @@ enum parser_status parse_list(struct ast **res, struct lexer *lexer)
     if (parse_and_or(res, lexer) == PARSER_OK)
     {
         // Create list node for AST
-        struct ast *list_node = calloc(1, sizeof(struct ast));
+        struct ast *list_node = calloc(1, sizeof(struct ast_cmd_list));
         list_node->type = AST_COMMAND_LIST;
 
         // Add previously parsed `and_or` to AST

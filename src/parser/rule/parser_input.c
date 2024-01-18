@@ -1,4 +1,4 @@
-#include "parser.h"
+#include "../parser.h"
 
 /**
  * @brief Parse a and_or
@@ -29,6 +29,6 @@ enum parser_status parse(struct ast **res, struct lexer *lexer)
             return PARSER_OK;
         }
     }
-    fprintf(stderr, "Syntax Error !\n");
+    fprintf(stderr, "42sh: syntax error\n");
     return PARSER_UNEXPECTED_TOKEN;
 }

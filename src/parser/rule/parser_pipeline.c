@@ -1,4 +1,4 @@
-#include "parser.h"
+#include "../parser.h"
 
 enum parser_status parse_command(struct ast **res, struct lexer *lexer);
 
@@ -22,8 +22,8 @@ enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
         while (lexer_peek(lexer).type == TOKEN_PIPE)
         {
             // Create pipe node
-            struct ast *pipe_node = calloc(1, sizeof(struct ast));
-            init_pipeline_node(pipe_node);
+            struct ast *pipe_node = calloc(1, sizeof(struct ast_pipeline));
+            pipe_node->type = AST_PIPELINE;
 
             fill_pipeline_node(pipe_node, *res);
             lexer_pop(lexer);

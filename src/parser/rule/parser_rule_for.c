@@ -1,4 +1,4 @@
-#include "parser.h"
+#include "../parser.h"
 
 enum parser_status parse_compound_list(struct ast **res, struct lexer *lexer);
 

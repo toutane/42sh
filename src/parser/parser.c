@@ -2,66 +2,94 @@
 
 #include "parser.h"
 
-void fill_sc_node(struct ast *sc_node, struct lexer *lexer)
+void fill_sc_node(struct ast *ast, struct lexer *lexer)
 {
-    if (sc_node->nb_args == 0)
+    struct ast_cmd *sc_node = (struct ast_cmd *)ast;
+
+    if (sc_node->argc == 0)
     {
         // Init simple-command node
-        sc_node->type = AST_SIMPLE_COMMAND;
-        sc_node->nb_args = 2;
-        sc_node->argv = malloc(sc_node->nb_args * sizeof(char *));
-        // TODO: Check for NULL after allocation try
+        ast->type = AST_SIMPLE_COMMAND;
+        sc_node->argc = 2;
+        sc_node->argv = malloc(sc_node->argc * sizeof(char *));
+        if (!sc_node)
+        {
+            exit(1);
+        }
+
         sc_node->argv[0] = strdup(lexer->cur_tok.value);
-        sc_node->argv[sc_node->nb_args - 1] = NULL;
+        sc_node->argv[sc_node->argc - 1] = NULL;
     }
     else
     {
         // Append element to simple-command node
-        sc_node->nb_args += 1;
-        sc_node->argv =
-            realloc(sc_node->argv, sc_node->nb_args * sizeof(char *));
-        // TODO: Check for NULL after allocation try
-        sc_node->argv[sc_node->nb_args - 2] = strdup(lexer->cur_tok.value);
-        sc_node->argv[sc_node->nb_args - 1] = NULL;
-    }
-}
-
-void fill_list_node(struct ast *list_node, struct ast *sc_node)
-{
-    list_node->nb_child += 1;
-    list_node->children = realloc(list_node->children,
-                                  sizeof(struct ast *) * list_node->nb_child);
-    // TODO: Check for NULL after allocation try
-    list_node->children[list_node->nb_child - 1] = sc_node;
-}
-
-void init_if_node(struct ast *if_node)
-{
-    // Init if_node
-    if_node->type = AST_CONDITION;
-    if_node->nb_child = 3;
-    if_node->children = calloc(if_node->nb_child, sizeof(struct ast *));
-    // TODO: Check for NULL after allocation try
-}
-
-void fill_if_node(struct ast *if_node, struct ast *node)
-{
-    if (if_node->nb_child == 0)
-    {
-        fprintf(stderr, "Uninitialized if_node");
-        return;
-    }
-    for (size_t i = 0; i < if_node->nb_child; i++)
-    {
-        if (!if_node->children[i])
+        sc_node->argc += 1;
+        sc_node->argv = realloc(sc_node->argv, sc_node->argc * sizeof(char *));
+        if (!sc_node)
         {
-            if_node->children[i] = node;
-            return;
+            exit(1);
         }
+
+        sc_node->argv[sc_node->argc - 2] = strdup(lexer->cur_tok.value);
+        sc_node->argv[sc_node->argc - 1] = NULL;
     }
-    fprintf(stderr, "If node can't have more than 3 children\n");
+    return;
 }
 
+void fill_list_node(struct ast *ast, struct ast *ast_cmd)
+{
+    struct ast_cmd_list *ast_cmd_list = (struct ast_cmd_list *)ast;
+
+    if (!ast_cmd_list->cmd)
+    {
+        ast_cmd_list->cmd = ast_cmd;
+    }
+    else
+    {
+        while (ast_cmd_list->next)
+        {
+            ast_cmd_list = (struct ast_cmd_list *)ast_cmd_list->next;
+        }
+        /// Create a list node
+        struct ast_cmd_list *new_list = calloc(1, sizeof(struct ast_cmd_list));
+        new_list->base.type = AST_COMMAND_LIST;
+        new_list->cmd = ast_cmd;
+
+        // Append it
+        ast_cmd_list->next = (struct ast *)new_list;
+    }
+    return;
+}
+
+/*
+void init_if_node(struct ast *ast)
+{
+    ast->type = AST_CONDITION;
+    return;
+}
+*/
+
+// every if, then and else have to be filled in the right order
+void fill_if_node(struct ast *ast, struct ast *ast_child)
+{
+    struct ast_condition *ast_condition = (struct ast_condition *)ast;
+
+    if (!ast_condition->condition)
+    {
+        ast_condition->condition = ast_child;
+    }
+    else if (!ast_condition->then_body)
+    {
+        ast_condition->then_body = ast_child;
+    }
+    else
+    {
+        ast_condition->else_body = ast_child;
+    }
+    return;
+}
+
+/*
 void init_redirection_node(struct ast *redirection_node)
 {
     redirection_node->type = AST_REDIRECTION;
@@ -69,13 +97,25 @@ void init_redirection_node(struct ast *redirection_node)
     redirection_node->argv = calloc(redirection_node->nb_args, sizeof(char *));
     // TODO CHECK if calloc failed
 }
+*/
 
-void fill_redirection_node(struct ast *redirection_node, size_t position,
-                           char *str)
+// default case: ionumber set to 1
+void fill_redirection_node(struct ast *ast, int ionumber, char *str)
 {
-    redirection_node->argv[position] = strdup(str);
+    struct ast_redirection *ast_redirection = (struct ast_redirection *)ast;
+
+    if (!str)
+    {
+        ast_redirection->ionumber = ionumber;
+    }
+    else
+    {
+        ast_redirection->data = strdup(str);
+    }
+    return;
 }
 
+/*
 void init_pipeline_node(struct ast *pipe_node)
 {
     pipe_node->type = AST_PIPELINE;
@@ -83,16 +123,20 @@ void init_pipeline_node(struct ast *pipe_node)
     pipe_node->children = calloc(2, sizeof(struct ast *));
     // TODO CHECK if calloc failed
 }
+*/
 
-void fill_pipeline_node(struct ast *pipe_node, struct ast *node)
+void fill_pipeline_node(struct ast *ast, struct ast *ast_child)
 {
-    for (size_t i = 0; i < pipe_node->nb_child; ++i)
+    struct ast_pipeline *ast_pipeline = (struct ast_pipeline *)ast;
+
+    if (!ast_pipeline->left)
     {
-        if (!pipe_node->children[i])
-        {
-            pipe_node->children[i] = node;
-            return;
-        }
+        ast_pipeline->left = ast_child;
     }
-    fprintf(stderr, "42sh: If node can't have more than 2 children\n");
+    else
+    {
+        ast_pipeline->left = ast_child;
+    }
+
+    return;
 }

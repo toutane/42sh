@@ -10,16 +10,19 @@
 #define NODE_FORMAT                                                            \
     "node%p [label=%s, color=\"%s\", style=filled, fillcolor=\"%s\"]\n"
 
+/*
 // Lookup table for AST node types
 static char *ast_type_str[] = {
     [AST_COMMAND_LIST] = "LIST",
     [AST_SIMPLE_COMMAND] = "CMD",
     [AST_CONDITION] = "IF",
 };
+*/
 
 /*
  * @brief Write a dot formated ast into a file
  */
+/*
 static void generate_dot_file(struct ast *node, FILE *file)
 {
     if (node == NULL)
@@ -67,30 +70,37 @@ static void generate_dot_file(struct ast *node, FILE *file)
         generate_dot_file(node->children[i], file);
     }
 }
+*/
 
 int create_dot_file(struct ast *ast, char *filename)
 {
-    printf("Output AST in dot format (in \"%s\")\n", filename);
-    FILE *file = fopen(filename, "w");
-    if (file == NULL)
-    {
-        fprintf(stderr, "42sh: create_dot_file: Could not open file %s\n",
-                filename);
+    if (ast && filename)
         return 1;
-    }
-
-    fprintf(file, "digraph AST {\n");
-
-    fprintf(file, "splines=false;\n"); // Remove curved edges
-    fprintf(file,
-            "node [fontname=helvetica, shape=record];\n"); // Set font and shape
-                                                           // for nodes
-    fprintf(file, "edge [fontname=helvetica];\n"); // Set font for edges
-
-    generate_dot_file(ast, file);
-
-    fprintf(file, "}\n");
-
-    fclose(file);
     return 0;
+    /*
+        printf("Output AST in dot format (in \"%s\")\n", filename);
+        FILE *file = fopen(filename, "w");
+        if (file == NULL)
+        {
+            fprintf(stderr, "42sh: create_dot_file: Could not open file %s\n",
+                    filename);
+            return 1;
+        }
+
+        fprintf(file, "digraph AST {\n");
+
+        fprintf(file, "splines=false;\n"); // Remove curved edges
+        fprintf(file,
+                "node [fontname=helvetica, shape=record];\n"); // Set font and
+    shape
+                                                               // for nodes
+        fprintf(file, "edge [fontname=helvetica];\n"); // Set font for edges
+
+        generate_dot_file(ast, file);
+
+        fprintf(file, "}\n");
+
+        fclose(file);
+        return 0;
+    */
 }
