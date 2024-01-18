@@ -16,10 +16,6 @@ enum parser_status parse_list(struct ast **res, struct lexer *lexer)
         struct ast *list_node = calloc(1, sizeof(struct ast_cmd_list));
         list_node->type = AST_COMMAND_LIST;
 
-        // if we dont do this for some reason the address of this two is 0x1
-        ((struct ast_cmd_list *)list_node)->base = NULL;
-        ((struct ast_cmd_list *)list_node)->next = NULL;
-
         // Add previously parsed `and_or` to AST
         fill_list_node(list_node, *res);
 

@@ -42,14 +42,14 @@ struct ast
 
 struct ast_cmd
 {
-    struct ast *base;
+    struct ast base;
     char **argv;
     int argc;
 };
 
 struct ast_condition
 {
-    struct ast *base;
+    struct ast base;
     struct ast *condition;
     struct ast *then_body;
     struct ast *else_body;
@@ -57,7 +57,7 @@ struct ast_condition
 
 struct ast_cmd_list
 {
-    struct ast *base;
+    struct ast base;
     // ast_cmd
     struct ast *cmd;
     // ast_cmd_list
@@ -66,14 +66,14 @@ struct ast_cmd_list
 
 struct ast_pipeline
 {
-    struct ast *base;
+    struct ast base;
     struct ast *left;
     struct ast *right;
 };
 
 struct ast_redirection
 {
-    struct ast *base;
+    struct ast base;
     enum redirection_type redirection_type;
     // -1 if no ionumber during parsing
     int ionumber;
