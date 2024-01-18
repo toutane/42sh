@@ -17,6 +17,7 @@ int eval_ast(struct ast *ast)
         //[AST_PIPELINE] = &eval_pipeline,
     };
 
+    printf("%d\n", ast->type);
     return (*functions[ast->type])(ast);
 }
 

@@ -23,7 +23,7 @@ void free_ast_cmd_list(struct ast *ast)
 
 void free_ast_if(struct ast *ast)
 {
-    struct ast_if *ast_if = (struct ast_if *)ast;
+    struct ast_condition *ast_if = (struct ast_condition *)ast;
     ast_free(ast_if->condition);
     ast_free(ast_if->then_body);
     ast_free(ast_if->else_body);
@@ -43,7 +43,8 @@ void free_ast_pipeline(struct ast *ast)
 void free_ast_redir(struct ast *ast)
 {
     struct ast_redirection *ast_redirection = (struct ast_redirection *)ast;
-    free(ast_redirection->data);
+    if (ast_redirection->data)
+        free(ast_redirection->data);
     free(ast);
     return;
 }
@@ -59,7 +60,7 @@ void ast_free(struct ast *ast)
     static const free_type functions[] = {
         [AST_SIMPLE_COMMAND] = &free_ast_cmd,
         [AST_COMMAND_LIST] = &free_ast_cmd_list,
-        [AST_IF] = &free_ast_if,
+        [AST_CONDITION] = &free_ast_if,
         [AST_REDIRECTION] = &free_ast_redir,
         [AST_PIPELINE] = &free_ast_pipeline,
     };

@@ -28,7 +28,7 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
     }
     if (lexer_peek(lexer).type == TOKEN_WORD)
     {
-        struct ast *sc_node = calloc(1, sizeof(struct ast));
+        struct ast *sc_node = calloc(1, sizeof(struct ast_cmd));
         if (!sc_node)
         {
             return PARSER_UNEXPECTED_TOKEN;

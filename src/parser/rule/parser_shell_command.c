@@ -1,4 +1,4 @@
-#include "parser.h"
+#include "../parser.h"
 
 enum parser_status parse_rule_if(struct ast **res, struct lexer *lexer);
 enum parser_status parse_rule_while(struct ast **res, struct lexer *lexer);

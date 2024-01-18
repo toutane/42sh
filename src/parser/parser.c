@@ -9,7 +9,7 @@ void fill_sc_node(struct ast *ast, struct lexer *lexer)
     if (sc_node->argc == 0)
     {
         // Init simple-command node
-        sc_node->base->type = AST_SIMPLE_COMMAND;
+        ast->type = AST_SIMPLE_COMMAND;
         sc_node->argc = 2;
         sc_node->argv = malloc(sc_node->argc * sizeof(char *));
         if (!sc_node)
@@ -40,12 +40,19 @@ void fill_list_node(struct ast *ast, struct ast *ast_cmd)
 {
     struct ast_cmd_list *ast_cmd_list = (struct ast_cmd_list *)ast;
 
-    while (ast_cmd_list->next)
+    if (!ast_cmd_list->base)
     {
-        ast_cmd_list = (struct ast_cmd_list *)ast_cmd_list->next;
+        ast_cmd_list->base = ast_cmd;
     }
+    else
+    {
+        while (ast_cmd_list->next)
+        {
+            ast_cmd_list = (struct ast_cmd_list *)ast_cmd_list->next;
+        }
 
-    ast_cmd_list->next = ast_cmd;
+        ast_cmd_list->next = ast_cmd;
+    }
     return;
 }
 
