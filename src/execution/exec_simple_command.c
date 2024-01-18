@@ -14,11 +14,16 @@ int eval_simple_command(struct ast *ast)
     }
 
     int pid = fork();
-    // TODO: check if fork suceed
+    // Check if fork suceed
+    if (pid == -1)
+    {
+        perror("");
+        _exit(127); // Check this value
+    }
     if (pid == 0)
     {
         execvp(ast_cmd->argv[0], ast_cmd->argv);
-        exit(execvp_error(errno));
+        _exit(execvp_error(errno));
     }
     else
     {
