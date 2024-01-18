@@ -3,7 +3,7 @@
 void free_ast_cmd(struct ast *ast)
 {
     struct ast_cmd *ast_cmd = (struct ast_cmd *)ast;
-    for (int i = 0; ast_cmd->argv[i] != NULL; ++i)
+    for (int i = 0; i < ast_cmd->argc; ++i)
     {
         free(ast_cmd->argv[i]);
     }
