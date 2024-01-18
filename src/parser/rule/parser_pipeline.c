@@ -1,7 +1,5 @@
 #include "../parser.h"
 
-enum parser_status parse_command(struct ast **res, struct lexer *lexer);
-
 /**
  * @brief Parse a command
  *
