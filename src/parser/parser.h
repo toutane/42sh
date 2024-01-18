@@ -14,32 +14,23 @@ enum parser_status
     PARSER_UNEXPECTED_TOKEN,
 };
 
-void fill_sc_node(struct ast *sc_node, struct lexer *lexer);
-
-void fill_list_node(struct ast *list_node, struct ast *sc_node);
-
-void init_if_node(struct ast *if_node);
-
-void fill_if_node(struct ast *if_node, struct ast *node);
-
-void init_redirection_node(struct ast *redirection_node);
-
-void fill_redirection_node(struct ast *redirection_node, int position,
-                           char *str);
-
-void init_pipeline_node(struct ast *if_node);
-
-void fill_pipeline_node(struct ast *if_node, struct ast *node);
-
-/**
- * @brief Parse either a list, or newline
- *
- * input =     list '\n'
- *          |  list EOF
- *          | '\n'
- *          | EOF
- *          ;
- */
 enum parser_status parse(struct ast **res, struct lexer *lexer);
+
+enum parser_status parse_and_or(struct ast **res, struct lexer *lexer);
+enum parser_status parse_command(struct ast **res, struct lexer *lexer);
+enum parser_status parse_compound_list(struct ast **res, struct lexer *lexer);
+enum parser_status parse_element(struct ast **res, struct lexer *lexer);
+enum parser_status parse_else_clause(struct ast **res, struct lexer *lexer);
+enum parser_status parse_input(struct ast **res, struct lexer *lexer);
+enum parser_status parse_list(struct ast **res, struct lexer *lexer);
+enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer);
+enum parser_status parse_prefix(struct ast **res, struct lexer *lexer);
+enum parser_status parse_redirection(struct ast **res, struct lexer *lexer);
+enum parser_status parse_rule_for(struct ast **res, struct lexer *lexer);
+enum parser_status parse_rule_if(struct ast **res, struct lexer *lexer);
+enum parser_status parse_rule_until(struct ast **res, struct lexer *lexer);
+enum parser_status parse_rule_while(struct ast **res, struct lexer *lexer);
+enum parser_status parse_shell_command(struct ast **res, struct lexer *lexer);
+enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer);
 
 #endif /* ! PARSER_H */

@@ -1,10 +1,5 @@
 #include "../parser.h"
 
-enum parser_status parse_rule_if(struct ast **res, struct lexer *lexer);
-enum parser_status parse_rule_while(struct ast **res, struct lexer *lexer);
-enum parser_status parse_rule_until(struct ast **res, struct lexer *lexer);
-enum parser_status parse_rule_for(struct ast **res, struct lexer *lexer);
-
 /**
  * @brief Parse a shell rule
  *

@@ -2,6 +2,7 @@
 
 int eval_pipeline(struct ast *ast)
 {
+    struct ast_pipeline *ast_pipeline = (struct ast_pipeline *)ast;
     int fds[2];
     if (pipe(fds) == -1)
     {
@@ -29,7 +30,7 @@ int eval_pipeline(struct ast *ast)
             exit(127);
         }
 
-        int res = eval_ast(ast->children[0]);
+        int res = eval_ast(ast_pipeline->left);
         close(fds[1]);
         exit(res);
     }
@@ -58,7 +59,7 @@ int eval_pipeline(struct ast *ast)
                 exit(127);
             }
 
-            int res = eval_ast(ast->children[1]);
+            int res = eval_ast(ast_pipeline->right);
             close(fds[0]);
             exit(res);
         }

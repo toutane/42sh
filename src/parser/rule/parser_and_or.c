@@ -1,7 +1,5 @@
 #include "../parser.h"
 
-enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer);
-
 /**
  * @brief Parse one or more pipelines separated by operators && or ||
  *

@@ -5,8 +5,6 @@
  *
  * and_or =         pipeline ;
  */
-enum parser_status parse_and_or(struct ast **res, struct lexer *lexer);
-
 enum parser_status parse_list(struct ast **res, struct lexer *lexer)
 {
     // | and_or

@@ -8,6 +8,7 @@
 
 #include "../error_handling/error_handling_execvp.h"
 #include "../utils/token/token.h"
+#include "lexer/lexer.h"
 
 enum ast_type
 {
@@ -80,20 +81,18 @@ struct ast_redirection
     char *data;
 };
 
-/*
-struct ast
-{
-    enum ast_type type; ///< The kind of node we're dealing with
-    char **argv; ///< Content of the AST_SIMPLE_COMMAND
-    size_t nb_args; ///< Size of argv field (NULL included)
-    struct ast **children; ///< The children list of the node if any
-    size_t nb_child; ///< The number of node's children
-};
-*/
-
 /**
  * @brief Frees the ast.
  */
 void ast_free(struct ast *ast);
+
+/**
+ * @brief Fill the ast.
+ */
+void fill_sc_node(struct ast *ast, struct lexer *lexer);
+void fill_list_node(struct ast *ast, struct ast *ast_cmd);
+void fill_if_node(struct ast *ast, struct ast *ast_child);
+void fill_redirection_node(struct ast *ast, int ionumber, char *str);
+void fill_pipeline_node(struct ast *ast, struct ast *ast_child);
 
 #endif /* ! AST_H */

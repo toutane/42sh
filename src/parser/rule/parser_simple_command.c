@@ -1,9 +1,5 @@
 #include "../parser.h"
 
-enum parser_status parse_element(struct ast **res, struct lexer *lexer);
-
-enum parser_status parse_prefix(struct ast **res, struct lexer *lexer);
-
 /**
  * @brief Parse any prefix, possibly followed by a WORD and by any number
  * of element
