@@ -5,8 +5,8 @@
 #include <string.h>
 
 #include "../ast/ast.h"
-#include "lexer/lexer.h"
-#include "utils/token/token.h"
+#include "../lexer/lexer.h"
+#include "../utils/token/token.h"
 
 enum parser_status
 {
