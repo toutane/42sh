@@ -38,6 +38,7 @@ enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
             }
             // Free node(s)
             ast_free(pipe_node);
+            *res = NULL;
             return PARSER_UNEXPECTED_TOKEN;
         }
         // Assign to possible negation node
