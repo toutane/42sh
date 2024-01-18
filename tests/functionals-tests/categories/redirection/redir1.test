@@ -1,0 +1,5 @@
+echo hi > output.txt
+< output.txt echo hi
+> output.txt echo ha
+< file1.txt > output.txt echo ha
+echo tata > file1 > file2 > file3
