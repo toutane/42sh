@@ -35,6 +35,16 @@ struct lexer
  */
 struct lexer *lexer_new(struct stream_info *stream, struct options *opts);
 
+/*
+ * @brief The different contexts in which a quote can be found.
+ */
+enum QUOTING_CONTEXT
+{
+    NONE,
+    SINGLE_QUOTE,
+    DOUBLE_QUOTE
+};
+
 /**
  ** @brief Free the given lexer, but not its input.
  */

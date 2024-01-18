@@ -70,11 +70,13 @@ int execution_loop(struct options *opts, struct stream_info *stream)
 
         // Evaluate the AST
         status = eval_ast(ast);
+        /*
         if (status != 0)
         {
             free_all(ast, lexer, stream);
             return status;
         }
+        */
 
         // Free the AST
         ast_free(ast);

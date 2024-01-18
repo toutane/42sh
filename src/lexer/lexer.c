@@ -102,11 +102,12 @@ static void handle_word_delimiter(struct lexer *lexer, char delim)
     }
 }
 
-static void handle_single_quote(struct lexer *lexer, int *is_inside_quotes)
+static void handle_single_quote(struct lexer *lexer,
+                                enum QUOTING_CONTEXT *quoting_context)
 {
-    if (!*is_inside_quotes)
+    if (*quoting_context == NONE)
     {
-        *is_inside_quotes = 1;
+        *quoting_context = SINGLE_QUOTE;
         if (lexer->cur_tok.type == TOKEN_NONE)
         {
             fill_token(&lexer->cur_tok, TOKEN_WORD, NULL);
@@ -116,9 +117,59 @@ static void handle_single_quote(struct lexer *lexer, int *is_inside_quotes)
     }
     else
     {
-        *is_inside_quotes = 0;
+        if (*quoting_context != DOUBLE_QUOTE)
+        {
+            *quoting_context = NONE;
+        }
         append_consume(lexer, '\'');
     }
+
+    return;
+}
+
+static void handle_double_quote(struct lexer *lexer,
+                                enum QUOTING_CONTEXT *quoting_context)
+{
+    if (*quoting_context == NONE)
+    {
+        *quoting_context = DOUBLE_QUOTE;
+        if (lexer->cur_tok.type == TOKEN_NONE)
+        {
+            fill_token(&lexer->cur_tok, TOKEN_WORD, NULL);
+        }
+
+        append_consume(lexer, '"');
+    }
+    else
+    {
+        if (*quoting_context != SINGLE_QUOTE)
+        {
+            *quoting_context = NONE;
+        }
+        append_consume(lexer, '"');
+    }
+
+    return;
+}
+
+/* Quoting is used to remove the special meaning of certain characters or words
+ * to the shell. */
+static void handle_quoting(struct lexer *lexer, char cur_char,
+                           enum QUOTING_CONTEXT *quoting_context)
+{
+    switch (cur_char)
+    {
+    case '\'':
+        handle_single_quote(lexer, quoting_context);
+        break;
+    case '"':
+        handle_double_quote(lexer, quoting_context);
+        break;
+    default:
+        // Should not happen
+        break;
+    }
+    return;
 }
 
 static void handle_comment(struct lexer *lexer)
@@ -138,10 +189,10 @@ static void handle_comment(struct lexer *lexer)
  * https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_10)
  * to delimits tokens.
  */
-static void delimit_token(struct lexer *lexer)
+static void delimit_token(struct lexer *lexer,
+                          enum QUOTING_CONTEXT *quoting_context)
 {
-    int is_inside_quotes = 0;
-
+    // int is_quoted = (*quoting_context != NONE);
     char prev_char;
     size_t len;
 
@@ -151,6 +202,7 @@ static void delimit_token(struct lexer *lexer)
     {
         set_len_and_prev_char(lexer, &prev_char, &len);
         char cur_char = stream_peek(lexer->stream);
+        // printf("cur_char: %c\n", cur_char);
 
         /* Token Recognition Algorithm Rule 1
          * If the end of the input stream is encountered, the current token
@@ -160,7 +212,7 @@ static void delimit_token(struct lexer *lexer)
         {
             handle_word_delimiter(lexer, EOF);
             lexer->cur_tok.type =
-                is_inside_quotes ? TOKEN_ERROR : lexer->cur_tok.type;
+                (*quoting_context != NONE) ? TOKEN_ERROR : lexer->cur_tok.type;
 
             // Delimit the current token
             return;
@@ -171,7 +223,7 @@ static void delimit_token(struct lexer *lexer)
          * current character is not quoted and can be used with the previous
          * characters to form an operator, it shall be used as part of that
          * (operator) token. */
-        if (lexer->cur_tok.type == TOKEN_OPERATOR && !is_inside_quotes
+        if (lexer->cur_tok.type == TOKEN_OPERATOR && !(*quoting_context != NONE)
             && len == 1 && can_be_second_in_ope(prev_char, cur_char))
         {
             append_consume(lexer, cur_char);
@@ -188,15 +240,18 @@ static void delimit_token(struct lexer *lexer)
             return;
         }
 
-        // Token Recognition Algorithm Rule 4
-        if (cur_char == '\'')
+        /* Token Recognition Algorithm Rule 4
+         * If the current character is single-quote, or
+         * double-quote and it is not quoted, it shall affect quoting for
+         * subsequent characters up to the end of the quoted text. */
+        if (cur_char == '\'' || cur_char == '"')
         {
-            handle_single_quote(lexer, &is_inside_quotes);
+            handle_quoting(lexer, cur_char, quoting_context);
             continue;
         }
 
         /* Token Recognition Algorithm Rule 6 */
-        if (!is_inside_quotes && can_be_first_in_ope(cur_char))
+        if (!(*quoting_context != NONE) && can_be_first_in_ope(cur_char))
         {
             if (lexer->cur_tok.type == TOKEN_NONE)
             {
@@ -227,7 +282,7 @@ static void delimit_token(struct lexer *lexer)
          * character shall be discarded if it is a <blank>, for '\n' and ';',
          * the current token shall be updated to TOKEN_NEWLINE or
          * TOKEN_SEMICOLON*/
-        if (!is_inside_quotes && is_delimiter(cur_char))
+        if (!(*quoting_context != NONE) && is_delimiter(cur_char))
         {
             handle_word_delimiter(lexer, cur_char);
 
@@ -268,12 +323,17 @@ static void delimit_token(struct lexer *lexer)
 
 struct token parse_input_for_tok(struct lexer *lexer)
 {
+    enum QUOTING_CONTEXT quoting_context = NONE;
+
     // Reset current token
     lexer->cur_tok.type = TOKEN_NONE;
 
-    delimit_token(lexer);
+    delimit_token(lexer, &quoting_context);
+
     categorize_token(&(lexer->cur_tok));
+
     single_quote_expansion(lexer);
+
     return lexer->cur_tok;
 }
 
