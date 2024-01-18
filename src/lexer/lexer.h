@@ -3,10 +3,10 @@
 
 #include <stddef.h>
 
-#include "../io/io.h"
-#include "../options/opt_parser.h"
-#include "../utils/strings/strings.h"
-#include "../utils/token/token.h"
+#include "io/io.h"
+#include "options/opt_parser.h"
+#include "utils/strings/strings.h"
+#include "utils/token/token.h"
 
 /**
  * @file lexer.h
@@ -72,6 +72,6 @@ struct token lexer_pop(struct lexer *lexer);
  * the single quotes are removed. This is a very basic expansion that seems to
  * work for step 1.
  */
-void single_quote_expansion(struct lexer *lexer);
+void single_quote_expansion(char **str);
 
 #endif /* ! LEXER_H */

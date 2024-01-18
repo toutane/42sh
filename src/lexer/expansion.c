@@ -1,17 +1,19 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "lexer.h"
 
-void single_quote_expansion(struct lexer *lexer)
+void single_quote_expansion(char **str)
 {
-    if (lexer->cur_tok.type != TOKEN_WORD)
+    if (*str == NULL)
     {
         return;
     }
 
-    char *val = lexer->cur_tok.value;
-    size_t len = strlen(val);
+    //printf("single_quote_expansion: %s\n", *str);
+
+    size_t len = strlen(*str);
     if (len < 2)
     {
         return;
@@ -21,7 +23,7 @@ void single_quote_expansion(struct lexer *lexer)
     int nb_single_quotes = 0;
     for (size_t i = 0; i < len; i++)
     {
-        if (val[i] == '\'')
+        if ((*str)[i] == '\'')
         {
             nb_single_quotes++;
         }
@@ -32,13 +34,17 @@ void single_quote_expansion(struct lexer *lexer)
     int j = 0;
     for (size_t i = 0; i < len; i++)
     {
-        if (val[i] != '\'')
+        if ((*str)[i] != '\'')
         {
-            new_val[j] = val[i];
+            new_val[j] = (*str)[i];
             j++;
         }
     }
 
-    free(lexer->cur_tok.value);
-    lexer->cur_tok.value = new_val;
+    //printf("new value: %s\n", new_val);
+
+    // Free the old value and replace it with the new one
+    free(*str);
+    *str = new_val;
+    return;
 }

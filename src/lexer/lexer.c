@@ -273,7 +273,7 @@ struct token parse_input_for_tok(struct lexer *lexer)
 
     delimit_token(lexer);
     categorize_token(&(lexer->cur_tok));
-    single_quote_expansion(lexer);
+    // single_quote_expansion(lexer);
     return lexer->cur_tok;
 }
 

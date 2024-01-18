@@ -1,15 +1,16 @@
 #ifndef EXEC_H
 #define EXEC_H
 
-#include "../ast/ast.h"
-#include "../builtins/builtins.h"
-#include "../error_handling/error_handling.h"
-#include "../io/io.h"
-#include "../options/opt_parser.h"
-#include "../parser/parser.h"
-#include "../utils/dot_file/dot_file.h"
-#include "../utils/printers/printers.h"
-#include "../utils/token/token.h"
+#include "ast/ast.h"
+#include "builtins/builtins.h"
+#include "error_handling/error_handling.h"
+#include "io/io.h"
+#include "options/opt_parser.h"
+#include "parser/parser.h"
+#include "utils/dot_file/dot_file.h"
+#include "utils/printers/printers.h"
+#include "utils/token/token.h"
+#include "lexer/lexer.h"
 
 /*
  * @brief: Executes the program in a loop, reading from the input stream while
