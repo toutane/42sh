@@ -55,3 +55,6 @@ Makefile
 configure~
 build/*
 debug/*
+
+# when working in pie
+.__afs*
