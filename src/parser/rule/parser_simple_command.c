@@ -1,4 +1,4 @@
-#include "parser.h"
+#include "../parser.h"
 
 enum parser_status parse_element(struct ast **res, struct lexer *lexer);
 
@@ -28,11 +28,16 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
     }
     if (lexer_peek(lexer).type == TOKEN_WORD)
     {
-        struct ast *sc_node = calloc(1, sizeof(struct ast));
-        // TODO: Check for NULL after allocation try
+        struct ast *sc_node = calloc(1, sizeof(struct ast_cmd));
+        if (!sc_node)
+        {
+            return PARSER_UNEXPECTED_TOKEN;
+        }
+        sc_node->type = AST_SIMPLE_COMMAND;
 
         // Fill node
         fill_sc_node(sc_node, lexer);
+
         // replace AST
         *res = sc_node;
 

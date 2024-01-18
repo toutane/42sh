@@ -1,4 +1,4 @@
-#include "parser.h"
+#include "../parser.h"
 
 enum parser_status parse_compound_list(struct ast **res, struct lexer *lexer);
 
@@ -27,8 +27,8 @@ enum parser_status parse_else_clause(struct ast **res, struct lexer *lexer)
     else if (lexer->cur_tok.type == TOKEN_ELIF)
     {
         // Create IF node
-        struct ast *elif_node = calloc(1, sizeof(struct ast));
-        init_if_node(elif_node);
+        struct ast *elif_node = calloc(1, sizeof(struct ast_condition));
+        elif_node->type = AST_CONDITION;
 
         // Pop 'elif'
         lexer_pop(lexer);

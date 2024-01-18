@@ -3,10 +3,12 @@
 int eval_list(struct ast *ast)
 {
     int status = 0;
+    struct ast_cmd_list *ast_cmd_list = (struct ast_cmd_list *)ast;
 
-    for (size_t i = 0; i < ast->nb_child; i++)
+    while (ast_cmd_list)
     {
-        status = eval_ast(ast->children[i]);
+        status = eval_ast(ast_cmd_list->cmd);
+        ast_cmd_list = (struct ast_cmd_list *)ast_cmd_list->next;
     }
 
     return status;
