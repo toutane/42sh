@@ -23,11 +23,3 @@ enum parser_status parse_prefix(struct ast **res, struct lexer *lexer)
     }
     return PARSER_UNEXPECTED_TOKEN;
 }
-
-/*
- *
- *
- * simple command node = { assignment_word }, words....
- *
- *
- */
