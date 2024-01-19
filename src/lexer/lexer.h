@@ -8,6 +8,15 @@
 #include "../utils/strings/strings.h"
 #include "../utils/token/token.h"
 
+enum LEXER_ERROR
+{
+    NO_ERROR,
+    UNMATCHED_SINGLE_QUOTE,
+    UNMATCHED_DOUBLE_QUOTE,
+    UNMATCHED_BRACE,
+    BAD_SUBSTITUTION,
+};
+
 /**
  * @file lexer.h
  * @brief Structures and functions to create and use a lexer.
@@ -28,6 +37,7 @@ struct lexer
     struct stream_info *stream; // The input stream
     struct token cur_tok; // The next token, if processed
     int must_parse_next_tok; // 1 if the next token must be parsed, 0 otherwise
+    enum LEXER_ERROR last_error; // The last error that occured
 };
 
 /**
@@ -42,7 +52,7 @@ enum QUOTING_CONTEXT
 {
     NONE,
     SINGLE_QUOTE,
-    DOUBLE_QUOTE
+    DOUBLE_QUOTE,
 };
 
 /**
