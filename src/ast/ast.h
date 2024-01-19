@@ -7,21 +7,21 @@
 #include <sys/wait.h>
 
 #include "../error_handling/error_handling_execvp.h"
+#include "../lexer/lexer.h"
 #include "../utils/token/token.h"
-#include "lexer/lexer.h"
 
 enum ast_type
 {
     AST_SIMPLE_COMMAND,
     AST_COMMAND_LIST,
     AST_CONDITION,
-    AST_REDIRECTION,
     AST_PIPELINE,
+    AST_REDIRECTION,
+    AST_NEG,
     /*
     AST_MUL,
     AST_DIV,
     AST_NUMBER,
-    AST_NEG
     */
 };
 
@@ -80,6 +80,12 @@ struct ast_redirection
     int ionumber;
     char *target;
     struct ast *next;// -> next -> NULL
+};
+
+struct ast_neg
+{
+    struct ast base;
+    struct ast *data;
 };
 
 /**

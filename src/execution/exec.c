@@ -15,6 +15,7 @@ int eval_ast(struct ast *ast)
         [AST_CONDITION] = &eval_condition,
         [AST_PIPELINE] = &eval_pipeline,
         [AST_REDIRECTION] = &eval_redirection,
+        [AST_NEG] = &eval_neg,
     };
 
     return (*functions[ast->type])(ast);
