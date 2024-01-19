@@ -7,9 +7,14 @@
  */
 enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
 {
+    struct ast *neg_node = NULL;
+
     // ['!']
     if (lexer_peek(lexer).type == TOKEN_NEG)
     {
+        neg_node = calloc(1, sizeof(struct ast_neg));
+        neg_node->type = AST_NEG;
+
         // Create negation node
         lexer_pop(lexer);
     }
@@ -36,15 +41,24 @@ enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
 
                 continue;
             }
+
             // Free node(s)
             ast_free(pipe_node);
+            ast_free(neg_node);
             *res = NULL;
             return PARSER_UNEXPECTED_TOKEN;
         }
-        // Assign to possible negation node
-        // then on AST
+
+        // assign to possible negation node
+        if (neg_node)
+        {
+            ((struct ast_neg *)neg_node)->data = *res;
+            *res = neg_node;
+        }
+
         return PARSER_OK;
     }
     // Free node(s)
+    ast_free(neg_node);
     return PARSER_UNEXPECTED_TOKEN;
 }
