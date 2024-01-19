@@ -78,4 +78,6 @@ struct token lexer_pop(struct lexer *lexer);
 
 void expand_quoting(char **str);
 
+int is_assignment_word(struct token *token, int is_the_first_word);
+
 #endif /* ! LEXER_H */

@@ -40,3 +40,16 @@ int is_str_sequence_of_digits(char *str)
 
     return 1;
 }
+
+int is_name(char *str)
+{
+    for (int i = 0; str[i] != '\0'; i++)
+    {
+        if (!isalnum(str[i]) && str[i] != '_')
+        {
+            return 0;
+        }
+    }
+
+    return 1;
+}

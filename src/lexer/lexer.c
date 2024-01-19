@@ -396,3 +396,60 @@ struct token lexer_pop(struct lexer *lexer)
     lexer->must_parse_next_tok = 1;
     return lexer->cur_tok;
 }
+
+/* Check if the given TOKEN_WORD can describe an assignment word. This is
+ * specified in the Rule 7 of the algorithm described in section 2.2.10 of the
+ * SCL
+ * (https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_10_02)
+ */
+int is_assignment_word(struct token *token, int is_the_first_word)
+{
+    // printf("is_assignment_word: %s, is_first_word: %d\n", token->value,
+    // is_the_first_word);
+    // An assignment must derive from a TOKEN_WORD
+    if (token->type != TOKEN_WORD)
+    {
+        return 0;
+    }
+
+    // Get the position of the '=' character if any, NULL otherwise
+    char *equal_sign = strchr(token->value, '=');
+
+    /* Rule 7.a */
+    if (is_the_first_word)
+    {
+        if (equal_sign == NULL)
+        {
+            return 0;
+        }
+    }
+
+    /* Rule 7.b */
+    // TODO: check if the '=' is not quoted
+    // First paragraph of the Rule 7.b
+
+    // Check if the first character is '=', if so 0 is returned
+    if (token->value != NULL && token->value[0] == '=')
+    {
+        return 0;
+    }
+
+    // Check that all the characters before '=' form a valid name
+    if (equal_sign != NULL)
+    {
+        char *name = malloc(sizeof(char) * (equal_sign - token->value + 1));
+        strncpy(name, token->value, equal_sign - token->value);
+        name[equal_sign - token->value] = '\0';
+
+        if (!is_name(name))
+        {
+            free(name);
+            return 0;
+        }
+
+        free(name);
+        return 1;
+    }
+
+    return 0;
+}
