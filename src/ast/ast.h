@@ -4,11 +4,12 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/wait.h>
 
 #include "../error_handling/error_handling_execvp.h"
+#include "../lexer/lexer.h"
 #include "../utils/token/token.h"
-#include "lexer/lexer.h"
 
 enum ast_type
 {
@@ -17,11 +18,11 @@ enum ast_type
     AST_CONDITION,
     AST_REDIRECTION,
     AST_PIPELINE,
+    AST_FOR,
     /*
     AST_MUL,
     AST_DIV,
     AST_NUMBER,
-    AST_NEG
     */
 };
 
@@ -81,6 +82,20 @@ struct ast_redirection
     char *data;
 };
 
+struct ast_for
+{
+    struct ast base;
+
+    // store the first word in the grammar
+    char *condition;
+
+    // if IN exists, then store data in array
+    char **array;
+    size_t array_size;
+
+    struct ast *data;
+};
+
 /**
  * @brief Frees the ast.
  */
@@ -94,5 +109,6 @@ void fill_list_node(struct ast *ast, struct ast *ast_cmd);
 void fill_if_node(struct ast *ast, struct ast *ast_child);
 void fill_redirection_node(struct ast *ast, int ionumber, char *str);
 void fill_pipeline_node(struct ast *ast, struct ast *ast_child);
+void fill_for_node(struct ast *ast, struct ast *ast_child, char *data);
 
 #endif /* ! AST_H */

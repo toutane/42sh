@@ -1,4 +1,4 @@
-#include "ast.h"
+#include "../ast.h"
 
 // every if, then and else have to be filled in the right order
 void fill_if_node(struct ast *ast, struct ast *ast_child)
@@ -19,4 +19,3 @@ void fill_if_node(struct ast *ast, struct ast *ast_child)
     }
     return;
 }
-

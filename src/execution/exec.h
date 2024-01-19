@@ -7,12 +7,12 @@
 #include "../builtins/builtins.h"
 #include "../error_handling/error_handling.h"
 #include "../io/io.h"
+#include "../lexer/lexer.h"
 #include "../options/opt_parser.h"
 #include "../parser/parser.h"
 #include "../utils/dot_file/dot_file.h"
 #include "../utils/printers/printers.h"
 #include "../utils/token/token.h"
-#include "lexer/lexer.h"
 
 /*
  * @brief: Executes the program in a loop, reading from the input stream while
@@ -31,5 +31,7 @@ int eval_condition(struct ast *ast);
 int eval_list(struct ast *ast);
 
 int eval_pipeline(struct ast *ast);
+
+int eval_for(struct ast *ast);
 
 #endif /* ! EXEC_H */
