@@ -1,6 +1,7 @@
 #ifndef EXEC_H
 #define EXEC_H
 
+#include <fcntl.h>
 #include <stdio.h>
 
 #include "../ast/ast.h"
@@ -31,6 +32,8 @@ int eval_condition(struct ast *ast);
 int eval_list(struct ast *ast);
 
 int eval_pipeline(struct ast *ast);
+
+int eval_redirection(struct ast *ast);
 
 int eval_neg(struct ast *ast);
 
