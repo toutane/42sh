@@ -7,8 +7,8 @@
 #include <sys/wait.h>
 
 #include "../error_handling/error_handling_execvp.h"
+#include "../lexer/lexer.h"
 #include "../utils/token/token.h"
-#include "lexer/lexer.h"
 
 enum ast_type
 {
@@ -17,11 +17,12 @@ enum ast_type
     AST_CONDITION,
     AST_REDIRECTION,
     AST_PIPELINE,
+    AST_WHILE,
+    AST_UNTIL,
     /*
     AST_MUL,
     AST_DIV,
     AST_NUMBER,
-    AST_NEG
     */
 };
 
@@ -79,6 +80,20 @@ struct ast_redirection
     // -1 if no ionumber during parsing
     int ionumber;
     char *data;
+};
+
+struct ast_while
+{
+    struct ast base;
+    struct ast *condition;
+    struct ast *data;
+};
+
+struct ast_until
+{
+    struct ast base;
+    struct ast *condition;
+    struct ast *data;
 };
 
 /**

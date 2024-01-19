@@ -49,6 +49,28 @@ void free_ast_redir(struct ast *ast)
     return;
 }
 
+void free_ast_while(struct ast *ast)
+{
+    struct ast_while *ast_while = (struct ast_while *)ast;
+    if (ast_while->condition)
+        ast_free(ast_while->condition);
+    if (ast_while->data)
+        ast_free(ast_while->data);
+    free(ast);
+    return;
+}
+
+void free_ast_until(struct ast *ast)
+{
+    struct ast_until *ast_until = (struct ast_until *)ast;
+    if (ast_until->condition)
+        ast_free(ast_until->condition);
+    if (ast_until->data)
+        ast_free(ast_until->data);
+    free(ast);
+    return;
+}
+
 typedef void (*free_type)(struct ast *ast);
 void ast_free(struct ast *ast)
 {
@@ -63,6 +85,8 @@ void ast_free(struct ast *ast)
         [AST_CONDITION] = &free_ast_if,
         [AST_REDIRECTION] = &free_ast_redir,
         [AST_PIPELINE] = &free_ast_pipeline,
+        [AST_WHILE] = &free_ast_while,
+        [AST_UNTIL] = &free_ast_until,
     };
     (*functions[ast->type])(ast);
 }
