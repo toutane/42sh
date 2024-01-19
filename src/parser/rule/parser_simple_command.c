@@ -1,5 +1,22 @@
 #include "../parser.h"
 
+void push_back(struct ast **list, struct ast *to_push)
+{
+    struct ast_redirection *tmp = (struct ast_redirection *)*list;
+    if (!tmp)
+    {
+        *list = to_push;
+    }
+    else
+    {
+        while (tmp->next)
+        {
+            tmp = (struct ast_redirection *)tmp->next;
+        }
+        tmp->next = to_push;
+    }
+}
+
 /**
  * @brief Parse any prefix, possibly followed by a WORD and by any number
  * of element
@@ -12,30 +29,43 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
 {
     // prefix { prefix }
     // | { prefix } WORD { element }
+
+    struct {
+       struct ast *redirs;
+       struct ast *command;
+    } locals;
+    locals.redirs = NULL;
+    locals.command = NULL;
+
     char prefixed = 0;
     if (parse_prefix(res, lexer) == PARSER_OK)
     {
         // parse { prefix }
+        // Add parsed prefix to locals
+        push_back(&locals.redirs, *res);
         prefixed = 1;
         while (parse_prefix(res, lexer) == PARSER_OK)
         {
+            // Add parsed prefix to locals
+            push_back(&locals.redirs, *res);
             continue;
         }
     }
     if (lexer_peek(lexer).type == TOKEN_WORD)
     {
-        struct ast *sc_node = calloc(1, sizeof(struct ast_cmd));
-        if (!sc_node)
+        // Change to locals
+        locals.command = calloc(1, sizeof(struct ast_cmd));
+        if (!locals.command)
         {
-            return PARSER_UNEXPECTED_TOKEN;
+            err(1, "42sh: Allocation failed\n");
         }
-        sc_node->type = AST_SIMPLE_COMMAND;
+        locals.command->type = AST_SIMPLE_COMMAND;
 
         // Fill node
-        fill_sc_node(sc_node, lexer);
+        fill_sc_node(locals.command, lexer);
 
         // replace AST
-        *res = sc_node;
+        *res = locals.command;
 
         // Pop first WORD
         lexer_pop(lexer);
@@ -43,8 +73,18 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
         // { element }
         while (parse_element(res, lexer) == PARSER_OK)
         {
-            continue;
+            if (*res != locals.command)
+            {
+                // Add it to locals
+                push_back(&locals.redirs, *res);
+                // replace AST
+                *res = locals.command;
+            }
         }
+        // Add locals.commant to the end of locals.redirs
+        push_back(&locals.redirs, locals.command);
+        // Put is on AST
+        *res = locals.redirs;
         return PARSER_OK;
     }
     else

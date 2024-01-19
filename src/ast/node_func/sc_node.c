@@ -16,7 +16,7 @@ void fill_sc_node(struct ast *ast, struct lexer *lexer)
         sc_node->argv = malloc(sc_node->argc * sizeof(char *));
         if (!sc_node)
         {
-            exit(1);
+            _exit(1);
         }
 
         sc_node->argv[0] = strdup(lexer->cur_tok.value);
@@ -29,7 +29,7 @@ void fill_sc_node(struct ast *ast, struct lexer *lexer)
         sc_node->argv = realloc(sc_node->argv, sc_node->argc * sizeof(char *));
         if (!sc_node)
         {
-            exit(1);
+            _exit(1);
         }
 
         sc_node->argv[sc_node->argc - 2] = strdup(lexer->cur_tok.value);

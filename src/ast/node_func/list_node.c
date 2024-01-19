@@ -1,4 +1,4 @@
-#include "ast.h"
+#include "../ast.h"
 
 void fill_list_node(struct ast *ast, struct ast *ast_cmd)
 {

@@ -1,6 +1,7 @@
 #ifndef EXEC_H
 #define EXEC_H
 
+#include <fcntl.h>
 #include <stdio.h>
 
 #include "ast/ast.h"
@@ -33,5 +34,9 @@ int eval_condition(struct ast *ast, struct hash_map *gv_hash_map);
 int eval_list(struct ast *ast, struct hash_map *gv_hash_map);
 
 int eval_pipeline(struct ast *ast, struct hash_map *gv_hash_map);
+
+int eval_redirection(struct ast *ast, struct hash_map *gv_hash_map);
+
+int eval_neg(struct ast *ast, struct hash_map *gv_hash_map);
 
 #endif /* ! EXEC_H */
