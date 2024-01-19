@@ -1,8 +1,8 @@
 #define _XOPEN_SOURCE 500
 
-#include "ast.h"
-
 #include <string.h>
+
+#include "ast.h"
 
 void fill_sc_node(struct ast *ast, struct lexer *lexer)
 {

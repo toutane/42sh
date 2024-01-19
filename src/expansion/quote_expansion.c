@@ -1,8 +1,7 @@
+#include "quote_expansion.h"
+
 #include <stdlib.h>
 #include <string.h>
-
-#include "io/io.h"
-#include "lexer.h"
 
 static void append_char_to_str(char **str, char c)
 {

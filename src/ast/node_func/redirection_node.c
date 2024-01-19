@@ -1,8 +1,8 @@
 #define _XOPEN_SOURCE 500
 
-#include "ast.h"
-
 #include <string.h>
+
+#include "ast.h"
 
 // default case: ionumber set to 1
 void fill_redirection_node(struct ast *ast, int ionumber, char *str)
@@ -19,4 +19,3 @@ void fill_redirection_node(struct ast *ast, int ionumber, char *str)
     }
     return;
 }
-

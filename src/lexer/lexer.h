@@ -5,6 +5,7 @@
 
 #include "../io/io.h"
 #include "../options/opt_parser.h"
+#include "../utils/hash_map/hash_map.h"
 #include "../utils/strings/strings.h"
 #include "../utils/token/token.h"
 
@@ -40,11 +41,6 @@ struct lexer
     enum LEXER_ERROR last_error; // The last error that occured
 };
 
-/**
- * @brief Creates a new lexer given an input string.
- */
-struct lexer *lexer_new(struct stream_info *stream, struct options *opts);
-
 /*
  * @brief The different contexts in which a quote can be found.
  */
@@ -54,11 +50,6 @@ enum QUOTING_CONTEXT
     SINGLE_QUOTE,
     DOUBLE_QUOTE,
 };
-
-/**
- ** @brief Free the given lexer, but not its input.
- */
-void lexer_free(struct lexer *lexer);
 
 /**
  * @brief Returns a token from the input stream
@@ -85,8 +76,6 @@ struct token lexer_peek(struct lexer *lexer);
  *   calling lexer_pop in a loop will iterate over all tokens until EOF.
  */
 struct token lexer_pop(struct lexer *lexer);
-
-void expand_quoting(char **str);
 
 int is_assignment_word(struct token *token, int is_the_first_word);
 
