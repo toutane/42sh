@@ -11,6 +11,7 @@ enum parser_status parse_redirection(struct ast **res, struct lexer *lexer)
     // Create AST node
     struct ast *redir_node = calloc(1, sizeof(struct ast_redirection));
     init_redirection_node(redir_node);
+    ((struct ast_redirection *)redir_node)->next = *res;
 
     if (lexer_peek(lexer).type == TOKEN_IONUMBER)
     {
@@ -37,6 +38,5 @@ enum parser_status parse_redirection(struct ast **res, struct lexer *lexer)
 
     // Free node
     ast_free(redir_node);
-    *res = NULL;
     return PARSER_UNEXPECTED_TOKEN;
 }
