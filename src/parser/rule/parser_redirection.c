@@ -29,8 +29,9 @@ enum parser_status parse_redirection(struct ast **res, struct lexer *lexer)
             fill_redirection_node_target(&redir_node->base, lexer->cur_tok.value);
             lexer_pop(lexer);
 
+            //OLD !
             // Add ast to the node
-            redir_node->next = *res;
+            //redir_node->next = *res;
 
             *res = &redir_node->base;
 
