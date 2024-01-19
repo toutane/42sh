@@ -45,6 +45,8 @@ void free_ast_redir(struct ast *ast)
     struct ast_redirection *ast_redirection = (struct ast_redirection *)ast;
     if (ast_redirection->target)
         free(ast_redirection->target);
+    if (ast_redirection->next)
+        ast_free(ast_redirection->next);
     free(ast);
     return;
 }
