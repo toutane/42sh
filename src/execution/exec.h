@@ -4,19 +4,19 @@
 #include <fcntl.h>
 #include <stdio.h>
 
-#include "ast/ast.h"
-#include "builtins/builtins.h"
-#include "error_handling/error_handling.h"
-#include "expansion/expansion.h"
-#include "io/io.h"
-#include "lexer/lexer.h"
-#include "options/opt_parser.h"
-#include "parser/parser.h"
-#include "utils/assignment_words/assignment_words.h"
-#include "utils/dot_file/dot_file.h"
-#include "utils/hash_map/hash_map.h"
-#include "utils/printers/printers.h"
-#include "utils/token/token.h"
+#include "../ast/ast.h"
+#include "../builtins/builtins.h"
+#include "../error_handling/error_handling.h"
+#include "../expansion/expansion.h"
+#include "../io/io.h"
+#include "../lexer/lexer.h"
+#include "../options/opt_parser.h"
+#include "../parser/parser.h"
+#include "../utils/assignment_words/assignment_words.h"
+#include "../utils/dot_file/dot_file.h"
+#include "../utils/hash_map/hash_map.h"
+#include "../utils/printers/printers.h"
+#include "../utils/token/token.h"
 
 /* @brief: Executes the program in a loop, reading from the input stream while
  * eof is not reached. It creates a AST while reading the input stream and

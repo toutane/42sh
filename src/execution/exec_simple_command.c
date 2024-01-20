@@ -29,11 +29,29 @@ int eval_simple_command(struct ast *ast, struct hash_map *gv_hash_map)
         return 0;
     }
 
+    // as we perform arithmetic of pointer we will need at the end to set the
+    // pointer to his former value, in order to be able to free it
+    int offset = 0;
+    while (is_str_assignment_word(ast_cmd->argv[0]))
+    {
+        // if the first word of argv is an assignement word, we pop it thanks to
+        // arithmetic pointer
+        free(ast_cmd->argv[0]);
+        ast_cmd->argv[0] = NULL;
+
+        ast_cmd->argv++;
+        ast_cmd->argc--;
+
+        ++offset;
+    }
+
     /* Execution step */
     if (is_builtin_word(ast_cmd->argv[0]))
     {
         status =
             (builtin_fun(ast_cmd->argv[0]))(ast_cmd->argc - 1, ast_cmd->argv);
+        ast_cmd->argv -= offset; // to free the argv array, we need to set it to
+                                 // his original value
         fflush(NULL); // Flush stdout to avoid mixing output
         return status;
     }
@@ -44,11 +62,13 @@ int eval_simple_command(struct ast *ast, struct hash_map *gv_hash_map)
     if (pid == -1)
     {
         perror("");
+        ast_cmd->argv -= offset;
         _exit(127); // Check this value
     }
     if (pid == 0)
     {
         execvp(ast_cmd->argv[0], ast_cmd->argv);
+        ast_cmd->argv -= offset;
         _exit(execvp_error(errno));
     }
     else
@@ -56,6 +76,7 @@ int eval_simple_command(struct ast *ast, struct hash_map *gv_hash_map)
         waitpid(pid, &status, 0);
     }
 
+    ast_cmd->argv -= offset;
     // Check if the command was interrupted by a signal
     if (WIFSIGNALED(status))
     {
