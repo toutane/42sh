@@ -38,6 +38,7 @@ int main(int argc, char *argv[])
     fill_at_sign_var(argc, argv, gv_hash_map);
     fill_arguments_var(argc, argv, gv_hash_map);
     fill_star_sign_var(argc, argv, gv_hash_map);
+    fill_dollar_var(gv_hash_map);
     fill_arguments_amount(argc, gv_hash_map);
 
     // Launch execution loop

@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 void fill_at_sign_var(int argc, char *argv[], struct hash_map *gv_hash_map)
 {
@@ -45,6 +47,28 @@ void fill_arguments_var(int argc, char *argv[], struct hash_map *gv_hash_map)
         hash_map_insert(gv_hash_map, key, arguments_array, &j);
         k++;
     }
+}
+
+void fill_dollar_var(struct hash_map *gv_hash_map)
+{
+    char **arguments_array = calloc(2, sizeof(char *));
+
+    // get pid of the process
+    pid_t pid = getpid();
+    // get the size of the number
+    int n = snprintf(NULL, 0, "%d", pid);
+
+    arguments_array[0] = calloc(n + 1, sizeof(char));
+    snprintf(arguments_array[0], n + 1, "%d", pid);
+
+    char *key = calloc(2, sizeof(char));
+    key[0] = '$';
+    key[1] = '\0';
+
+    int i = 0;
+    hash_map_insert(gv_hash_map, key, arguments_array, &i);
+
+    return;
 }
 
 void fill_star_sign_var(int argc, char *argv[], struct hash_map *gv_hash_map)
