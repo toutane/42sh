@@ -149,7 +149,7 @@ static void param_expansion(char **str, struct stream_info *stream,
                             enum QUOTING_CONTEXT *context,
                             struct hash_map *gv_hash_map)
 {
-    if (*context != NONE)
+    if (*context == SINGLE_QUOTE)
     {
         // We are in a quote context, so we don't expand the dollar
         append_char_to_str(str, '$');
