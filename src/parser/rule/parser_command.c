@@ -1,16 +1,5 @@
 #include "../parser.h"
 
-enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer);
-
-/**
- * @brief Parse a IONUMBER, followed by a redirection symbol, followed by
- * a word
- *
- * redirection = [IONUMBER] ( '>' | '<' | '>>' | '>&' | '<&' | '>|' | '<>' )
- *                                                                      WORD ;
- */
-enum parser_status parse_redirection(struct ast **res, struct lexer *lexer);
-
 /**
  * @brief Parse a simple_command
  *
