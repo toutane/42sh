@@ -1,5 +1,6 @@
-#define OPEN_FAIL 2
+#define OPEN_FAIL 1
 #define DUP2_FAIL 127
+#define CREATE_FILE_PERM 0644
 
 #include "exec.h"
 
@@ -10,7 +11,7 @@ static int eval_redirection_GREAT(struct ast *ast)// TODO: Check returns code
     struct ast_redirection *ast_redir = (struct ast_redirection *)ast;
     // assert(ast_redir->redirection_type == REDIR_GREAT);
 
-    int fd = open(ast_redir->target, O_CREAT | O_TRUNC | O_WRONLY, 0644);
+    int fd = open(ast_redir->target, O_CREAT | O_TRUNC | O_WRONLY, CREATE_FILE_PERM);
     if (fd == -1)
     {
         fprintf(stderr, "failed to open redirection file\n");
@@ -27,7 +28,44 @@ static int eval_redirection_GREAT(struct ast *ast)// TODO: Check returns code
         _exit(DUP2_FAIL);// Here
     }
 
-    int ret_val = 0;// Here
+    int ret_val = EXIT_SUCCESS;// Here
+    if (ast_redir->next != NULL)
+    {
+        ret_val = eval_ast(ast_redir->next);
+    }
+
+    fflush(NULL);
+
+    // Restoring closed fds
+    dup2(stdout_dup, ast_redir->ionumber);
+    close(stdout_dup);
+
+    return ret_val;
+}
+
+/// >& redirection
+static int eval_redirection_GREATAND(struct ast *ast)// TODO: Check returns code
+{
+    // assert(ast->type == AST_REDIRECTION);
+    struct ast_redirection *ast_redir = (struct ast_redirection *)ast;
+    // assert(ast_redir->redirection_type == REDIR_GREATAND);
+
+    // strtoul seems useless here
+    // words after >& are implementation-defined (thus won't be tested)
+    // TODO: Close fd if '-' is the target
+    int fd = atoi(ast_redir->target);
+
+    // Save potentialy closed fd
+    int stdout_dup = dup(ast_redir->ionumber);
+
+    // Assigning fd to ionumber
+    if (dup2(fd, ast_redir->ionumber) == -1)
+    {
+        fprintf(stderr, "dup2 failed\n");
+        _exit(DUP2_FAIL);// Here
+    }
+
+    int ret_val = EXIT_SUCCESS;// Here
     if (ast_redir->next != NULL)
     {
         ret_val = eval_ast(ast_redir->next);
@@ -49,7 +87,7 @@ static int eval_redirection_LESSGREAT(struct ast *ast)// TODO: Check returns cod
     struct ast_redirection *ast_redir = (struct ast_redirection *)ast;
     // assert(ast_redir->redirection_type == REDIR_LESSGREAT);
 
-    int fd = open(ast_redir->target, O_CREAT | O_RDWR, 0644);
+    int fd = open(ast_redir->target, O_CREAT | O_RDWR, CREATE_FILE_PERM);
     if (fd == -1)
     {
         fprintf(stderr, "failed to open redirection file\n");
@@ -67,7 +105,86 @@ static int eval_redirection_LESSGREAT(struct ast *ast)// TODO: Check returns cod
         _exit(DUP2_FAIL);// Here
     }
 
-    int ret_val = 0;// Here
+    int ret_val = EXIT_SUCCESS;// Here
+    if (ast_redir->next != NULL)
+    {
+        ret_val = eval_ast(ast_redir->next);
+    }
+
+    fflush(NULL);
+
+    // Restoring closed fds
+    dup2(stdout_dup, ast_redir->ionumber);
+    close(stdout_dup);
+
+    return ret_val;
+}
+
+/// < redirection
+static int eval_redirection_LESS(struct ast *ast)// TODO: Check returns code
+{
+    // assert(ast->type == AST_REDIRECTION);
+    struct ast_redirection *ast_redir = (struct ast_redirection *)ast;
+    // assert(ast_redir->redirection_type == REDIR_LESS);
+
+    int fd = open(ast_redir->target, O_CREAT | O_RDONLY, CREATE_FILE_PERM);
+    if (fd == -1)
+    {
+        fprintf(stderr, "failed to open redirection file\n");
+        _exit(OPEN_FAIL);// Here
+    }
+
+    // Save potentialy closed fd
+    // Should be stdin by default here
+    int stdout_dup = dup(ast_redir->ionumber);
+
+    // Assigning fd to ionumber
+    if (dup2(fd, ast_redir->ionumber) == -1)
+    {
+        fprintf(stderr, "dup2 failed\n");
+        _exit(DUP2_FAIL);// Here
+    }
+
+    int ret_val = EXIT_SUCCESS;// Here
+    if (ast_redir->next != NULL)
+    {
+        ret_val = eval_ast(ast_redir->next);
+    }
+
+    fflush(NULL);
+
+    // Restoring closed fds
+    dup2(stdout_dup, ast_redir->ionumber);
+    close(stdout_dup);
+
+    return ret_val;
+}
+
+/// >> redirection
+static int eval_redirection_DGREAT(struct ast *ast)// TODO: Check returns code
+{
+    // assert(ast->type == AST_REDIRECTION);
+    struct ast_redirection *ast_redir = (struct ast_redirection *)ast;
+    // assert(ast_redir->redirection_type == REDIR_DGREAT);
+
+    int fd = open(ast_redir->target, O_CREAT | O_APPEND | O_WRONLY, CREATE_FILE_PERM);
+    if (fd == -1)
+    {
+        fprintf(stderr, "failed to open redirection file\n");
+        _exit(OPEN_FAIL);// Here
+    }
+
+    // Save potentialy closed fd
+    int stdout_dup = dup(ast_redir->ionumber);
+
+    // Assigning fd to ionumber
+    if (dup2(fd, ast_redir->ionumber) == -1)
+    {
+        fprintf(stderr, "dup2 failed\n");
+        _exit(DUP2_FAIL);// Here
+    }
+
+    int ret_val = EXIT_SUCCESS;// Here
     if (ast_redir->next != NULL)
     {
         ret_val = eval_ast(ast_redir->next);
@@ -86,8 +203,8 @@ static int eval_redirection_LESSGREAT(struct ast *ast)// TODO: Check returns cod
 typedef int (*eval_type)(struct ast *ast);
 int eval_redirection(struct ast *ast)
 {
-    if (!ast)
-    {
+if (!ast)
+{
         return 0;
     }
 
@@ -95,6 +212,9 @@ int eval_redirection(struct ast *ast)
         [REDIR_GREAT] = &eval_redirection_GREAT,
         [REDIR_CLOBBER] = &eval_redirection_GREAT,
         [REDIR_LESSGREAT] = &eval_redirection_LESSGREAT,
+        [REDIR_DGREAT] = &eval_redirection_DGREAT,
+        [REDIR_LESS] = &eval_redirection_LESS,
+        [REDIR_GREATAND] = &eval_redirection_GREATAND,
     };
 
     return (*functions[((struct ast_redirection *)ast)->redirection_type])(ast);
