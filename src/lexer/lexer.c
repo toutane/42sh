@@ -130,7 +130,7 @@ static void handle_word_delimiter(struct lexer *lexer, char delim)
     }
 }
 
-static void handle_escape_quote(struct lexer *lexer)
+static void handle_escape_quote(struct lexer *lexer, enum QUOTING_CONTEXT *quoting_context)
 {
     // Consume the <blackslash> to get the next character
     stream_pop(lexer->stream);
@@ -150,6 +150,12 @@ static void handle_escape_quote(struct lexer *lexer)
     if (lexer->cur_tok.type == TOKEN_NONE)
     {
         fill_token(&lexer->cur_tok, TOKEN_WORD, NULL);
+    }
+
+    if (*quoting_context == SINGLE_QUOTE)
+    {
+        append_char_to_token_value(&lexer->cur_tok, '\\');
+        return;
     }
 
     // We append the <backslash> and the next character to the current token
@@ -215,7 +221,7 @@ static void handle_quoting(struct lexer *lexer, char cur_char,
     switch (cur_char)
     {
     case '\\':
-        handle_escape_quote(lexer);
+        handle_escape_quote(lexer, quoting_context);
         break;
     case '\'':
         handle_single_quote(lexer, quoting_context);
@@ -479,7 +485,7 @@ struct token lexer_peek(struct lexer *lexer)
 
         lexer->must_parse_next_tok = 0;
         parse_input_for_tok(lexer); // Update the current token
-                                    //
+
         if (lexer->last_error != NO_ERROR)
         {
             fprintf(stderr, "42sh: lexer error: %s\n",
