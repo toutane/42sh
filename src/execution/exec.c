@@ -82,8 +82,6 @@ int execution_loop(struct options *opts, struct stream_info *stream,
         // Evaluate the AST
         status = eval_ast(ast, gv_hash_map);
 
-        // hash_map_dump(gv_hash_map);
-
         // Free the AST
         ast_free(ast);
 

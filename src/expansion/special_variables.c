@@ -7,12 +7,15 @@
 
 void fill_at_sign_var(int argc, char *argv[], struct hash_map *gv_hash_map)
 {
-    char **arguments_array = calloc((argc - optind + 1), sizeof(char *));
+    char **arguments_array = calloc((argc - optind), sizeof(char *));
+
+    int k = 0;
+
     for (int i = optind + 1; i < argc; i++)
     {
-        arguments_array[i - optind - 1] =
-            calloc(strlen(argv[i]) + 1, sizeof(char));
-        memcpy(arguments_array[i - optind - 1], argv[i], strlen(argv[i]));
+        arguments_array[k] = calloc(strlen(argv[i]) + 1, sizeof(char));
+        memcpy(arguments_array[k], argv[i], strlen(argv[i]));
+        k++;
     }
 
     int i = 0;
@@ -35,6 +38,7 @@ void fill_arguments_var(int argc, char *argv[], struct hash_map *gv_hash_map)
         char **arguments_array = calloc(2, sizeof(char *));
 
         arguments_array[0] = calloc(strlen(argv[i]) + 1, sizeof(char));
+
         memcpy(arguments_array[0], argv[i], strlen(argv[i]));
 
         int j = 0;
