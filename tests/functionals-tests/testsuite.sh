@@ -24,8 +24,10 @@ ref_stderr=/tmp/.ref_stderr
 my_stdout=/tmp/.my_stdout
 my_stderr=/tmp/.my_stderr
 
-# path to working directory
+# path to working directory and mirror morking dir
 WORKING_DIR=$(realpath "$(dirname "$0")/working-dir")
+WORKING_DIR_REF="${WORKING_DIR}/../working-dir_ref"
+WORKING_DIR_MY="${WORKING_DIR}/../working-dir_my"
 
 # time out delay
 timeout_time=2s
@@ -33,49 +35,57 @@ timeout_time=2s
 line_by_line=0
 full_file=1
 
-# add a file extantion given in $2 to file pattern given in $1
-add_file_extention()
-{
-    find . -name "$1" -exec mv {} {}"$2" \;
-}
-
 # execute the command by passing it to a string
 run_string()
 {
-    # Execute testsuite in working dir
-    cd $WORKING_DIR
+    # build mirror ref and my dir
+    build_mirror_dir
+
+    # Execute testsuite in working dir ref
+    cd $WORKING_DIR_REF
 
     bash --posix -c "$1" > $ref_stdout 2> $ref_stderr
     REF_CODE=$?
-    add_file_extention $FILE_PATTERN ".ref"
+
+    # Go back to previous dir
+    cd - > /dev/null
+
+    # Execute testsuite in working dir my
+    cd $WORKING_DIR_MY
 
     timeout $timeout_time $BINARY -c "$1" > $my_stdout 2> $my_stderr
     MY_CODE=$?
     # WARNING, if program return 124 without timeout he will be considered as timeout
     [ $MY_CODE -eq 124 ] && WAS_TIMEOUT=1
-    add_file_extention $FILE_PATTERN ".my"
-
-    INPUT="string"
 
     # Go back to previous dir
     cd - > /dev/null
+
+    INPUT="string"
 }
 
 # execute the command by passing it to a file script
 run_file()
 {
-    # Execute testsuite in working dir
-    cd $WORKING_DIR
+    # build mirror ref and my dir
+    build_mirror_dir
+
+    # Execute testsuite in working dir ref
+    cd $WORKING_DIR_REF
 
     bash --posix "$1" > $ref_stdout 2> $ref_stderr
     REF_CODE=$?
-    add_file_extention $FILE_PATTERN ".ref"
+
+    # Go back to previous dir
+    cd - > /dev/null
+
+    # Execute testsuite in working dir my
+    cd $WORKING_DIR_MY
 
     timeout $timeout_time $BINARY "$1" > $my_stdout 2> $my_stderr
     MY_CODE=$?
     # WARNING, if program return 124 without timeout he will be considered as timeout
     [ $MY_CODE -eq 124 ] && WAS_TIMEOUT=1
-    add_file_extention $FILE_PATTERN ".my"
 
     INPUT="file"
 
@@ -86,18 +96,25 @@ run_file()
 # execute the command by passing it to stdin
 run_stdin()
 {
-    # Execute testsuite in working dir
-    cd $WORKING_DIR
+    # build mirror ref and my dir
+    build_mirror_dir
+
+    # Execute testsuite in working dir ref
+    cd $WORKING_DIR_REF
 
     echo "$1" | bash --posix > $ref_stdout 2> $ref_stderr
     REF_CODE=$?
-    add_file_extention $FILE_PATTERN ".ref"
+
+    # Go back to previous dir
+    cd - > /dev/null
+
+    # Execute testsuite in working dir my
+    cd $WORKING_DIR_MY
 
     timeout $timeout_time echo "$1" | $BINARY > $my_stdout 2> $my_stderr
     MY_CODE=$?
     # WARNING, if program return 124 without timeout he will be considered as timeout
     [ $MY_CODE -eq 124 ] && WAS_TIMEOUT=1
-    add_file_extention $FILE_PATTERN ".my"
 
     INPUT="stdin"
 
@@ -111,6 +128,9 @@ check_diff()
     diff --color=always -u $ref_stdout $my_stdout > $1.diff
     DIFF_CODE=$?
 
+    diff --color=always -u -r $WORKING_DIR_REF $WORKING_DIR_MY > $1_working_dir.diff
+    DIFF_CODE_DIR=$?
+
     grep -q $GREP_PATTERN $my_stderr
     GREP_CODE=$?
 
@@ -119,7 +139,13 @@ check_diff()
         echo -ne "$RED TIMEOUT($INPUT)$WHITE"
         sucess=false
     fi
-    
+
+    # check both working-dir for ref and my
+    if [ $DIFF_CODE_DIR -eq 1 ]; then
+        echo -ne "$RED WORKING-DIR($INPUT)$WHITE"
+        sucess=false
+    fi
+
     #check memory leaks
     if [ $GREP_CODE -eq 0 ]; then
         echo -ne "$RED MEMORY_LEAKS($INPUT)$WHITE"
@@ -138,7 +164,7 @@ check_diff()
         echo -ne "$RED STDERR($INPUT)$WHITE"
         sucess=false
     fi
-    
+
     # check if the error code is the same
     if { [ $REF_CODE != $MY_CODE ] && [ $WAS_TIMEOUT -eq 0 ]; }; then
         echo -ne "$RED RETURN($INPUT)$WHITE"
@@ -151,12 +177,24 @@ check_diff()
         if [ $REF_CODE != $MY_CODE ] && [ $WAS_TIMEOUT -eq 0 ]; then
             echo -e "ref return code: $REF_CODE\nmy return code: $MY_CODE$WHITE"
         fi
-        [ -s $( realpath $1.diff ) ] && echo -e "$(cat $(realpath $1.diff))$WHITE"
+
+        # Check diff between stdout of ref and my
+        if [ -s $( realpath $1.diff ) ]; then
+            echo -e "$(cat $(realpath $1.diff))$WHITE"
+        fi
+
+        # Check diff between ref and my working-dir
+        if [ -s $( realpath $1_working_dir.diff ) ]; then
+            echo -e "$(cat $(realpath $1_working_dir.diff))$WHITE"
+        fi
 
         TOTAL_FAIL=$((TOTAL_FAIL + 1))
     fi
 
-    rm -f $1.diff
+    rm -f *.diff
+
+    # remove mirror directories
+    clear_mirror_dir
 }
 
 run_test_file()
@@ -252,6 +290,18 @@ run_testsuite()
     done
 }
 
+build_mirror_dir()
+{
+    # build ref mirror dir
+    cp -r $WORKING_DIR $WORKING_DIR_REF
+    # build my mirror dir
+    cp -r $WORKING_DIR $WORKING_DIR_MY
+}
+
+clear_mirror_dir()
+{
+    rm -rf $WORKING_DIR_REF $WORKING_DIR_MY
+}
 
 #### MAIN ####
 

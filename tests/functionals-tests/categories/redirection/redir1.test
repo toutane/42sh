@@ -1,5 +1,5 @@
 echo hi > file1
 < file1 echo hi
 > file1 echo ha
-< file1 > file2 echo ha
+< foo > file2 echo ha
 echo tata > file1 > file2 > file3
