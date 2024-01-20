@@ -19,4 +19,3 @@ void fill_if_node(struct ast *ast, struct ast *ast_child)
     }
     return;
 }
-

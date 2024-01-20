@@ -1,8 +1,8 @@
 #include "exec.h"
 
-typedef int (*eval_type)(struct ast *ast);
+typedef int (*eval_type)(struct ast *ast, struct hash_map *gv_hash_map);
 
-int eval_ast(struct ast *ast)
+int eval_ast(struct ast *ast, struct hash_map *gv_hash_map)
 {
     if (!ast)
     {
@@ -18,40 +18,36 @@ int eval_ast(struct ast *ast)
         [AST_NEG] = &eval_neg,
     };
 
-    return (*functions[ast->type])(ast);
+    return (*functions[ast->type])(ast, gv_hash_map);
 }
 
-int execution_loop(struct options *opts, struct stream_info *stream)
+int execution_loop(struct options *opts, struct stream_info *stream,
+                   struct hash_map *gv_hash_map)
 {
+    struct to_be_freed to_be_freed = {
+        .ast = NULL, .lexer = NULL, .stream = stream, .gv_hash_map = gv_hash_map
+    };
+
     int status = 0;
 
     // Create the lexer
     struct lexer *lexer = lexer_new(stream, opts);
-
-    struct ast *ast = NULL;
+    to_be_freed.lexer = lexer;
 
     while (lexer_peek(lexer).type != TOKEN_EOF)
     {
-        /* !! FOR DEBUGGING PURPOSES !!
-         * This is a simple loop that prints all the tokens in the stream
-         * and then exits the program. It helps to verify the token recognition
-         * algorithm on tokens that are not implemented by the parser yet */
-        /*
-        struct token tok = lexer_pop(lexer);
-        printf("%s: %s\n", token_type_to_str(tok.type), tok.value);
-        while (tok.type != TOKEN_EOF)
-        {
-            tok = lexer_pop(lexer);
-            printf("%s: %s\n", token_type_to_str(tok.type), tok.value);
-        }
-        */
-        /* !! FOR DEBUGGING PURPOSES !! */
-
         // Create a new AST
+        struct ast *ast = NULL;
+
         if (parse(&ast, lexer) != PARSER_OK)
         {
-            error(ast, lexer, stream, "42sh: grammar error during parsing\n");
-            return GRAMMAR_ERROR;
+            // If the lexer has encountered an bad substituion, 42sh shall exit
+            // with 1
+            int err = lexer->last_error == BAD_SUBSTITUTION ? 1 : GRAMMAR_ERROR;
+
+            to_be_freed.ast = ast;
+            error(&to_be_freed, "42sh: grammar error during parsing\n");
+            return err;
         }
 
         // Print the AST if pretty_print option is enabled
@@ -66,26 +62,23 @@ int execution_loop(struct options *opts, struct stream_info *stream)
             status = create_dot_file(ast, "ast.dot");
             if (status != 0)
             {
-                free_all(ast, lexer, stream);
+                to_be_freed.ast = ast;
+                free_all(&to_be_freed);
                 return EXIT_FAILURE;
             }
         }
 
         // Evaluate the AST
-        status = eval_ast(ast);
+        status = eval_ast(ast, gv_hash_map);
 
         // Free the AST
         ast_free(ast);
-        ast = NULL;
 
         // Pop the current token
         lexer_pop(lexer);
     }
 
-    ast = NULL;
-
-    // Free the lexer, the AST and the stream, AST is NULL so it won't be freed
-    free_all(ast, lexer, stream);
+    free_all(&to_be_freed);
 
     return status;
 }

@@ -46,6 +46,7 @@ AC_CONFIG_FILES([
    src/utils/Makefile
    src/error_handling/Makefile
    src/execution/Makefile
+   src/expansion/Makefile
 
    tests/Makefile
    tests/functionals-tests/Makefile

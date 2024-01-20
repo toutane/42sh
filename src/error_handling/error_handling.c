@@ -1,19 +1,26 @@
 #include "error_handling.h"
 
-void free_all(struct ast *ast, struct lexer *lexer, struct stream_info *stream)
+void free_all(struct to_be_freed *to_be_freed)
 {
-    ast_free(ast);
-    lexer_free(lexer);
-    stream_free(stream);
+    ast_free(to_be_freed->ast);
+    lexer_free(to_be_freed->lexer);
+    stream_free(to_be_freed->stream);
+    hash_map_free(to_be_freed->gv_hash_map);
     return;
 }
 
-void error(struct ast *ast, struct lexer *lexer, struct stream_info *stream,
-           const char *str)
+void error(struct to_be_freed *to_be_freed, const char *str)
 {
-    free_all(ast, lexer, stream);
+    free_all(to_be_freed);
 
-    fprintf(stderr, "%s", str);
+    if (errno != 0)
+    {
+        fprintf(stderr, "%s (%s)", str, strerror(errno));
+    }
+    else
+    {
+        fprintf(stderr, "%s", str);
+    }
 
     return;
 }

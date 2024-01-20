@@ -8,21 +8,30 @@
 #include "../ast/ast.h"
 #include "../io/io.h"
 #include "../lexer/lexer.h"
+#include "../lexer/lexer_setup.h"
 #include "../options/opt_parser.h"
 #include "../parser/parser.h"
+#include "../utils/hash_map/hash_map.h"
 #include "../utils/token/token.h"
 
 #define GRAMMAR_ERROR 2;
 
-/*
- * @brief Prints the error message and exits the program.
- */
-void free_all(struct ast *ast, struct lexer *lexer, struct stream_info *stream);
+struct to_be_freed
+{
+    struct ast *ast;
+    struct hash_map *gv_hash_map;
+    struct lexer *lexer;
+    struct stream_info *stream;
+};
 
 /*
  * @brief Prints the error message and exits the program.
  */
-void error(struct ast *ast, struct lexer *lexer, struct stream_info *stream,
-           const char *str);
+void free_all(struct to_be_freed *to_be_freed);
+
+/*
+ * @brief Prints the error message and exits the program.
+ */
+void error(struct to_be_freed *to_be_freed, const char *str);
 
 #endif /* ! ERROR_HANDLING_H */
