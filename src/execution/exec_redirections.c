@@ -137,7 +137,7 @@ static int eval_redirection_LESS(struct ast *ast,
     struct ast_redirection *ast_redir = (struct ast_redirection *)ast;
     // assert(ast_redir->redirection_type == REDIR_LESS);
 
-    int fd = open(ast_redir->target, O_CREAT | O_RDONLY, CREATE_FILE_PERM);
+    int fd = open(ast_redir->target, O_RDONLY, CREATE_FILE_PERM);
     if (fd == -1)
     {
         fprintf(stderr, "failed to open redirection file\n");
