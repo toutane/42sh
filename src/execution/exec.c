@@ -37,8 +37,8 @@ int execution_loop(struct options *opts, struct stream_info *stream)
     struct hash_map *gv_hash_map = hash_map_init(10);
     to_be_freed.gv_hash_map = gv_hash_map;
 
-    int i = 0;
-    hash_map_insert(gv_hash_map, "aa", "dd", &i);
+    //int i = 0;
+    //hash_map_insert(gv_hash_map, "aa", "dd", &i);
 
     while (lexer_peek(lexer).type != TOKEN_EOF)
     {
