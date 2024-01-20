@@ -3,6 +3,7 @@
 
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "../ast/ast.h"
 #include "../builtins/builtins.h"
