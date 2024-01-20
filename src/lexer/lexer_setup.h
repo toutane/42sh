@@ -1,9 +1,9 @@
 #ifndef LEXER_SETUP_H
 #define LEXER_SETUP_H
 
-#include "io/io.h"
-#include "lexer/lexer.h"
-#include "options/opt_parser.h"
+#include "../io/io.h"
+#include "../lexer/lexer.h"
+#include "../options/opt_parser.h"
 
 /**
  * @brief Creates a new lexer given an input string.

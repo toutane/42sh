@@ -5,7 +5,8 @@ void free_ast_cmd(struct ast *ast)
     struct ast_cmd *ast_cmd = (struct ast_cmd *)ast;
     for (int i = 0; i < ast_cmd->argc; ++i)
     {
-        free(ast_cmd->argv[i]);
+        if (ast_cmd->argv[i])
+            free(ast_cmd->argv[i]);
     }
     free(ast_cmd->argv);
     free(ast);

@@ -8,11 +8,11 @@
 #include "../ast/ast.h"
 #include "../io/io.h"
 #include "../lexer/lexer.h"
+#include "../lexer/lexer_setup.h"
 #include "../options/opt_parser.h"
 #include "../parser/parser.h"
 #include "../utils/hash_map/hash_map.h"
 #include "../utils/token/token.h"
-#include "lexer/lexer_setup.h"
 
 #define GRAMMAR_ERROR 2;
 

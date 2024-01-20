@@ -1,4 +1,4 @@
-#include "utils/assignment_words/assignment_words.h"
+#include "../../utils/assignment_words/assignment_words.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -26,7 +26,7 @@ static int contains_char(char *str, char target)
     return 0;
 }
 
-static int is_str_assignment_word(char *str)
+int is_str_assignment_word(char *str)
 {
     // Get the position of the '=' character if any, NULL otherwise
     char equal_sign_pos = contains_char(str, '=');
