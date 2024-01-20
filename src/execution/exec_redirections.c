@@ -56,6 +56,11 @@ static int eval_redirection_GREATAND(struct ast *ast,
     // strtoul seems useless here
     // words after >& are implementation-defined (thus won't be tested)
     // TODO: Close fd if '-' is the target
+    if (!strcmp(ast_redir->target, "-"))
+    {
+        close(ast_redir->ionumber);
+        return EXIT_SUCCESS;
+    }
     int fd = atoi(ast_redir->target);
 
     // Save potentialy closed fd
@@ -64,7 +69,7 @@ static int eval_redirection_GREATAND(struct ast *ast,
     // Assigning fd to ionumber
     if (dup2(fd, ast_redir->ionumber) == -1)
     {
-        fprintf(stderr, "dup2 failed\n");
+        perror("");
         _exit(DUP2_FAIL);// Here
     }
 
@@ -165,6 +170,47 @@ static int eval_redirection_LESS(struct ast *ast,
     return ret_val;
 }
 
+/// <& redirection
+static int eval_redirection_LESSAND(struct ast *ast,
+                       struct hash_map *gv_hash_map)// TODO: Check returns code
+{
+    // assert(ast->type == AST_REDIRECTION);
+    struct ast_redirection *ast_redir = (struct ast_redirection *)ast;
+    // assert(ast_redir->redirection_type == REDIR_LESSAND);
+
+    if (!strcmp(ast_redir->target, "-"))
+    {
+        close(ast_redir->ionumber);
+        return EXIT_SUCCESS;
+    }
+    int fd = atoi(ast_redir->target);
+
+    // Save potentialy closed fd
+    // Should be stdin by default here
+    int stdout_dup = dup(ast_redir->ionumber);
+
+    // Assigning fd to ionumber
+    if (dup2(fd, ast_redir->ionumber) == -1)
+    {
+        perror("");
+        _exit(DUP2_FAIL);// Here
+    }
+
+    int ret_val = EXIT_SUCCESS;// Here
+    if (ast_redir->next != NULL)
+    {
+        ret_val = eval_ast(ast_redir->next, gv_hash_map);
+    }
+
+    fflush(NULL);
+
+    // Restoring closed fds
+    dup2(stdout_dup, ast_redir->ionumber);
+    close(stdout_dup);
+
+    return ret_val;
+}
+
 /// >> redirection
 static int eval_redirection_DGREAT(struct ast *ast,
                        struct hash_map *gv_hash_map)// TODO: Check returns code
@@ -221,6 +267,7 @@ if (!ast)
         [REDIR_DGREAT] = &eval_redirection_DGREAT,
         [REDIR_LESS] = &eval_redirection_LESS,
         [REDIR_GREATAND] = &eval_redirection_GREATAND,
+        [REDIR_LESSAND] = &eval_redirection_LESSAND,
     };
 
     return (*functions[((struct ast_redirection *)ast)->redirection_type])(
