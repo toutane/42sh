@@ -41,9 +41,13 @@ int execution_loop(struct options *opts, struct stream_info *stream,
 
         if (parse(&ast, lexer) != PARSER_OK)
         {
+            // If the lexer has encountered an bad substituion, 42sh shall exit
+            // with 1
+            int err = lexer->last_error == BAD_SUBSTITUTION ? 1 : GRAMMAR_ERROR;
+
             to_be_freed.ast = ast;
             error(&to_be_freed, "42sh: grammar error during parsing\n");
-            return GRAMMAR_ERROR;
+            return err;
         }
 
         // Print the AST if pretty_print option is enabled

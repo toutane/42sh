@@ -130,7 +130,8 @@ static void handle_word_delimiter(struct lexer *lexer, char delim)
     }
 }
 
-static void handle_escape_quote(struct lexer *lexer, enum QUOTING_CONTEXT *quoting_context)
+static void handle_escape_quote(struct lexer *lexer,
+                                enum QUOTING_CONTEXT *quoting_context)
 {
     // Consume the <blackslash> to get the next character
     stream_pop(lexer->stream);
@@ -371,6 +372,12 @@ static void delimit_token(struct lexer *lexer,
             continue;
         }
 
+        if (is_inside_braces && !isalnum(cur_char) && cur_char != '_'
+            && cur_char != '}')
+        {
+            lexer->last_error = BAD_SUBSTITUTION;
+        }
+
         /* Token Recognition Algorithm Rule 5
          * If the current character is an unquoted '$', the shell shall identify
          * the start of any candidate for parameter expansion from its
@@ -474,6 +481,15 @@ struct token parse_input_for_tok(struct lexer *lexer)
 
 struct token lexer_peek(struct lexer *lexer)
 {
+    // If the current token is TOKEN_ERROR, we shall not parse other tokens
+    if (lexer->last_error != NO_ERROR)
+    {
+        lexer->cur_tok.type = TOKEN_ERROR;
+        free(lexer->cur_tok.value); // Free the previous token value if any
+        lexer->cur_tok.value = NULL;
+        return lexer->cur_tok;
+    }
+
     int is_verbose = lexer->opts->verbose;
 
     if (lexer->must_parse_next_tok)
@@ -488,7 +504,7 @@ struct token lexer_peek(struct lexer *lexer)
 
         if (lexer->last_error != NO_ERROR)
         {
-            fprintf(stderr, "42sh: lexer error: %s\n",
+            fprintf(stderr, "42sh: %s: %s\n", lexer->cur_tok.value,
                     get_lexer_error_msg(lexer->last_error));
         }
 

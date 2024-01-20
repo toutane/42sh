@@ -3,3 +3,4 @@ run_test_file var_simple.test
 run_test_file var_simple_with_braces.test
 run_test_file reassign_var.test
 run_test_file complex_expansion_1.test
+run_test_file bad_substitution.test

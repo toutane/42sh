@@ -13,7 +13,14 @@ void error(struct to_be_freed *to_be_freed, const char *str)
 {
     free_all(to_be_freed);
 
-    fprintf(stderr, "%s (%s)", str, strerror(errno));
+    if (errno != 0)
+    {
+        fprintf(stderr, "%s (%s)", str, strerror(errno));
+    }
+    else
+    {
+        fprintf(stderr, "%s", str);
+    }
 
     return;
 }
