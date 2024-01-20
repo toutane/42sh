@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "../parser.h"
 
 /**
@@ -7,7 +9,8 @@
  */
 enum parser_status parse_prefix(struct ast **res, struct lexer *lexer)
 {
-    if (lexer_peek(lexer).type == TOKEN_ASSIGNMENT_WORD)
+    struct token token = lexer_peek(lexer);
+    if (is_assignment_word(&token, 1))
     {
         // TODO: Create node for ASSIGNMENT_WORD
         // Put it in the AST

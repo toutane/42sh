@@ -12,6 +12,34 @@
         printf("[LEXER] " action " token: %s\n", token_type_to_str(tok.type)); \
     }
 
+struct LEXER_ERROR_MSG_INFO
+{
+    enum LEXER_ERROR error;
+    char *msg;
+};
+
+struct LEXER_ERROR_MSG_INFO lexer_error_msg_map[] = {
+    { NO_ERROR, "no error" },
+    { UNMATCHED_SINGLE_QUOTE, "unmatched single quote" },
+    { UNMATCHED_DOUBLE_QUOTE, "unexpected EOF while looking for matching \"" },
+    { UNMATCHED_BRACE, "unmatched brace" },
+    { BAD_SUBSTITUTION, "bad substitution" },
+};
+
+char *get_lexer_error_msg(enum LEXER_ERROR error)
+{
+    for (size_t i = 0;
+         i < sizeof(lexer_error_msg_map) / sizeof(lexer_error_msg_map[0]); i++)
+    {
+        if (error == lexer_error_msg_map[i].error)
+        {
+            return lexer_error_msg_map[i].msg;
+        }
+    }
+
+    return "Unknown error";
+}
+
 void fill_token(struct token *tok, enum token_type type, char *value)
 {
     if (tok == NULL)
@@ -212,6 +240,64 @@ static void handle_comment(struct lexer *lexer)
     }
 }
 
+static void handle_parameter_expansion(struct lexer *lexer, char cur_char,
+                                       int *is_inside_braces)
+{
+    if (lexer->cur_tok.type == TOKEN_NONE)
+    {
+        fill_token(&lexer->cur_tok, TOKEN_WORD, NULL);
+    }
+
+    if (cur_char == '$')
+    {
+        stream_pop(lexer->stream);
+
+        if (stream_peek(lexer->stream) == '{')
+        {
+            (*is_inside_braces)++;
+            append_char_to_token_value(&lexer->cur_tok, '$');
+            append_consume(lexer, '{');
+        }
+        else
+        {
+            append_char_to_token_value(&lexer->cur_tok, '$');
+        }
+    }
+    else
+    {
+        if (*is_inside_braces)
+        {
+            (*is_inside_braces)--;
+        }
+        append_consume(lexer, '}');
+    }
+}
+
+static void set_error(struct lexer *lexer,
+                      enum QUOTING_CONTEXT *quoting_context,
+                      int is_inside_braces)
+{
+    if (*quoting_context == SINGLE_QUOTE)
+    {
+        lexer->last_error = UNMATCHED_SINGLE_QUOTE;
+        lexer->cur_tok.type = TOKEN_ERROR;
+    }
+    else if (*quoting_context == DOUBLE_QUOTE)
+    {
+        lexer->last_error = UNMATCHED_DOUBLE_QUOTE;
+        lexer->cur_tok.type = TOKEN_ERROR;
+    }
+    else if (is_inside_braces)
+    {
+        lexer->last_error = UNMATCHED_BRACE;
+        lexer->cur_tok.type = TOKEN_ERROR;
+    }
+    else
+    {
+        lexer->last_error = NO_ERROR;
+    }
+}
+
 /*
  * @brief: Updates the current token (inside the lexer struct)
  * according to the input stream. It follows the Token Recognition Algorithm
@@ -222,7 +308,7 @@ static void handle_comment(struct lexer *lexer)
 static void delimit_token(struct lexer *lexer,
                           enum QUOTING_CONTEXT *quoting_context)
 {
-    // int is_quoted = (*quoting_context != NONE);
+    int is_inside_braces = 0;
     char prev_char;
     size_t len;
 
@@ -241,8 +327,7 @@ static void delimit_token(struct lexer *lexer,
         if (cur_char == EOF)
         {
             handle_word_delimiter(lexer, EOF);
-            lexer->cur_tok.type =
-                (*quoting_context != NONE) ? TOKEN_ERROR : lexer->cur_tok.type;
+            set_error(lexer, quoting_context, is_inside_braces);
 
             // Delimit the current token
             return;
@@ -280,8 +365,20 @@ static void delimit_token(struct lexer *lexer,
             continue;
         }
 
+        /* Token Recognition Algorithm Rule 5
+         * If the current character is an unquoted '$', the shell shall identify
+         * the start of any candidate for parameter expansion from its
+         * introductory unquoted character sequences: '$' or "${", up to the
+         * matching '}' character.}
+         */
+        if (*quoting_context == NONE && (cur_char == '$' || cur_char == '}'))
+        {
+            handle_parameter_expansion(lexer, cur_char, &is_inside_braces);
+            continue;
+        }
+
         /* Token Recognition Algorithm Rule 6 */
-        if (!(*quoting_context != NONE) && can_be_first_in_ope(cur_char))
+        if (*quoting_context == NONE && can_be_first_in_ope(cur_char))
         {
             if (lexer->cur_tok.type == TOKEN_NONE)
             {
@@ -312,7 +409,8 @@ static void delimit_token(struct lexer *lexer,
          * character shall be discarded if it is a <blank>, for '\n' and ';',
          * the current token shall be updated to TOKEN_NEWLINE or
          * TOKEN_SEMICOLON*/
-        if (!(*quoting_context != NONE) && is_delimiter(cur_char))
+        if (*quoting_context == NONE && !(is_inside_braces)
+            && is_delimiter(cur_char))
         {
             handle_word_delimiter(lexer, cur_char);
 
@@ -358,6 +456,9 @@ struct token parse_input_for_tok(struct lexer *lexer)
     // Reset current token
     lexer->cur_tok.type = TOKEN_NONE;
 
+    // Reset last error
+    lexer->last_error = NO_ERROR;
+
     delimit_token(lexer, &quoting_context);
 
     categorize_token(&(lexer->cur_tok));
@@ -378,6 +479,13 @@ struct token lexer_peek(struct lexer *lexer)
 
         lexer->must_parse_next_tok = 0;
         parse_input_for_tok(lexer); // Update the current token
+                                    //
+        if (lexer->last_error != NO_ERROR)
+        {
+            fprintf(stderr, "42sh: lexer error: %s\n",
+                    get_lexer_error_msg(lexer->last_error));
+        }
+
         PRINT_TOKEN(is_verbose, lexer->cur_tok, "Peek");
         return lexer->cur_tok;
     }
@@ -395,4 +503,59 @@ struct token lexer_pop(struct lexer *lexer)
 
     lexer->must_parse_next_tok = 1;
     return lexer->cur_tok;
+}
+
+/* Check if the given TOKEN_WORD can describe an assignment word. This is
+ * specified in the Rule 7 of the algorithm described in section 2.2.10 of the
+ * SCL
+ * (https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_10_02)
+ */
+int is_assignment_word(struct token *token, int is_the_first_word)
+{
+    // An assignment must derive from a TOKEN_WORD
+    if (token->type != TOKEN_WORD)
+    {
+        return 0;
+    }
+
+    // Get the position of the '=' character if any, NULL otherwise
+    char *equal_sign = strchr(token->value, '=');
+
+    /* Rule 7.a */
+    if (is_the_first_word)
+    {
+        if (equal_sign == NULL)
+        {
+            return 0;
+        }
+    }
+
+    /* Rule 7.b */
+    // TODO: check if the '=' is not quoted
+    // First paragraph of the Rule 7.b
+
+    // Check if the first character is '=', if so 0 is returned
+    if (token->value != NULL && token->value[0] == '=')
+    {
+        return 0;
+    }
+
+    // Check that all the characters before '=' form a valid name
+    if (equal_sign != NULL)
+    {
+        char *name = malloc(sizeof(char) * (equal_sign - token->value + 1));
+        strncpy(name, token->value, equal_sign - token->value);
+        name[equal_sign - token->value] = '\0';
+
+        if (!is_name(name))
+        {
+            free(name);
+            return 0;
+        }
+
+        free(name);
+        return 1;
+    }
+
+    return 0;
 }

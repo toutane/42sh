@@ -6,6 +6,7 @@ bin_PROGRAMS = 42sh
 				$(DEBUG_CFLAGS) \
 				$(COVERAGE_CFLAGS)
 42sh_LDADD = $(top_builddir)/src/execution/libexecution.a \
+				$(top_builddir)/src/expansion/libexpansion.a \
 				$(top_builddir)/src/lexer/liblexer.a \
 				$(top_builddir)/src/parser/libparser.a \
 				$(top_builddir)/src/ast/libast.a \
@@ -25,4 +26,5 @@ SUBDIRS = 	lexer \
 			utils \
 			error_handling \
 			builtins \
-			execution
+			execution \
+			expansion

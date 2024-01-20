@@ -13,4 +13,6 @@ void append_char_to_token_value(struct token *tok, char c);
  */
 int is_str_sequence_of_digits(char *str);
 
+int is_name(char *str);
+
 #endif /* ! STRINGS_H */
