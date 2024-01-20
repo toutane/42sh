@@ -7,3 +7,6 @@ echo tata > file1 > file2 > file3
 < foo cat > output.txt
 < foo cat >> output.txt >> output.txt
 echo tata > file1 > file2 > file3
+< faa cat > file2
+< foo < faa cat >output.txt
+
