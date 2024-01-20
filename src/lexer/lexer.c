@@ -318,6 +318,7 @@ static void delimit_token(struct lexer *lexer,
     {
         set_len_and_prev_char(lexer, &prev_char, &len);
         char cur_char = stream_peek(lexer->stream);
+
         // printf("cur_char: %c\n", cur_char);
 
         /* Token Recognition Algorithm Rule 1
@@ -375,6 +376,11 @@ static void delimit_token(struct lexer *lexer,
         {
             handle_parameter_expansion(lexer, cur_char, &is_inside_braces);
             continue;
+        }
+
+        if (is_inside_braces && !isalnum(cur_char) && cur_char != '_')
+        {
+            lexer->last_error = BAD_SUBSTITUTION;
         }
 
         /* Token Recognition Algorithm Rule 6 */
@@ -482,7 +488,7 @@ struct token lexer_peek(struct lexer *lexer)
                                     //
         if (lexer->last_error != NO_ERROR)
         {
-            fprintf(stderr, "42sh: lexer error: %s\n",
+            fprintf(stderr, "42sh: %s: %s\n", lexer->cur_tok.value,
                     get_lexer_error_msg(lexer->last_error));
         }
 
