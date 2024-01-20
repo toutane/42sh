@@ -2,28 +2,6 @@
 
 #include "exec.h"
 
-/* Expand the quoting of arguments, this contains backslash, double quote,
- * single quote and parameter ('$' and '${' ) expansion. For the parameter
- * expansion, the algorithm will search into the global variables hash_map and
- * properly expand variable identifiers. */
-static void expand_arguments(struct ast_cmd *ast_cmd,
-                             struct hash_map *gv_hash_map)
-{
-    /* Backslash, double quote and single quote expansion */
-    for (int i = 0; i < ast_cmd->argc - 1; i++)
-    {
-        expand_quoting(&(ast_cmd->argv[i]));
-    }
-
-    /* Parameter expansion */
-    for (int i = 0; i < ast_cmd->argc - 1; i++)
-    {
-        expand_parameter(&(ast_cmd->argv[i]), gv_hash_map);
-    }
-
-    return;
-}
-
 int eval_simple_command(struct ast *ast, struct hash_map *gv_hash_map)
 {
     int status = 0;
@@ -33,7 +11,10 @@ int eval_simple_command(struct ast *ast, struct hash_map *gv_hash_map)
      * single quote and parameter ('$' and '${' ) expansion. For the parameter
      * expansion, the algorithm will search into the global variables hash_map
      * and properly expand variable identifiers. */
-    expand_arguments(ast_cmd, gv_hash_map);
+    for (int i = 0; i < ast_cmd->argc - 1; i++)
+    {
+        expand_string(&(ast_cmd->argv[i]), gv_hash_map);
+    }
 
     /* Determine if the node is completely composed of assignment words, if so,
      * we update the global variables hash map with the new values and do not

@@ -1,5 +1,6 @@
-#include "quote_expansion.h"
+#include "expansion.h"
 
+#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -109,7 +110,99 @@ static void handle_double_quote(char **str, struct stream_info *stream,
     stream_pop(stream);
 }
 
-static void expand_loop(struct stream_info *stream, char **str)
+static void param_expansion(char **str, struct stream_info *stream,
+                            enum QUOTING_CONTEXT *context,
+                            struct hash_map *gv_hash_map)
+{
+    if (*context != NONE)
+    {
+        // We are in a quote context, so we don't expand the dollar
+        append_char_to_str(str, '$');
+        stream_pop(stream);
+        return;
+    }
+
+    // Consume the dollar
+    stream_pop(stream);
+
+    // Get the next character
+    char next_char = stream_peek(stream);
+    if (next_char == EOF)
+    {
+        return;
+    }
+
+    /* In this step, we create a new string (expression) that is the variable
+     * identifier. If the next character is a '{', we consume the opening brace
+     * and we read until we find a closing brace. Otherwise, we read until we
+     * find a character that is not an alphanumeric character or an underscore
+     * (because in this case expression is the longer valid name). All the
+     * characters that forming the expression are removed from the token_word
+     * string. */
+    char *expression = NULL;
+    if (next_char == '{')
+    {
+        // Consume the opening brace
+        stream_pop(stream);
+        while (1)
+        {
+            next_char = stream_peek(stream);
+            if (next_char == EOF)
+            {
+                break;
+            }
+
+            if (next_char == '}')
+            {
+                stream_pop(stream);
+                break;
+            }
+
+            append_char_to_str(&expression, next_char);
+            stream_pop(stream);
+        }
+    }
+    else
+    {
+        while (1)
+        {
+            next_char = stream_peek(stream);
+            if (next_char == EOF)
+            {
+                break;
+            }
+
+            if (!isalnum(next_char) && next_char != '_')
+            {
+                break;
+            }
+
+            append_char_to_str(&expression, next_char);
+            stream_pop(stream);
+        }
+    }
+
+    /* Once the expression is created and filled properly, we look for the value
+     * of the variable in the global variable hash map. If the variable is not
+     * found, we set the value to the empty
+     * string. Then, we append the value to the token_word string back. */
+    const char *value = hash_map_get(gv_hash_map, expression);
+    if (value == NULL)
+    {
+        value = "";
+    }
+
+    while (value != NULL && *value != '\0')
+    {
+        append_char_to_str(str, *value);
+        value++;
+    }
+
+    free(expression);
+}
+
+static void expand_loop(struct stream_info *stream, char **str,
+                        struct hash_map *gv_hash_map)
 {
     enum QUOTING_CONTEXT context = NONE;
 
@@ -139,6 +232,12 @@ static void expand_loop(struct stream_info *stream, char **str)
             continue;
         }
 
+        if (cur_char == '$')
+        {
+            param_expansion(str, stream, &context, gv_hash_map);
+            continue;
+        }
+
         append_char_to_str(str, cur_char);
         stream_pop(stream);
     }
@@ -151,7 +250,7 @@ static void expand_loop(struct stream_info *stream, char **str)
     }
 }
 
-void expand_quoting(char **str)
+void expand_string(char **str, struct hash_map *gv_hash_map)
 {
     if (*str == NULL)
     {
@@ -167,7 +266,7 @@ void expand_quoting(char **str)
         return;
     }
 
-    expand_loop(stream, &expanded_str);
+    expand_loop(stream, &expanded_str, gv_hash_map);
 
     stream_free(stream);
     free(*str);

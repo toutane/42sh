@@ -1,6 +1,8 @@
 #include "exec.h"
 
-static int eval_redirection_GREAT(struct ast *ast, struct hash_map *gv_hash_map)// TODO: Check returns code
+static int
+eval_redirection_GREAT(struct ast *ast,
+                       struct hash_map *gv_hash_map) // TODO: Check returns code
 {
     // assert(ast->type == AST_REDIRECTION);
     struct ast_redirection *ast_redir = (struct ast_redirection *)ast;
@@ -10,7 +12,7 @@ static int eval_redirection_GREAT(struct ast *ast, struct hash_map *gv_hash_map)
     if (fd == -1)
     {
         fprintf(stderr, "failed to open redirection file\n");
-        _exit(2);// Here
+        _exit(2); // Here
     }
 
     // Save potentialy closed fd
@@ -20,7 +22,7 @@ static int eval_redirection_GREAT(struct ast *ast, struct hash_map *gv_hash_map)
     if (dup2(fd, ast_redir->ionumber) == -1)
     {
         fprintf(stderr, "dup2 failed\n");
-        _exit(127);// Here
+        _exit(127); // Here
     }
 
     int ret_val = 0;
@@ -51,5 +53,6 @@ int eval_redirection(struct ast *ast, struct hash_map *gv_hash_map)
         [REDIR_CLOBBER] = &eval_redirection_GREAT,
     };
 
-    return (*functions[((struct ast_redirection *)ast)->redirection_type])(ast, gv_hash_map);
+    return (*functions[((struct ast_redirection *)ast)->redirection_type])(
+        ast, gv_hash_map);
 }

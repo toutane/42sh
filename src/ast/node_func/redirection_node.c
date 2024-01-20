@@ -1,8 +1,8 @@
 #define _XOPEN_SOURCE 500
 
-#include "ast.h"
-
 #include <string.h>
+
+#include "ast.h"
 
 void init_redirection_node(struct ast *ast)
 {
@@ -21,8 +21,7 @@ void fill_redirection_node_ionumber(struct ast *ast, int ionumber)
 void fill_redirection_node_type(struct ast *ast, struct token tok)
 {
     struct ast_redirection *ast_redirection = (struct ast_redirection *)ast;
-    static enum redirection_type match_table[] =
-    {
+    static enum redirection_type match_table[] = {
         [TOKEN_GREAT] = REDIR_GREAT, // '>'
         [TOKEN_LESS] = REDIR_LESS, // '<'
         [TOKEN_DGREAT] = REDIR_DGREAT, // '>>'
@@ -35,8 +34,7 @@ void fill_redirection_node_type(struct ast *ast, struct token tok)
     if (ast_redirection->ionumber == -1)
     {
         // Then initialize it
-        static int ionumbers_table[] =
-        {
+        static int ionumbers_table[] = {
             [TOKEN_GREAT] = 1, // '>'
             [TOKEN_LESS] = 0, // '<'
             [TOKEN_DGREAT] = 1, // '>>'
@@ -49,7 +47,7 @@ void fill_redirection_node_type(struct ast *ast, struct token tok)
     }
 }
 
-void fill_redirection_node_target(struct ast *ast, char* target)
+void fill_redirection_node_target(struct ast *ast, char *target)
 {
     struct ast_redirection *ast_redirection = (struct ast_redirection *)ast;
     ast_redirection->target = strdup(target);
