@@ -373,7 +373,7 @@ static void delimit_token(struct lexer *lexer,
         }
 
         if (is_inside_braces && !isalnum(cur_char) && cur_char != '_'
-            && cur_char != '}')
+            && cur_char != '}' && !is_char_special_variable(cur_char))
         {
             lexer->last_error = BAD_SUBSTITUTION;
         }
