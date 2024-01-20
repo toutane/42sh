@@ -80,3 +80,19 @@ void fill_star_sign_var(int argc, char *argv[], struct hash_map *gv_hash_map)
 
     hash_map_insert(gv_hash_map, key, arguments_array, &i);
 }
+
+void fill_arguments_amount(int argc, struct hash_map *gv_hash_map)
+{
+    int arguments_amount = argc - optind - 1;
+    char *value = int_to_string(arguments_amount);
+
+    char **arguments_array = calloc(2, sizeof(char *));
+    arguments_array[0] = value;
+
+    char *key = calloc(2, sizeof(char));
+    key[0] = '#';
+    key[1] = '\0';
+
+    int i = 0;
+    hash_map_insert(gv_hash_map, key, arguments_array, &i);
+}

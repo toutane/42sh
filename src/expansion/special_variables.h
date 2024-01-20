@@ -10,4 +10,6 @@ void fill_star_sign_var(int argc, char *argv[], struct hash_map *gv_hash_map);
 
 void fill_arguments_var(int argc, char *argv[], struct hash_map *gv_hash_map);
 
+void fill_arguments_amount(int argc, struct hash_map *gv_hash_map);
+
 #endif /* ! SPECIAL_VARIABLES_H */
