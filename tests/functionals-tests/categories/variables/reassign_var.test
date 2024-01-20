@@ -1,0 +1,5 @@
+band="The Rolling Stones"
+echo "Mon groupe prefere c'est \${band}"
+
+band="The Eagles"
+echo "Mon groupe prefere c'est \${band}"
