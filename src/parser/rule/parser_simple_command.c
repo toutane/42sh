@@ -38,6 +38,15 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
     locals.redirs = NULL;
     locals.command = NULL;
 
+    // Change to locals - we need to allocate here to be able to put all
+    // assignements words into sc node
+    locals.command = calloc(1, sizeof(struct ast_cmd));
+    if (!locals.command)
+    {
+        err(1, "42sh: Allocation failed\n");
+    }
+    locals.command->type = AST_SIMPLE_COMMAND;
+
     char prefixed = 0;
     if (parse_prefix(res, lexer) == PARSER_OK)
     {
@@ -47,21 +56,22 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
         prefixed = 1;
         while (parse_prefix(res, lexer) == PARSER_OK)
         {
-            // Add parsed prefix to locals
-            push_back(&locals.redirs, *res);
-            continue;
+            // *res is NULL if the last token is an ASSIGNMENT_WORD
+            if (*res == NULL)
+            {
+                fill_sc_node(locals.command, lexer);
+                lexer_pop(lexer);
+            }
+            else
+            {
+                // Add parsed prefix to locals
+                push_back(&locals.redirs, *res);
+                continue;
+            }
         }
     }
     if (lexer_peek(lexer).type == TOKEN_WORD)
     {
-        // Change to locals
-        locals.command = calloc(1, sizeof(struct ast_cmd));
-        if (!locals.command)
-        {
-            err(1, "42sh: Allocation failed\n");
-        }
-        locals.command->type = AST_SIMPLE_COMMAND;
-
         // Fill node
         fill_sc_node(locals.command, lexer);
 
@@ -90,7 +100,12 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
     }
     else
     {
-        return (prefixed ? PARSER_OK : PARSER_UNEXPECTED_TOKEN);
+        if (prefixed)
+        {
+            return PARSER_OK;
+        }
     }
+    ast_free(locals.command);
+    *res = NULL;
     return PARSER_UNEXPECTED_TOKEN;
 }
