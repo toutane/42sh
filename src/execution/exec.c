@@ -36,21 +36,6 @@ int execution_loop(struct options *opts, struct stream_info *stream,
 
     while (lexer_peek(lexer).type != TOKEN_EOF)
     {
-        /* !! FOR DEBUGGING PURPOSES !!
-         * This is a simple loop that prints all the tokens in the stream
-         * and then exits the program. It helps to verify the token recognition
-         * algorithm on tokens that are not implemented by the parser yet */
-        /*
-        struct token tok = lexer_pop(lexer);
-        printf("%s: %s\n", token_type_to_str(tok.type), tok.value);
-        while (tok.type != TOKEN_EOF)
-        {
-            tok = lexer_pop(lexer);
-            printf("%s: %s\n", token_type_to_str(tok.type), tok.value);
-        }
-        */
-        /* !! FOR DEBUGGING PURPOSES !! */
-
         // Create a new AST
         struct ast *ast = NULL;
 

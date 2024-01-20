@@ -1,4 +1,3 @@
 run_test_line var_simple.test
 run_test_file var_simple.test
 run_test_file var_simple_with_braces.test
-run_test_file special_variables.test

@@ -39,8 +39,6 @@ int main(int argc, char *argv[])
     fill_arguments_var(argc, argv, gv_hash_map);
     fill_star_sign_var(argc, argv, gv_hash_map);
 
-    hash_map_dump(gv_hash_map);
-
     // Launch execution loop
     return execution_loop(&opts, stream, gv_hash_map);
 }
