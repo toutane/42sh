@@ -41,6 +41,11 @@ int is_str_sequence_of_digits(char *str)
     return 1;
 }
 
+int is_char_special_variable(char c)
+{
+    return c == '?' || c == '$' || c == '#' || c == '@' || c == '*';
+}
+
 int is_name(char *str)
 {
     for (int i = 0; str[i] != '\0'; i++)
@@ -52,4 +57,21 @@ int is_name(char *str)
     }
 
     return 1;
+}
+
+char *int_to_string(int number)
+{
+    // Determine the number of digits in the integer
+    int numDigits = snprintf(NULL, 0, "%d", number);
+
+    // Allocate memory for the string (including space for null terminator)
+    char *result = (char *)malloc(numDigits + 1);
+
+    if (result != NULL)
+    {
+        // Convert the integer to a string
+        snprintf(result, numDigits + 1, "%d", number);
+    }
+
+    return result;
 }

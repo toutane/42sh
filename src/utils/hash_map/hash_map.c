@@ -29,8 +29,8 @@ struct hash_map *hash_map_init(size_t size)
     return new_hash_map;
 }
 
-static int hash_map_insert_help(struct hash_map *hash_map, const char *key,
-                                char *value, int *updated)
+static int hash_map_insert_help(struct hash_map *hash_map, char *key,
+                                char **value, int *updated)
 {
     size_t index = hash(key) % hash_map->size;
     struct pair_list *cur = hash_map->data[index];
@@ -69,7 +69,7 @@ static int hash_map_insert_help(struct hash_map *hash_map, const char *key,
     return 0;
 }
 
-int hash_map_insert(struct hash_map *hash_map, const char *key, char *value,
+int hash_map_insert(struct hash_map *hash_map, char *key, char **value,
                     int *updated)
 {
     if (!hash_map || hash_map->size == 0)
@@ -115,6 +115,16 @@ void hash_map_free(struct hash_map *hash_map)
         {
             struct pair_list *pair_to_free = cur;
             cur = cur->next;
+
+            char **value = pair_to_free->value;
+            while (pair_to_free->value && *(pair_to_free->value))
+            {
+                free(*(pair_to_free->value));
+                pair_to_free->value++;
+            }
+
+            free(value);
+            free(pair_to_free->key);
             free(pair_to_free);
         }
     }
@@ -130,11 +140,11 @@ void hash_map_dump(struct hash_map *hash_map)
         struct pair_list *cur = hash_map->data[i];
         if (cur)
         {
-            printf("%s: %s", cur->key, cur->value);
+            // printf("%s: %s", cur->key, cur->value);
             cur = cur->next;
             while (cur)
             {
-                printf(", %s: %s", cur->key, cur->value);
+                // printf(", %s: %s", cur->key, cur->value);
                 cur = cur->next;
             }
             printf("\n");
@@ -142,9 +152,9 @@ void hash_map_dump(struct hash_map *hash_map)
     }
 }
 
-const char *hash_map_get(const struct hash_map *hash_map, char *key)
+char **hash_map_get(const struct hash_map *hash_map, char *key)
 {
-    if (!hash_map)
+    if (!hash_map || !key)
     {
         return NULL;
     }
@@ -163,7 +173,7 @@ const char *hash_map_get(const struct hash_map *hash_map, char *key)
     return NULL;
 }
 
-int hash_map_remove(struct hash_map *hash_map, const char *key)
+int hash_map_remove(struct hash_map *hash_map, char *key)
 {
     if (!hash_map)
     {

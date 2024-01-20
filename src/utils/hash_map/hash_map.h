@@ -5,8 +5,8 @@
 
 struct pair_list
 {
-    const char *key;
-    char *value;
+    char *key;
+    char **value;
     struct pair_list *next;
 };
 
@@ -18,15 +18,15 @@ struct hash_map
 
 struct hash_map *hash_map_init(size_t size);
 
-int hash_map_insert(struct hash_map *hash_map, const char *key, char *value,
+int hash_map_insert(struct hash_map *hash_map, char *key, char **value,
                     int *updated);
 
 void hash_map_free(struct hash_map *hash_map);
 
 void hash_map_dump(struct hash_map *hash_map);
 
-const char *hash_map_get(const struct hash_map *hash_map, char *key);
+char **hash_map_get(const struct hash_map *hash_map, char *key);
 
-int hash_map_remove(struct hash_map *hash_map, const char *key);
+int hash_map_remove(struct hash_map *hash_map, char *key);
 
 #endif /* ! HASH_MAP_H */

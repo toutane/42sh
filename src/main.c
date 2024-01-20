@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "execution/exec.h"
+#include "expansion/special_variables.h"
 #include "io/io.h"
 #include "options/opt_parser.h"
 
@@ -32,6 +33,12 @@ int main(int argc, char *argv[])
                                            // program should exit with success
     }
 
+    // Create global variables hash table
+    struct hash_map *gv_hash_map = hash_map_init(10);
+    fill_at_sign_var(argc, argv, gv_hash_map);
+    fill_arguments_var(argc, argv, gv_hash_map);
+    fill_star_sign_var(argc, argv, gv_hash_map);
+
     // Launch execution loop
-    return execution_loop(&opts, stream);
+    return execution_loop(&opts, stream, gv_hash_map);
 }

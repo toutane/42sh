@@ -92,6 +92,11 @@ static void get_value_from_assignment_word(char **value, char *assignment_word)
 
 void update_gv_hash_map(char **argv, struct hash_map *gv_hash_map)
 {
+    if (!gv_hash_map)
+    {
+        return;
+    }
+
     int i = 0;
     while (argv[i] != NULL)
     {
@@ -101,8 +106,8 @@ void update_gv_hash_map(char **argv, struct hash_map *gv_hash_map)
         char *value = NULL;
         get_value_from_assignment_word(&value, argv[i]);
 
-        int updated = 0;
-        hash_map_insert(gv_hash_map, key, value, &updated);
+        // int updated = 0;
+        // hash_map_insert(gv_hash_map, key, value, &updated);
 
         i++;
     }

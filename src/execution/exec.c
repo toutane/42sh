@@ -21,10 +21,11 @@ int eval_ast(struct ast *ast, struct hash_map *gv_hash_map)
     return (*functions[ast->type])(ast, gv_hash_map);
 }
 
-int execution_loop(struct options *opts, struct stream_info *stream)
+int execution_loop(struct options *opts, struct stream_info *stream,
+                   struct hash_map *gv_hash_map)
 {
     struct to_be_freed to_be_freed = {
-        .ast = NULL, .lexer = NULL, .stream = stream, .gv_hash_map = NULL
+        .ast = NULL, .lexer = NULL, .stream = stream, .gv_hash_map = gv_hash_map
     };
 
     int status = 0;
@@ -32,13 +33,6 @@ int execution_loop(struct options *opts, struct stream_info *stream)
     // Create the lexer
     struct lexer *lexer = lexer_new(stream, opts);
     to_be_freed.lexer = lexer;
-
-    // Create global variables hash table
-    struct hash_map *gv_hash_map = hash_map_init(10);
-    to_be_freed.gv_hash_map = gv_hash_map;
-
-    int i = 0;
-    hash_map_insert(gv_hash_map, "aa", "dd", &i);
 
     while (lexer_peek(lexer).type != TOKEN_EOF)
     {
