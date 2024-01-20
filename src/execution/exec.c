@@ -1,8 +1,8 @@
 #include "exec.h"
 
-typedef int (*eval_type)(struct ast *ast);
+typedef int (*eval_type)(struct ast *ast, struct hash_map *gv_hash_map);
 
-int eval_ast(struct ast *ast)
+int eval_ast(struct ast *ast, struct hash_map *gv_hash_map)
 {
     if (!ast)
     {
@@ -18,17 +18,27 @@ int eval_ast(struct ast *ast)
         [AST_NEG] = &eval_neg,
     };
 
-    return (*functions[ast->type])(ast);
+    return (*functions[ast->type])(ast, gv_hash_map);
 }
 
 int execution_loop(struct options *opts, struct stream_info *stream)
 {
+    struct to_be_freed to_be_freed = {
+        .ast = NULL, .lexer = NULL, .stream = stream, .gv_hash_map = NULL
+    };
+
     int status = 0;
 
     // Create the lexer
     struct lexer *lexer = lexer_new(stream, opts);
+    to_be_freed.lexer = lexer;
 
-    struct ast *ast = NULL;
+    // Create global variables hash table
+    struct hash_map *gv_hash_map = hash_map_init(10);
+    to_be_freed.gv_hash_map = gv_hash_map;
+
+    int i = 0;
+    hash_map_insert(gv_hash_map, "aa", "dd", &i);
 
     while (lexer_peek(lexer).type != TOKEN_EOF)
     {
@@ -48,9 +58,12 @@ int execution_loop(struct options *opts, struct stream_info *stream)
         /* !! FOR DEBUGGING PURPOSES !! */
 
         // Create a new AST
+        struct ast *ast = NULL;
+
         if (parse(&ast, lexer) != PARSER_OK)
         {
-            error(ast, lexer, stream, "42sh: grammar error during parsing\n");
+            to_be_freed.ast = ast;
+            error(&to_be_freed, "42sh: grammar error during parsing\n");
             return GRAMMAR_ERROR;
         }
 
@@ -66,26 +79,25 @@ int execution_loop(struct options *opts, struct stream_info *stream)
             status = create_dot_file(ast, "ast.dot");
             if (status != 0)
             {
-                free_all(ast, lexer, stream);
+                to_be_freed.ast = ast;
+                free_all(&to_be_freed);
                 return EXIT_FAILURE;
             }
         }
 
         // Evaluate the AST
-        status = eval_ast(ast);
+        status = eval_ast(ast, gv_hash_map);
+
+        // hash_map_dump(gv_hash_map);
 
         // Free the AST
         ast_free(ast);
-        ast = NULL;
 
         // Pop the current token
         lexer_pop(lexer);
     }
 
-    ast = NULL;
-
-    // Free the lexer, the AST and the stream, AST is NULL so it won't be freed
-    free_all(ast, lexer, stream);
+    free_all(&to_be_freed);
 
     return status;
 }

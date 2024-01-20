@@ -30,9 +30,10 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
     // prefix { prefix }
     // | { prefix } WORD { element }
 
-    struct {
-       struct ast *redirs;
-       struct ast *command;
+    struct
+    {
+        struct ast *redirs;
+        struct ast *command;
     } locals;
     locals.redirs = NULL;
     locals.command = NULL;

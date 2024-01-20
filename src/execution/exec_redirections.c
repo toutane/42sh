@@ -5,7 +5,9 @@
 #include "exec.h"
 
 /// > as well as >| redirections
-static int eval_redirection_GREAT(struct ast *ast)// TODO: Check returns code
+static int
+eval_redirection_GREAT(struct ast *ast,
+                       struct hash_map *gv_hash_map) // TODO: Check returns code
 {
     // assert(ast->type == AST_REDIRECTION);
     struct ast_redirection *ast_redir = (struct ast_redirection *)ast;
@@ -31,7 +33,7 @@ static int eval_redirection_GREAT(struct ast *ast)// TODO: Check returns code
     int ret_val = EXIT_SUCCESS;// Here
     if (ast_redir->next != NULL)
     {
-        ret_val = eval_ast(ast_redir->next);
+        ret_val = eval_ast(ast_redir->next, gv_hash_map);
     }
 
     fflush(NULL);
@@ -44,7 +46,8 @@ static int eval_redirection_GREAT(struct ast *ast)// TODO: Check returns code
 }
 
 /// >& redirection
-static int eval_redirection_GREATAND(struct ast *ast)// TODO: Check returns code
+static int eval_redirection_GREATAND(struct ast *ast,
+                       struct hash_map *gv_hash_map)// TODO: Check returns code
 {
     // assert(ast->type == AST_REDIRECTION);
     struct ast_redirection *ast_redir = (struct ast_redirection *)ast;
@@ -68,7 +71,7 @@ static int eval_redirection_GREATAND(struct ast *ast)// TODO: Check returns code
     int ret_val = EXIT_SUCCESS;// Here
     if (ast_redir->next != NULL)
     {
-        ret_val = eval_ast(ast_redir->next);
+        ret_val = eval_ast(ast_redir->next, gv_hash_map);
     }
 
     fflush(NULL);
@@ -81,7 +84,8 @@ static int eval_redirection_GREATAND(struct ast *ast)// TODO: Check returns code
 }
 
 /// <> redirection
-static int eval_redirection_LESSGREAT(struct ast *ast)// TODO: Check returns code
+static int eval_redirection_LESSGREAT(struct ast *ast,
+                       struct hash_map *gv_hash_map)// TODO: Check returns code
 {
     // assert(ast->type == AST_REDIRECTION);
     struct ast_redirection *ast_redir = (struct ast_redirection *)ast;
@@ -108,7 +112,7 @@ static int eval_redirection_LESSGREAT(struct ast *ast)// TODO: Check returns cod
     int ret_val = EXIT_SUCCESS;// Here
     if (ast_redir->next != NULL)
     {
-        ret_val = eval_ast(ast_redir->next);
+        ret_val = eval_ast(ast_redir->next, gv_hash_map);
     }
 
     fflush(NULL);
@@ -121,7 +125,8 @@ static int eval_redirection_LESSGREAT(struct ast *ast)// TODO: Check returns cod
 }
 
 /// < redirection
-static int eval_redirection_LESS(struct ast *ast)// TODO: Check returns code
+static int eval_redirection_LESS(struct ast *ast,
+                       struct hash_map *gv_hash_map)// TODO: Check returns code
 {
     // assert(ast->type == AST_REDIRECTION);
     struct ast_redirection *ast_redir = (struct ast_redirection *)ast;
@@ -148,7 +153,7 @@ static int eval_redirection_LESS(struct ast *ast)// TODO: Check returns code
     int ret_val = EXIT_SUCCESS;// Here
     if (ast_redir->next != NULL)
     {
-        ret_val = eval_ast(ast_redir->next);
+        ret_val = eval_ast(ast_redir->next, gv_hash_map);
     }
 
     fflush(NULL);
@@ -161,7 +166,8 @@ static int eval_redirection_LESS(struct ast *ast)// TODO: Check returns code
 }
 
 /// >> redirection
-static int eval_redirection_DGREAT(struct ast *ast)// TODO: Check returns code
+static int eval_redirection_DGREAT(struct ast *ast,
+                       struct hash_map *gv_hash_map)// TODO: Check returns code
 {
     // assert(ast->type == AST_REDIRECTION);
     struct ast_redirection *ast_redir = (struct ast_redirection *)ast;
@@ -187,7 +193,7 @@ static int eval_redirection_DGREAT(struct ast *ast)// TODO: Check returns code
     int ret_val = EXIT_SUCCESS;// Here
     if (ast_redir->next != NULL)
     {
-        ret_val = eval_ast(ast_redir->next);
+        ret_val = eval_ast(ast_redir->next, gv_hash_map);
     }
 
     fflush(NULL);
@@ -200,8 +206,8 @@ static int eval_redirection_DGREAT(struct ast *ast)// TODO: Check returns code
 }
 
 // Should be at the end of the file
-typedef int (*eval_type)(struct ast *ast);
-int eval_redirection(struct ast *ast)
+typedef int (*eval_type)(struct ast *ast, struct hash_map *gv_hash_map);
+int eval_redirection(struct ast *ast, struct hash_map *gv_hash_map)
 {
 if (!ast)
 {
@@ -217,5 +223,6 @@ if (!ast)
         [REDIR_GREATAND] = &eval_redirection_GREATAND,
     };
 
-    return (*functions[((struct ast_redirection *)ast)->redirection_type])(ast);
+    return (*functions[((struct ast_redirection *)ast)->redirection_type])(
+        ast, gv_hash_map);
 }

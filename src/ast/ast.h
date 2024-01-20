@@ -79,7 +79,7 @@ struct ast_redirection
     // /!\ 1 if no ionumber during parsing
     int ionumber;
     char *target;
-    struct ast *next;// -> next -> NULL
+    struct ast *next; // -> next -> NULL
 };
 
 struct ast_neg
@@ -105,6 +105,6 @@ void fill_pipeline_node(struct ast *ast, struct ast *ast_child);
 void init_redirection_node(struct ast *ast);
 void fill_redirection_node_ionumber(struct ast *ast, int ionumber);
 void fill_redirection_node_type(struct ast *ast, struct token tok);
-void fill_redirection_node_target(struct ast *ast, char* target);
+void fill_redirection_node_target(struct ast *ast, char *target);
 
 #endif /* ! AST_H */
