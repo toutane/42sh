@@ -110,11 +110,46 @@ static void handle_double_quote(char **str, struct stream_info *stream,
     stream_pop(stream);
 }
 
+static void expand_variable(char **str, char *expression,
+                            struct hash_map *gv_hash_map)
+{
+    /* Once the expression is created and filled properly, we look for the value
+     * of the variable in the global variable hash map. If the variable is not
+     * found, we set the value to the empty
+     * string. Then, we append the value to the token_word string back. */
+    char **value = hash_map_get(gv_hash_map, expression);
+
+    if (value == NULL)
+    {
+        free(expression);
+        return;
+    }
+
+    size_t i = 0;
+    while (value[i] != NULL)
+    {
+        size_t j = 0;
+        while (value[i][j] != '\0')
+        {
+            append_char_to_str(str, value[i][j]);
+            j++;
+        }
+
+        if (value[i + 1] != NULL)
+        {
+            append_char_to_str(str, ' ');
+        }
+        i++;
+    }
+
+    free(expression);
+}
+
 static void param_expansion(char **str, struct stream_info *stream,
                             enum QUOTING_CONTEXT *context,
                             struct hash_map *gv_hash_map)
 {
-    if (*context != NONE)
+    if (*context == SINGLE_QUOTE)
     {
         // We are in a quote context, so we don't expand the dollar
         append_char_to_str(str, '$');
@@ -164,41 +199,38 @@ static void param_expansion(char **str, struct stream_info *stream,
     }
     else
     {
-        while (1)
+        if (is_char_special_variable(next_char))
         {
-            next_char = stream_peek(stream);
-            if (next_char == EOF)
-            {
-                break;
-            }
-
-            if (!isalnum(next_char) && next_char != '_')
-            {
-                break;
-            }
-
             append_char_to_str(&expression, next_char);
             stream_pop(stream);
         }
+        else if (isdigit(next_char))
+        {
+            append_char_to_str(&expression, next_char);
+            stream_pop(stream);
+        }
+        else
+        {
+            while (1)
+            {
+                next_char = stream_peek(stream);
+                if (next_char == EOF)
+                {
+                    break;
+                }
+
+                if (!isalnum(next_char) && next_char != '_')
+                {
+                    break;
+                }
+
+                append_char_to_str(&expression, next_char);
+                stream_pop(stream);
+            }
+        }
     }
 
-    /* Once the expression is created and filled properly, we look for the value
-     * of the variable in the global variable hash map. If the variable is not
-     * found, we set the value to the empty
-     * string. Then, we append the value to the token_word string back. */
-    const char *value = hash_map_get(gv_hash_map, expression);
-    if (value == NULL)
-    {
-        value = "";
-    }
-
-    while (value != NULL && *value != '\0')
-    {
-        append_char_to_str(str, *value);
-        value++;
-    }
-
-    free(expression);
+    expand_variable(str, expression, gv_hash_map);
 }
 
 static void expand_loop(struct stream_info *stream, char **str,

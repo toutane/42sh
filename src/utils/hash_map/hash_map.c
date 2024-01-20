@@ -29,11 +29,12 @@ struct hash_map *hash_map_init(size_t size)
     return new_hash_map;
 }
 
-static int hash_map_insert_help(struct hash_map *hash_map, const char *key,
-                                char *value, int *updated)
+static int hash_map_insert_help(struct hash_map *hash_map, char *key,
+                                char **value, int *updated)
 {
     size_t index = hash(key) % hash_map->size;
     struct pair_list *cur = hash_map->data[index];
+
     while (cur && strcmp(cur->key, key) != 0)
     {
         cur = cur->next;
@@ -42,12 +43,23 @@ static int hash_map_insert_help(struct hash_map *hash_map, const char *key,
     int has_to_be_updated = cur != NULL;
     if (has_to_be_updated)
     {
-        cur->value = value;
-        if (updated)
+        while (cur->next && strcmp(cur->key, key) != 0)
         {
-            *updated = 1;
+            cur = cur->next;
         }
-        return 1;
+
+        // Free the old value
+        free(cur->key);
+        int i = 0;
+        while (cur->value[i] != NULL)
+        {
+            free(cur->value[i]);
+            i++;
+        }
+
+        free(cur->value);
+        cur->value = value;
+        cur->key = key;
     }
     else
     {
@@ -69,7 +81,7 @@ static int hash_map_insert_help(struct hash_map *hash_map, const char *key,
     return 0;
 }
 
-int hash_map_insert(struct hash_map *hash_map, const char *key, char *value,
+int hash_map_insert(struct hash_map *hash_map, char *key, char **value,
                     int *updated)
 {
     if (!hash_map || hash_map->size == 0)
@@ -97,8 +109,10 @@ int hash_map_insert(struct hash_map *hash_map, const char *key, char *value,
             *updated = 0;
         }
         hash_map->data[index] = new_pair;
+        return 1;
     }
-    return 1;
+
+    return 0;
 }
 
 void hash_map_free(struct hash_map *hash_map)
@@ -108,14 +122,24 @@ void hash_map_free(struct hash_map *hash_map)
         free(hash_map);
         return;
     }
+
     for (size_t i = 0; i < hash_map->size; i++)
     {
         struct pair_list *cur = hash_map->data[i];
         while (cur)
         {
-            struct pair_list *pair_to_free = cur;
-            cur = cur->next;
-            free(pair_to_free);
+            free(cur->key);
+            int i = 0;
+            while (cur->value[i] != NULL)
+            {
+                free(cur->value[i]);
+                i++;
+            }
+
+            free(cur->value);
+            struct pair_list *next = cur->next;
+            free(cur);
+            cur = next;
         }
     }
     free(hash_map->data);
@@ -130,11 +154,24 @@ void hash_map_dump(struct hash_map *hash_map)
         struct pair_list *cur = hash_map->data[i];
         if (cur)
         {
-            printf("%s: %s", cur->key, cur->value);
+            printf("%s:", cur->key);
+            int i = 0;
+            while (cur->value[i] != NULL)
+            {
+                printf(" %s", cur->value[i]);
+                i++;
+            }
+
             cur = cur->next;
             while (cur)
             {
-                printf(", %s: %s", cur->key, cur->value);
+                int j = 0;
+                printf(", %s:", cur->key);
+                while (cur->value[j] != NULL)
+                {
+                    printf(" %s", cur->value[j]);
+                    j++;
+                }
                 cur = cur->next;
             }
             printf("\n");
@@ -142,9 +179,9 @@ void hash_map_dump(struct hash_map *hash_map)
     }
 }
 
-const char *hash_map_get(const struct hash_map *hash_map, char *key)
+char **hash_map_get(const struct hash_map *hash_map, char *key)
 {
-    if (!hash_map)
+    if (!hash_map || !key)
     {
         return NULL;
     }
@@ -161,36 +198,4 @@ const char *hash_map_get(const struct hash_map *hash_map, char *key)
         }
     }
     return NULL;
-}
-
-int hash_map_remove(struct hash_map *hash_map, const char *key)
-{
-    if (!hash_map)
-    {
-        return 0;
-    }
-    for (size_t i = 0; i < hash_map->size; i++)
-    {
-        struct pair_list *prev = NULL;
-        struct pair_list *cur = hash_map->data[i];
-        while (cur && strcmp(cur->key, key) != 0)
-        {
-            prev = cur;
-            cur = cur->next;
-        }
-        if (cur)
-        {
-            if (prev)
-            {
-                prev->next = cur->next;
-            }
-            else
-            {
-                hash_map->data[i] = cur->next;
-            }
-            free(cur);
-            return 1;
-        }
-    }
-    return 0;
 }

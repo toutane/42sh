@@ -1,5 +1,6 @@
 #include "../../utils/assignment_words/assignment_words.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -69,11 +70,10 @@ static void get_key_from_assignment_word(char **key, char *assignment_word)
     int equal_sign_pos = contains_char(assignment_word, '=');
 
     // Allocate memory for the key
-    *key = malloc(sizeof(char) * equal_sign_pos);
+    *key = calloc((equal_sign_pos + 1), sizeof(char));
 
     // Copy the key into the allocated memory
     strncpy(*key, assignment_word, equal_sign_pos);
-    (*key)[equal_sign_pos] = '\0';
 }
 
 static void get_value_from_assignment_word(char **value, char *assignment_word)
@@ -92,6 +92,11 @@ static void get_value_from_assignment_word(char **value, char *assignment_word)
 
 void update_gv_hash_map(char **argv, struct hash_map *gv_hash_map)
 {
+    if (!gv_hash_map)
+    {
+        return;
+    }
+
     int i = 0;
     while (argv[i] != NULL)
     {
@@ -101,8 +106,11 @@ void update_gv_hash_map(char **argv, struct hash_map *gv_hash_map)
         char *value = NULL;
         get_value_from_assignment_word(&value, argv[i]);
 
+        char **value_arr = calloc(2, sizeof(char *));
+        value_arr[0] = value;
+
         int updated = 0;
-        hash_map_insert(gv_hash_map, key, value, &updated);
+        hash_map_insert(gv_hash_map, key, value_arr, &updated);
 
         i++;
     }

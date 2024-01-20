@@ -21,10 +21,11 @@ int eval_ast(struct ast *ast, struct hash_map *gv_hash_map)
     return (*functions[ast->type])(ast, gv_hash_map);
 }
 
-int execution_loop(struct options *opts, struct stream_info *stream)
+int execution_loop(struct options *opts, struct stream_info *stream,
+                   struct hash_map *gv_hash_map)
 {
     struct to_be_freed to_be_freed = {
-        .ast = NULL, .lexer = NULL, .stream = stream, .gv_hash_map = NULL
+        .ast = NULL, .lexer = NULL, .stream = stream, .gv_hash_map = gv_hash_map
     };
 
     int status = 0;
@@ -33,38 +34,20 @@ int execution_loop(struct options *opts, struct stream_info *stream)
     struct lexer *lexer = lexer_new(stream, opts);
     to_be_freed.lexer = lexer;
 
-    // Create global variables hash table
-    struct hash_map *gv_hash_map = hash_map_init(10);
-    to_be_freed.gv_hash_map = gv_hash_map;
-
-    int i = 0;
-    hash_map_insert(gv_hash_map, "aa", "dd", &i);
-
     while (lexer_peek(lexer).type != TOKEN_EOF)
     {
-        /* !! FOR DEBUGGING PURPOSES !!
-         * This is a simple loop that prints all the tokens in the stream
-         * and then exits the program. It helps to verify the token recognition
-         * algorithm on tokens that are not implemented by the parser yet */
-        /*
-        struct token tok = lexer_pop(lexer);
-        printf("%s: %s\n", token_type_to_str(tok.type), tok.value);
-        while (tok.type != TOKEN_EOF)
-        {
-            tok = lexer_pop(lexer);
-            printf("%s: %s\n", token_type_to_str(tok.type), tok.value);
-        }
-        */
-        /* !! FOR DEBUGGING PURPOSES !! */
-
         // Create a new AST
         struct ast *ast = NULL;
 
         if (parse(&ast, lexer) != PARSER_OK)
         {
+            // If the lexer has encountered an bad substituion, 42sh shall exit
+            // with 1
+            int err = lexer->last_error == BAD_SUBSTITUTION ? 1 : GRAMMAR_ERROR;
+
             to_be_freed.ast = ast;
             error(&to_be_freed, "42sh: grammar error during parsing\n");
-            return GRAMMAR_ERROR;
+            return err;
         }
 
         // Print the AST if pretty_print option is enabled
@@ -87,8 +70,6 @@ int execution_loop(struct options *opts, struct stream_info *stream)
 
         // Evaluate the AST
         status = eval_ast(ast, gv_hash_map);
-
-        // hash_map_dump(gv_hash_map);
 
         // Free the AST
         ast_free(ast);

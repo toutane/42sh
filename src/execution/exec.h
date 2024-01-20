@@ -23,7 +23,8 @@
  * eof is not reached. It creates a AST while reading the input stream and
  * executes it. It returns 0 if the execution was successful, an error code
  * otherwise. */
-int execution_loop(struct options *opts, struct stream_info *stream);
+int execution_loop(struct options *opts, struct stream_info *stream,
+                   struct hash_map *gv_hash_map);
 
 int eval_ast(struct ast *ast, struct hash_map *gv_hash_map);
 
