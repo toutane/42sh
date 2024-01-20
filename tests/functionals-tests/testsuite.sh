@@ -15,11 +15,17 @@ TOTAL_FAIL=0
 # grep regex to match memory leaks
 GREP_PATTERN="LeakSanitizer"
 
+# sed file format for redirection
+FILE_PATTERN="file?"
+
 # redirect files
 ref_stdout=/tmp/.ref_stdout
 ref_stderr=/tmp/.ref_stderr
 my_stdout=/tmp/.my_stdout
 my_stderr=/tmp/.my_stderr
+
+# path to working directory
+WORKING_DIR=$(realpath "$(dirname "$0")/working-dir")
 
 # time out delay
 timeout_time=2s
@@ -27,46 +33,76 @@ timeout_time=2s
 line_by_line=0
 full_file=1
 
+# add a file extantion given in $2 to file pattern given in $1
+add_file_extention()
+{
+    find . -name "$1" -exec mv {} {}"$2" \;
+}
+
 # execute the command by passing it to a string
 run_string()
 {
+    # Execute testsuite in working dir
+    cd $WORKING_DIR
+
     bash --posix -c "$1" > $ref_stdout 2> $ref_stderr
     REF_CODE=$?
+    add_file_extention $FILE_PATTERN ".ref"
 
     timeout $timeout_time $BINARY -c "$1" > $my_stdout 2> $my_stderr
     MY_CODE=$?
     # WARNING, if program return 124 without timeout he will be considered as timeout
     [ $MY_CODE -eq 124 ] && WAS_TIMEOUT=1
+    add_file_extention $FILE_PATTERN ".my"
 
     INPUT="string"
+
+    # Go back to previous dir
+    cd - > /dev/null
 }
 
 # execute the command by passing it to a file script
 run_file()
 {
+    # Execute testsuite in working dir
+    cd $WORKING_DIR
+
     bash --posix "$1" > $ref_stdout 2> $ref_stderr
     REF_CODE=$?
+    add_file_extention $FILE_PATTERN ".ref"
 
     timeout $timeout_time $BINARY "$1" > $my_stdout 2> $my_stderr
     MY_CODE=$?
     # WARNING, if program return 124 without timeout he will be considered as timeout
     [ $MY_CODE -eq 124 ] && WAS_TIMEOUT=1
+    add_file_extention $FILE_PATTERN ".my"
 
     INPUT="file"
+
+    # Go back to previous dir
+    cd - > /dev/null
 }
 
 # execute the command by passing it to stdin
 run_stdin()
 {
+    # Execute testsuite in working dir
+    cd $WORKING_DIR
+
     echo "$1" | bash --posix > $ref_stdout 2> $ref_stderr
     REF_CODE=$?
+    add_file_extention $FILE_PATTERN ".ref"
 
     timeout $timeout_time echo "$1" | $BINARY > $my_stdout 2> $my_stderr
     MY_CODE=$?
     # WARNING, if program return 124 without timeout he will be considered as timeout
     [ $MY_CODE -eq 124 ] && WAS_TIMEOUT=1
+    add_file_extention $FILE_PATTERN ".my"
 
     INPUT="stdin"
+
+    # Go back to previous dir
+    cd - > /dev/null
 }
 
 # check the differences between ref and my
@@ -131,17 +167,18 @@ run_test_file()
     TOTAL_RUN=$((TOTAL_RUN + 1))
 
     echo -ne "$BLUE-->>$WHITE $1...$WHITE"
-    file_to_string="$(cat "$1")"
+    string="$(cat "$1")"
+    file=$(realpath "$1")
 
     sucess=true
-    run_string "$file_to_string"
-    check_diff "$1" "$1"
+    run_string "$string"
+    check_diff "$file" "$string"
     if $sucess; then
-        run_file "$1"
-        check_diff "$1" "$1"
+        run_file "$file"
+        check_diff "$file" "$string"
         if $sucess; then
-            run_stdin "$file_to_string" 
-            check_diff "$1" "$1"
+            run_stdin "$string" 
+            check_diff "$file" "$string"
             if $sucess; then
                 echo -e "$GREEN OK$WHITE"
             fi
@@ -154,30 +191,31 @@ run_test_line()
     [ -e $1 ] || echo "Missing file $1" 1>&2
 
     counter=1
-    while read line; do
+    while read string; do
         WAS_TIMEOUT=0
         TOTAL_RUN=$((TOTAL_RUN + 1))
 
         echo -ne "$BLUE-->>$WHITE $1 - test $counter...$WHITE"
-        string_to_file="script_file.tmp"
-        echo "$line" > $string_to_file
+        file="script_file.tmp"
+        echo "$string" > $file
+        file=$(realpath $file)
 
         sucess=true
-        run_string "$line"
-        check_diff "$1_$counter" "$line"
+        run_string "$string"
+        check_diff "$1_$counter" "$string"
         if $sucess; then
-            run_file "$string_to_file"
-            check_diff "$1_$counter" "$line"
+            run_file "$file"
+            check_diff "$1_$counter" "$string"
             if $sucess; then
-                run_stdin "$line"
-                check_diff "$1_$counter" "$line"
+                run_stdin "$string"
+                check_diff "$1_$counter" "$string"
                 if $sucess; then
                     echo -e "$GREEN OK$WHITE"
                 fi
             fi
         fi
 
-        rm -f "$string_to_file"
+        rm -f "$file"
         counter=$(($counter + 1))
     done < "$1"
 }
@@ -191,9 +229,11 @@ run_category()
         return
     fi
 
+    # go to categories dir to execute testsuite.sh
+    save_cur_dir=$(pwd)
     cd $1
     source ./testsuite.sh
-    cd - >/dev/null
+    cd $save_cur_dir >/dev/null
 }
 
 run_testsuite()

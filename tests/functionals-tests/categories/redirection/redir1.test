@@ -1,5 +1,5 @@
-echo hi > ../../working-dir/output.txt
-< ../../working-dir/output.txt echo hi
-> ../../working-dir/output.txt echo ha
-< ../../working-dir/file1.txt > ../../working-dir/output.txt echo ha
-echo tata > ../../working-dir/file1 > ../../working-dir/file2 > ../../working-dir/file3
+echo hi > file1
+< file1 echo hi
+> file1 echo ha
+< file1 > file2 echo ha
+echo tata > file1 > file2 > file3
