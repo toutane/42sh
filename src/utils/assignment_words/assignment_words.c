@@ -1,4 +1,4 @@
-#include "../../utils/assignment_words/assignment_words.h"
+#include "utils/assignment_words/assignment_words.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,27 +10,10 @@ int is_valid_name_char(char c)
         || (c >= '0' && c <= '9');
 }
 
-/* Check if the given string contains the given char, return the position of the
- * target if it exists, 0 otherwise */
-static int contains_char(char *str, char target)
-{
-    size_t target_pos = 0;
-    while (str[target_pos] != '\0')
-    {
-        if (str[target_pos] == target)
-        {
-            return target_pos;
-        }
-        target_pos++;
-    }
-
-    return 0;
-}
-
 int is_str_assignment_word(char *str)
 {
     // Get the position of the '=' character if any, NULL otherwise
-    char equal_sign_pos = contains_char(str, '=');
+    char equal_sign_pos = get_index_of_char(str, '=');
 
     if (equal_sign_pos == 0)
     {
@@ -62,56 +45,4 @@ int only_assignment_words(char **argv)
         i++;
     }
     return 1;
-}
-
-static void get_key_from_assignment_word(char **key, char *assignment_word)
-{
-    // Get the position of the '=' character if any, NULL otherwise
-    int equal_sign_pos = contains_char(assignment_word, '=');
-
-    // Allocate memory for the key
-    *key = calloc((equal_sign_pos + 1), sizeof(char));
-
-    // Copy the key into the allocated memory
-    strncpy(*key, assignment_word, equal_sign_pos);
-}
-
-static void get_value_from_assignment_word(char **value, char *assignment_word)
-{
-    // Get the position of the '=' character if any, NULL otherwise
-    int equal_sign_pos = contains_char(assignment_word, '=');
-
-    // Allocate memory for the value
-    *value = malloc(sizeof(char) * (strlen(assignment_word) - equal_sign_pos));
-
-    // Copy the value into the allocated memory
-    strncpy(*value, assignment_word + equal_sign_pos + 1,
-            strlen(assignment_word) - equal_sign_pos);
-    (*value)[strlen(assignment_word) - equal_sign_pos] = '\0';
-}
-
-void update_gv_hash_map(char **argv, struct hash_map *gv_hash_map)
-{
-    if (!gv_hash_map)
-    {
-        return;
-    }
-
-    int i = 0;
-    while (argv[i] != NULL)
-    {
-        char *key = NULL;
-        get_key_from_assignment_word(&key, argv[i]);
-
-        char *value = NULL;
-        get_value_from_assignment_word(&value, argv[i]);
-
-        char **value_arr = calloc(2, sizeof(char *));
-        value_arr[0] = value;
-
-        int updated = 0;
-        hash_map_insert(gv_hash_map, key, value_arr, &updated);
-
-        i++;
-    }
 }

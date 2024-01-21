@@ -25,7 +25,10 @@ int eval_simple_command(struct ast *ast, struct hash_map *gv_hash_map)
      * variables hash map and return. */
     if (are_all_args_assignment_w)
     {
-        update_gv_hash_map(ast_cmd->argv, gv_hash_map);
+        for (int i = 0; i < ast_cmd->argc - 1; i++)
+        {
+            set_var_from_assignment_word(gv_hash_map, ast_cmd->argv[i]);
+        }
         return 0;
     }
 

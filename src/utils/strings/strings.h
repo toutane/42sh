@@ -19,4 +19,6 @@ int is_name(char *str);
 
 char *int_to_string(int number);
 
+int get_index_of_char(char *str, char target);
+
 #endif /* ! STRINGS_H */

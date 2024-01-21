@@ -3,12 +3,9 @@
 
 #include <stddef.h>
 
-struct pair_list
-{
-    char *key;
-    char **value;
-    struct pair_list *next;
-};
+#include "utils/hash_map/hash_map_setup.h"
+
+int hash_map_contains(const struct hash_map *hash_map, char *key);
 
 struct hash_map
 {
