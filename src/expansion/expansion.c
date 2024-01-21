@@ -117,7 +117,7 @@ static void expand_variable(char **str, char *expression,
      * of the variable in the global variable hash map. If the variable is not
      * found, we set the value to the empty
      * string. Then, we append the value to the token_word string back. */
-    char **value = hash_map_get(gv_hash_map, expression);
+    char **value = memory_get(gv_hash_map, expression);
 
     if (value == NULL)
     {
