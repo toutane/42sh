@@ -7,21 +7,12 @@
 
 int hash_map_contains(const struct hash_map *hash_map, char *key);
 
-struct hash_map
-{
-    struct pair_list **data;
-    size_t size;
-};
-
-struct hash_map *hash_map_init(size_t size);
-
-int hash_map_insert(struct hash_map *hash_map, char *key, char **value,
-                    int *updated);
-
-void hash_map_free(struct hash_map *hash_map);
-
-void hash_map_dump(struct hash_map *hash_map);
-
 char **hash_map_get(const struct hash_map *hash_map, char *key);
+
+void hash_map_insert(struct hash_map *hash_map, char *key, char **value);
+
+void hash_map_update(struct hash_map *hash_map, char *key, char **value);
+
+void hash_map_print(struct hash_map *hash_map);
 
 #endif /* ! HASH_MAP_H */
