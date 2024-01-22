@@ -7,3 +7,12 @@ run_test_file update_spe_env_var.test
 run_test_file empty_env_var.test
 run_test_file env_var_with_equal.test
 run_test_file dollar.test
+run_test_file env_var_if1.test
+run_test_file env_var_if2.test
+run_test_file env_var_question_mark.test
+run_test_file env_var_question_mark1.test
+run_test_file env_var_quote1.test
+run_test_file env_var_quote2.test
+run_test_file env_var_reset.test
+run_test_file env_var_sharp1.test
+run_test_file env_var_sharp2.test
