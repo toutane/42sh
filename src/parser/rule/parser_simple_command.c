@@ -36,7 +36,7 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
         struct ast *command;
     } locals;
     locals.redirs = NULL;
-    locals.command = NULL;
+    // locals.command = NULL;
 
     // Change to locals - we need to allocate here to be able to put all
     // assignements words into sc node
@@ -47,35 +47,28 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
     }
     locals.command->type = AST_SIMPLE_COMMAND;
 
+    *res = locals.command;
+
     char prefixed = 0;
     if (parse_prefix(res, lexer) == PARSER_OK)
     {
         // parse { prefix }
-        if (*res == NULL)
-        {
-            fill_sc_node(locals.command, lexer);
-            lexer_pop(lexer);
-        }
-        else
+        prefixed = 1;
+
+        if (*res != locals.command)
         {
             // Add parsed prefix to locals
             push_back(&locals.redirs, *res);
+            *res = locals.command;
         }
-        prefixed = 1;
 
         while (parse_prefix(res, lexer) == PARSER_OK)
         {
-            // *res is NULL if the last token is an ASSIGNMENT_WORD
-            if (*res == NULL)
-            {
-                fill_sc_node(locals.command, lexer);
-                lexer_pop(lexer);
-            }
-            else
+            if (*res != locals.command)
             {
                 // Add parsed prefix to locals
                 push_back(&locals.redirs, *res);
-                continue;
+                *res = locals.command;
             }
         }
     }
@@ -111,12 +104,20 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
     {
         if (prefixed)
         {
-            push_back(&locals.redirs, locals.command);
+            if (((struct ast_cmd *)locals.command)->argc > 0)
+            {
+                push_back(&locals.redirs, locals.command);
+            }
+            else
+            {
+                ast_free(locals.command);
+            }
             *res = locals.redirs;
             return PARSER_OK;
         }
     }
     ast_free(locals.command);
+    ast_free(locals.redirs);
     *res = NULL;
     return PARSER_UNEXPECTED_TOKEN;
 }
