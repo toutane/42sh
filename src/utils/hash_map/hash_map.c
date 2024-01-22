@@ -140,6 +140,26 @@ void hash_map_update(struct hash_map *hash_map, char *key, char **value)
     return;
 }
 
+void hash_map_map(struct hash_map *hash_map, void (*f)(char *, char **))
+{
+    if (hash_map == NULL || f == NULL)
+    {
+        return;
+    }
+
+    for (size_t i = 0; i < hash_map->size; i++)
+    {
+        struct pair_list *cur = hash_map->data[i];
+        while (cur)
+        {
+            f(cur->key, cur->value);
+            cur = cur->next;
+        }
+    }
+
+    return;
+}
+
 static void pair_list_print(struct pair_list *pair_list)
 {
     if (pair_list == NULL)

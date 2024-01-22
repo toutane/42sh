@@ -1,5 +1,9 @@
+#define _POSIX_C_SOURCE 200112L // For setenv and unsetenv
+
 #include "variables.h"
 
+#include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -42,6 +46,7 @@ static char *get_value_from_assignment_word(char *assignment_word)
  * The <name> should be valid (see XBD), but the <word> can be anything.
  * This function handles the logic of checking if the variable already exists,
  * in this case, the value of the variable is updated.  */
+
 void set_var_from_assignment_word(struct hash_map *memory,
                                   char *assignment_word_str)
 {
@@ -63,4 +68,42 @@ void set_var_from_assignment_word(struct hash_map *memory,
     memory_set(memory, key, value_array);
 
     return;
+}
+
+static void setenv_from_var(char *key, char **value)
+{
+    if (key == NULL || value == NULL)
+    {
+        return;
+    }
+
+    if (setenv(key, value[0], 1))
+    {
+        fprintf(stderr, "42sh: setenv: %s\n", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+}
+
+void setenv_from_memory(struct hash_map *memory)
+{
+    hash_map_map(memory, setenv_from_var);
+}
+
+static void unsetenv_from_var(char *key, char **value)
+{
+    if (key == NULL || value == NULL)
+    {
+        return;
+    }
+
+    if (unsetenv(key))
+    {
+        fprintf(stderr, "42sh: unsetenv: %s\n", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+}
+
+void unsetenv_from_memory(struct hash_map *memory)
+{
+    hash_map_map(memory, unsetenv_from_var);
 }
