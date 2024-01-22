@@ -15,9 +15,6 @@ TOTAL_FAIL=0
 # grep regex to match memory leaks
 GREP_PATTERN="LeakSanitizer"
 
-# sed file format for redirection
-FILE_PATTERN="file?"
-
 # redirect files
 ref_stdout=/tmp/.ref_stdout
 ref_stderr=/tmp/.ref_stderr
@@ -39,7 +36,7 @@ full_file=1
 run_string()
 {
     # build mirror ref and my dir
-    build_mirror_dir
+    #build_mirror_dir
 
     # Execute testsuite in working dir ref
     cd $WORKING_DIR_REF
@@ -68,7 +65,7 @@ run_string()
 run_file()
 {
     # build mirror ref and my dir
-    build_mirror_dir
+    #build_mirror_dir
 
     # Execute testsuite in working dir ref
     cd $WORKING_DIR_REF
@@ -97,12 +94,12 @@ run_file()
 run_stdin()
 {
     # build mirror ref and my dir
-    build_mirror_dir
+    #build_mirror_dir
 
     # Execute testsuite in working dir ref
     cd $WORKING_DIR_REF
 
-    echo "$1" | bash --posix > $ref_stdout 2> $ref_stderr
+    bash --posix < "$1" > $ref_stdout 2> $ref_stderr
     REF_CODE=$?
 
     # Go back to previous dir
@@ -111,7 +108,7 @@ run_stdin()
     # Execute testsuite in working dir my
     cd $WORKING_DIR_MY
 
-    timeout $timeout_time echo "$1" | $BINARY > $my_stdout 2> $my_stderr
+    timeout $timeout_time $BINARY < "$1" > $my_stdout 2> $my_stderr
     MY_CODE=$?
     # WARNING, if program return 124 without timeout he will be considered as timeout
     [ $MY_CODE -eq 124 ] && WAS_TIMEOUT=1
@@ -158,7 +155,7 @@ check_diff()
         sucess=false
     fi
 
-    # check if stderr exists
+    # check if stderr exists and is not empty
     if { [ -s $ref_stderr ] && [ ! -s $my_stderr ] && [ $WAS_TIMEOUT -eq 0 ]; } ||
         { [ ! -s $ref_stderr ] && [ -s $my_stderr ]; }; then
         echo -ne "$RED STDERR($INPUT)$WHITE"
@@ -173,6 +170,11 @@ check_diff()
 
     # check if tests fail
     if ! $sucess; then
+
+        # remove mirror directories and rebuild it
+        clear_mirror_dir
+        build_mirror_dir
+
         echo -e "\n$YELLOW$2$WHITE"
         if [ $REF_CODE != $MY_CODE ] && [ $WAS_TIMEOUT -eq 0 ]; then
             echo -e "ref return code: $REF_CODE\nmy return code: $MY_CODE$WHITE"
@@ -192,9 +194,6 @@ check_diff()
     fi
 
     rm -f *.diff
-
-    # remove mirror directories
-    clear_mirror_dir
 }
 
 run_test_file()
@@ -215,7 +214,7 @@ run_test_file()
         run_file "$file"
         check_diff "$file" "$string"
         if $sucess; then
-            run_stdin "$string" 
+            run_stdin "$file" 
             check_diff "$file" "$string"
             if $sucess; then
                 echo -e "$GREEN OK$WHITE"
@@ -245,7 +244,7 @@ run_test_line()
             run_file "$file"
             check_diff "$1_$counter" "$string"
             if $sucess; then
-                run_stdin "$string"
+                run_stdin "$file"
                 check_diff "$1_$counter" "$string"
                 if $sucess; then
                     echo -e "$GREEN OK$WHITE"
@@ -276,6 +275,9 @@ run_category()
 
 run_testsuite()
 {
+    # build mirror dir
+    build_mirror_dir
+
     for category in $@; do
         [ $category = "." ] && continue
         [ $category = $SCRIPT_LOCATION ] && continue
@@ -288,6 +290,9 @@ run_testsuite()
         run_category $category
         echo
     done
+
+    # clear mirror dir
+    clear_mirror_dir
 }
 
 build_mirror_dir()
@@ -304,6 +309,16 @@ clear_mirror_dir()
 }
 
 #### MAIN ####
+
+# path to sources files
+if [ $# -eq 0 ]; then
+    echo -e "${RED}ERROR, no source files dir  where given$WHITE"
+    exit 1
+else
+    REPO_ROOT=$(realpath "$1")
+    #SOURCE_FILE_PATH="$1"
+    shift
+fi
 
 # path tho program
 if [ $# -eq 0 ]; then

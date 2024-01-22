@@ -1,0 +1,2 @@
+echo toto >> output.txt
+echo toto >> output.txt tata >> output.txt

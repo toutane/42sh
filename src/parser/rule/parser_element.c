@@ -9,6 +9,8 @@
  */
 enum parser_status parse_element(struct ast **res, struct lexer *lexer)
 {
+    enum parser_status return_status = PARSER_OK;
+
     // | WORD
     lexer_peek(lexer);
     if (lexer->cur_tok.type == TOKEN_WORD || is_reserved_word(lexer->cur_tok))
@@ -21,9 +23,9 @@ enum parser_status parse_element(struct ast **res, struct lexer *lexer)
 
         return PARSER_OK;
     }
-    else if (parse_redirection(res, lexer) == PARSER_OK)
+    else if ((return_status = parse_redirection(res, lexer)) == PARSER_OK)
     {
         return PARSER_OK;
     }
-    return PARSER_UNEXPECTED_TOKEN;
+    return return_status;
 }

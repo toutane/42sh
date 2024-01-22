@@ -1,0 +1,1 @@
+ls /dev | grep tty | sort -r | rev > toto ; < toto cat | rev | wc -l > titi

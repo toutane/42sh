@@ -3,3 +3,13 @@
 ! echo "hu" | cat -e
 if echo "d s true" | grep "true"; then echo "sus"; fi
 if ! echo "true poiu" | ! grep "true"; then echo "sus"; fi
+! true
+!true
+! false
+!false
+!!!!!true
+!!!!false
+!!!true | !!!false
+!!true | !!!false
+!!true | !!false
+!!!true | !!false

@@ -1,5 +1,5 @@
 #define OPEN_FAIL 1
-#define DUP2_FAIL 127
+#define DUP2_FAIL 1
 #define CREATE_FILE_PERM 0644
 
 #include "exec.h"
@@ -57,11 +57,10 @@ static int eval_redirection_GREATAND(
 
     // strtoul seems useless here
     // words after >& are implementation-defined (thus won't be tested)
-    // TODO: Close fd if '-' is the target
     if (!strcmp(ast_redir->target, "-"))
     {
         close(ast_redir->ionumber);
-        return EXIT_SUCCESS;
+        return eval_ast(ast_redir->next, gv_hash_map);
     }
     int fd = atoi(ast_redir->target);
 
@@ -186,7 +185,7 @@ static int eval_redirection_LESSAND(
     if (!strcmp(ast_redir->target, "-"))
     {
         close(ast_redir->ionumber);
-        return EXIT_SUCCESS;
+        return eval_ast(ast_redir->next, gv_hash_map);
     }
     int fd = atoi(ast_redir->target);
 

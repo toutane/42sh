@@ -17,6 +17,52 @@ void push_back(struct ast **list, struct ast *to_push)
     }
 }
 
+static void init_locals(struct ast **redirs, struct ast **command)
+{
+    *redirs = NULL;
+    // Change to locals - we need to allocate here to be able to put all
+    // assignements words into sc node
+    *command = calloc(1, sizeof(struct ast_cmd));
+    if (!*command)
+    {
+        err(1, "42sh: Allocation failed\n");
+    }
+    (*command)->type = AST_SIMPLE_COMMAND;
+}
+
+static struct ast *build_locals(struct ast **redirs, struct ast **command)
+{
+    if (((struct ast_cmd *)*command)->argc > 0
+        || ((struct ast_cmd *)*command)->prefix_count > 0)
+    {
+        push_back(redirs, *command);
+    }
+    else
+    {
+        ast_free(*command);
+    }
+    return *redirs;
+}
+
+static void fill_locals(struct ast **redirs, struct ast **command,
+                        struct ast **res)
+{
+    if (*res != *command)
+    {
+        // Add parsed prefix to locals
+        push_back(redirs, *res);
+        *res = *command;
+    }
+}
+
+static void free_locals(struct ast **redirs, struct ast **command)
+{
+    ast_free(*command);
+    ast_free(*redirs);
+    *command = NULL;
+    *redirs = NULL;
+}
+
 /**
  * @brief Parse any prefix, possibly followed by a WORD and by any number
  * of element
@@ -27,96 +73,72 @@ void push_back(struct ast **list, struct ast *to_push)
  */
 enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
 {
+    enum parser_status return_status = PARSER_OK;
+
     // prefix { prefix }
     // | { prefix } WORD { element }
-
     struct
     {
         struct ast *redirs;
         struct ast *command;
     } locals;
-    locals.redirs = NULL;
-    locals.command = NULL;
+    init_locals(&locals.redirs, &locals.command);
 
-    // Change to locals - we need to allocate here to be able to put all
-    // assignements words into sc node
-    locals.command = calloc(1, sizeof(struct ast_cmd));
-    if (!locals.command)
-    {
-        err(1, "42sh: Allocation failed\n");
-    }
-    locals.command->type = AST_SIMPLE_COMMAND;
+    *res = locals.command;
 
     char prefixed = 0;
-    if (parse_prefix(res, lexer) == PARSER_OK)
+    if ((return_status = parse_prefix(res, lexer)) == PARSER_OK)
     {
         // parse { prefix }
-        if (*res == NULL)
-        {
-            fill_sc_node(locals.command, lexer, 0);
-            lexer_pop(lexer);
-        }
-        else
-        {
-            // Add parsed prefix to locals
-            push_back(&locals.redirs, *res);
-        }
         prefixed = 1;
+
+        // fill_locals
+        fill_locals(&locals.redirs, &locals.command, res);
 
         while (parse_prefix(res, lexer) == PARSER_OK)
         {
-            // *res is NULL if the last token is an ASSIGNMENT_WORD
-            if (*res == NULL)
-            {
-                fill_sc_node(locals.command, lexer, 0);
-                lexer_pop(lexer);
-            }
-            else
-            {
-                // Add parsed prefix to locals
-                push_back(&locals.redirs, *res);
-                continue;
-            }
+            // fill_locals
+            fill_locals(&locals.redirs, &locals.command, res);
         }
     }
-    if (lexer_peek(lexer).type == TOKEN_WORD)
+
+    if (return_status != PARSER_FAIL && lexer_peek(lexer).type == TOKEN_WORD)
     {
-        // Fill node
+        // Fill node and Pop
         fill_sc_node(locals.command, lexer, 1);
+        lexer_pop(lexer);
 
         // replace AST
         *res = locals.command;
 
-        // Pop first WORD
-        lexer_pop(lexer);
-
         // { element }
-        while (parse_element(res, lexer) == PARSER_OK)
+        while ((return_status = parse_element(res, lexer)) == PARSER_OK)
         {
-            if (*res != locals.command)
-            {
-                // Add it to locals
-                push_back(&locals.redirs, *res);
-                // replace AST
-                *res = locals.command;
-            }
+            // fill_locals
+            fill_locals(&locals.redirs, &locals.command, res);
         }
-        // Add locals.commant to the end of locals.redirs
-        push_back(&locals.redirs, locals.command);
-        // Put is on AST
-        *res = locals.redirs;
+
+        if (return_status == PARSER_FAIL)
+        {
+            free_locals(&locals.redirs, &locals.command);
+            *res = NULL;
+            return PARSER_FAIL;
+        }
+
+        // build_locals before returning
+        *res = build_locals(&locals.redirs, &locals.command);
         return PARSER_OK;
     }
     else
     {
         if (prefixed)
         {
-            push_back(&locals.redirs, locals.command);
-            *res = locals.redirs;
+            // build_locals before returning
+            *res = build_locals(&locals.redirs, &locals.command);
             return PARSER_OK;
         }
     }
-    ast_free(locals.command);
+    free_locals(&locals.redirs, &locals.command);
     *res = NULL;
     return PARSER_UNEXPECTED_TOKEN;
 }

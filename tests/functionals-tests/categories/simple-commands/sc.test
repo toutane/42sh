@@ -1,5 +1,4 @@
 ls
-pwd        
 ls -a
 ls -a -l
 man printf
