@@ -11,4 +11,6 @@ void setenv_from_memory(struct hash_map *memory);
 
 void unsetenv_from_memory(struct hash_map *memory);
 
+void setup_memory_with_environ(struct hash_map *memory);
+
 #endif /* ! VARIABLES_H */

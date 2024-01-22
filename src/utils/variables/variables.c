@@ -1,4 +1,5 @@
 #define _POSIX_C_SOURCE 200112L // For setenv and unsetenv
+#define _XOPEN_SOURCE 500 // For strdup
 
 #include "variables.h"
 
@@ -107,3 +108,19 @@ void unsetenv_from_memory(struct hash_map *memory)
 {
     hash_map_map(memory, unsetenv_from_var);
 }
+
+/*
+void initialize_memory(struct hash_map *memory)
+{
+    char *pwd_value = strdup(getenv("PWD"));
+    char **value_array = calloc(2, sizeof(char *));
+    value_array[0] = pwd_value;
+
+    char *key = calloc(4, sizeof(char));
+    key[0] = 'P';
+    key[1] = 'W';
+    key[2] = 'D';
+
+    memory_set(memory, key, value_array);
+}
+*/

@@ -78,6 +78,7 @@ static int handle_builtin_execution(struct ast_cmd *ast_cmd,
 
     // To free the argv array, we need to set it to its original value
     ast_cmd->argv -= offset;
+    ast_cmd->argc += offset;
 
     // Flush stdout to avoid mixing output
     fflush(NULL);
@@ -130,6 +131,7 @@ int eval_simple_command(struct ast *ast, struct hash_map *gv_hash_map)
 
         execvp(ast_cmd->argv[0], ast_cmd->argv);
         ast_cmd->argv -= offset;
+        ast_cmd->argc += offset;
 
         _exit(execvp_error(errno));
     }
@@ -139,6 +141,8 @@ int eval_simple_command(struct ast *ast, struct hash_map *gv_hash_map)
     }
 
     ast_cmd->argv -= offset;
+    ast_cmd->argc += offset;
+
     // Check if the command was interrupted by a signal
     if (WIFSIGNALED(status))
     {

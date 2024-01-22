@@ -1,13 +1,9 @@
-#define _POSIX_C_SOURCE 200809L
-
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "execution/exec.h"
 #include "expansion/special_variables.h"
 #include "io/io.h"
 #include "options/opt_parser.h"
 #include "utils/memory/memory.h"
+#include "utils/variables/variables.h"
 
 int main(int argc, char *argv[])
 {
@@ -41,6 +37,8 @@ int main(int argc, char *argv[])
     fill_star_sign_var(argc, argv, gv_hash_map);
     fill_dollar_var(gv_hash_map);
     fill_arguments_amount(argc, gv_hash_map);
+
+    // setup_memory_with_environ(gv_hash_map);
 
     // Launch execution loop
     return execution_loop(&opts, stream, gv_hash_map);
