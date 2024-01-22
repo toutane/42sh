@@ -170,6 +170,11 @@ check_diff()
 
     # check if tests fail
     if ! $sucess; then
+
+        # remove mirror directories and rebuild it
+        clear_mirror_dir
+        build_mirror_dir
+
         echo -e "\n$YELLOW$2$WHITE"
         if [ $REF_CODE != $MY_CODE ] && [ $WAS_TIMEOUT -eq 0 ]; then
             echo -e "ref return code: $REF_CODE\nmy return code: $MY_CODE$WHITE"
@@ -189,9 +194,6 @@ check_diff()
     fi
 
     rm -f *.diff
-
-    # remove mirror directories
-    #clear_mirror_dir
 }
 
 run_test_file()

@@ -9,4 +9,6 @@ echo tata > file1 > file2 > file3
 echo tata > file1 > file2 > file3
 < faa cat > file2
 < foo < faa cat >output.txt
-
+echo "tata" >& file2
+echo "tata" <& file2
+echo "tata" <> file2
