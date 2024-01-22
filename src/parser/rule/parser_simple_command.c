@@ -44,7 +44,7 @@ static struct ast *build_locals(struct ast **redirs, struct ast **command)
 }
 
 static void fill_locals(struct ast **redirs, struct ast **command,
-        struct ast **res)
+                        struct ast **res)
 {
     if (*res != *command)
     {
@@ -115,7 +115,7 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
             fill_locals(&locals.redirs, &locals.command, res);
         }
 
-        //build_locals before returning
+        // build_locals before returning
         *res = build_locals(&locals.redirs, &locals.command);
         return PARSER_OK;
     }
@@ -123,7 +123,7 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
     {
         if (prefixed)
         {
-            //build_locals before returning
+            // build_locals before returning
             *res = build_locals(&locals.redirs, &locals.command);
             return PARSER_OK;
         }
