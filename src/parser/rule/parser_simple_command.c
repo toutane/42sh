@@ -36,8 +36,6 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
         struct ast *command;
     } locals;
     locals.redirs = NULL;
-    // locals.command = NULL;
-
     // Change to locals - we need to allocate here to be able to put all
     // assignements words into sc node
     locals.command = calloc(1, sizeof(struct ast_cmd));
