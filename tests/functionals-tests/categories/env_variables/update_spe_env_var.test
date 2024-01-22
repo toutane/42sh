@@ -1,3 +1,0 @@
-echo $PWD
-PWD="pwd"
-echo $PWD
