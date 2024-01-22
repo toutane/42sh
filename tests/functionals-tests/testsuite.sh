@@ -15,9 +15,6 @@ TOTAL_FAIL=0
 # grep regex to match memory leaks
 GREP_PATTERN="LeakSanitizer"
 
-# sed file format for redirection
-FILE_PATTERN="file?"
-
 # redirect files
 ref_stdout=/tmp/.ref_stdout
 ref_stderr=/tmp/.ref_stderr
@@ -39,7 +36,7 @@ full_file=1
 run_string()
 {
     # build mirror ref and my dir
-    build_mirror_dir
+    #build_mirror_dir
 
     # Execute testsuite in working dir ref
     cd $WORKING_DIR_REF
@@ -68,7 +65,7 @@ run_string()
 run_file()
 {
     # build mirror ref and my dir
-    build_mirror_dir
+    #build_mirror_dir
 
     # Execute testsuite in working dir ref
     cd $WORKING_DIR_REF
@@ -97,7 +94,7 @@ run_file()
 run_stdin()
 {
     # build mirror ref and my dir
-    build_mirror_dir
+    #build_mirror_dir
 
     # Execute testsuite in working dir ref
     cd $WORKING_DIR_REF
@@ -158,7 +155,7 @@ check_diff()
         sucess=false
     fi
 
-    # check if stderr exists
+    # check if stderr exists and is not empty
     if { [ -s $ref_stderr ] && [ ! -s $my_stderr ] && [ $WAS_TIMEOUT -eq 0 ]; } ||
         { [ ! -s $ref_stderr ] && [ -s $my_stderr ]; }; then
         echo -ne "$RED STDERR($INPUT)$WHITE"
@@ -194,7 +191,7 @@ check_diff()
     rm -f *.diff
 
     # remove mirror directories
-    clear_mirror_dir
+    #clear_mirror_dir
 }
 
 run_test_file()
@@ -276,6 +273,9 @@ run_category()
 
 run_testsuite()
 {
+    # build mirror dir
+    build_mirror_dir
+
     for category in $@; do
         [ $category = "." ] && continue
         [ $category = $SCRIPT_LOCATION ] && continue
@@ -288,6 +288,9 @@ run_testsuite()
         run_category $category
         echo
     done
+
+    # clear mirror dir
+    clear_mirror_dir
 }
 
 build_mirror_dir()
@@ -304,6 +307,16 @@ clear_mirror_dir()
 }
 
 #### MAIN ####
+
+# path to sources files
+if [ $# -eq 0 ]; then
+    echo -e "${RED}ERROR, no source files dir  where given$WHITE"
+    exit 1
+else
+    REPO_ROOT=$(realpath "$1")
+    #SOURCE_FILE_PATH="$1"
+    shift
+fi
 
 # path tho program
 if [ $# -eq 0 ]; then
