@@ -16,3 +16,4 @@ run_test_file env_var_quote2.test
 run_test_file env_var_reset.test
 run_test_file env_var_sharp1.test
 run_test_file env_var_sharp2.test
+run_test_file env_var_multiple_words.test
