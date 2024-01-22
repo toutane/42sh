@@ -39,7 +39,7 @@ full_file=1
 run_string()
 {
     # build mirror ref and my dir
-    build_mirror_dir
+    #build_mirror_dir
 
     # Execute testsuite in working dir ref
     cd $WORKING_DIR_REF
@@ -68,7 +68,7 @@ run_string()
 run_file()
 {
     # build mirror ref and my dir
-    build_mirror_dir
+    #build_mirror_dir
 
     # Execute testsuite in working dir ref
     cd $WORKING_DIR_REF
@@ -97,7 +97,7 @@ run_file()
 run_stdin()
 {
     # build mirror ref and my dir
-    build_mirror_dir
+    #build_mirror_dir
 
     # Execute testsuite in working dir ref
     cd $WORKING_DIR_REF
@@ -194,7 +194,7 @@ check_diff()
     rm -f *.diff
 
     # remove mirror directories
-    clear_mirror_dir
+    #clear_mirror_dir
 }
 
 run_test_file()
@@ -276,6 +276,9 @@ run_category()
 
 run_testsuite()
 {
+    # build mirror dir
+    build_mirror_dir
+
     for category in $@; do
         [ $category = "." ] && continue
         [ $category = $SCRIPT_LOCATION ] && continue
@@ -288,6 +291,9 @@ run_testsuite()
         run_category $category
         echo
     done
+
+    # clear mirror dir
+    clear_mirror_dir
 }
 
 build_mirror_dir()
