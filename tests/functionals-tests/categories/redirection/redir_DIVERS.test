@@ -1,0 +1,5 @@
+< file1.txt > output.txt echo ha
+< foo cat > output.txt
+< foo cat >> output.txt >> output.txt
+< faa cat > file2
+< foo < faa cat >output.txt
