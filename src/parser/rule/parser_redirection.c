@@ -40,6 +40,11 @@ enum parser_status parse_redirection(struct ast **res, struct lexer *lexer)
 
             return PARSER_OK;
         }
+        else
+        {
+            ast_free(&redir_node->base);
+            return PARSER_FAIL;
+        }
     }
 
     // Free node

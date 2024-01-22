@@ -1,1 +1,5 @@
-echo "tata" <& file2
+echo "tata" <&
+echo "tata" <&2
+echo "tata" <& 2
+echo "tata" 0<&
+echo "tata" 0<&2

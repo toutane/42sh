@@ -72,9 +72,10 @@ static void free_locals(struct ast **redirs, struct ast **command)
  */
 enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
 {
+    enum parser_status return_status = PARSER_OK;
+
     // prefix { prefix }
     // | { prefix } WORD { element }
-
     struct
     {
         struct ast *redirs;
@@ -85,7 +86,7 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
     *res = locals.command;
 
     char prefixed = 0;
-    if (parse_prefix(res, lexer) == PARSER_OK)
+    if ((return_status = parse_prefix(res, lexer)) == PARSER_OK)
     {
         // parse { prefix }
         prefixed = 1;
@@ -99,7 +100,8 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
             fill_locals(&locals.redirs, &locals.command, res);
         }
     }
-    if (lexer_peek(lexer).type == TOKEN_WORD)
+
+    if (return_status != PARSER_FAIL && lexer_peek(lexer).type == TOKEN_WORD)
     {
         // Fill node and Pop
         fill_sc_node(locals.command, lexer);
@@ -109,10 +111,17 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
         *res = locals.command;
 
         // { element }
-        while (parse_element(res, lexer) == PARSER_OK)
+        while ((return_status = parse_element(res, lexer)) == PARSER_OK)
         {
             // fill_locals
             fill_locals(&locals.redirs, &locals.command, res);
+        }
+
+        if (return_status == PARSER_FAIL)
+        {
+            free_locals(&locals.redirs, &locals.command);
+            *res = NULL;
+            return PARSER_FAIL;
         }
 
         // build_locals before returning
