@@ -317,7 +317,6 @@ else
     #SOURCE_FILE_PATH="$1"
     shift
 fi
-echo -e "\n\n\n SOURCE FILE PATH = $SOURCE_FILE_PATH\n\n\n\n"
 
 # path tho program
 if [ $# -eq 0 ]; then
