@@ -1,9 +1,9 @@
 #ifndef HASH_MAP_H
 #define HASH_MAP_H
 
-#include "hash_map_setup.h"
-
 #include <stddef.h>
+
+#include "utils/hash_map/hash_map_setup.h"
 
 int hash_map_contains(const struct hash_map *hash_map, char *key);
 

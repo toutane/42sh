@@ -18,6 +18,7 @@
 #include "../utils/hash_map/hash_map.h"
 #include "../utils/printers/printers.h"
 #include "../utils/token/token.h"
+#include "utils/variables/variables.h"
 
 /* @brief: Executes the program in a loop, reading from the input stream while
  * eof is not reached. It creates a AST while reading the input stream and

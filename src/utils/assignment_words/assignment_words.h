@@ -1,8 +1,9 @@
 #ifndef ASSIGNMENT_WORDS_H
 #define ASSIGNMENT_WORDS_H
 
-#include "../../utils/hash_map/hash_map.h"
+#include "utils/hash_map/hash_map.h"
 #include "utils/memory/memory.h"
+#include "utils/strings/strings.h"
 
 int is_valid_name_char(char c);
 

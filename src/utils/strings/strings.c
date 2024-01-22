@@ -75,3 +75,19 @@ char *int_to_string(int number)
 
     return result;
 }
+
+int get_index_of_char(char *str, char target)
+{
+    size_t target_pos = 0;
+    while (str[target_pos] != '\0')
+    {
+        if (str[target_pos] == target)
+        {
+            return target_pos;
+        }
+
+        target_pos++;
+    }
+
+    return 0;
+}
