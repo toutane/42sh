@@ -20,13 +20,11 @@ void fill_at_sign_var(int argc, char *argv[], struct hash_map *gv_hash_map)
         k++;
     }
 
-    int i = 0;
-
     char *key = calloc(2, sizeof(char));
     key[0] = '@';
     key[1] = '\0';
 
-    hash_map_insert(gv_hash_map, key, arguments_array, &i);
+    hash_map_insert(gv_hash_map, key, arguments_array);
 }
 
 void fill_arguments_var(int argc, char *argv[], struct hash_map *gv_hash_map)
@@ -43,8 +41,7 @@ void fill_arguments_var(int argc, char *argv[], struct hash_map *gv_hash_map)
 
         memcpy(arguments_array[0], argv[i], strlen(argv[i]));
 
-        int j = 0;
-        hash_map_insert(gv_hash_map, key, arguments_array, &j);
+        hash_map_insert(gv_hash_map, key, arguments_array);
         k++;
     }
 }
@@ -65,8 +62,7 @@ void fill_dollar_var(struct hash_map *gv_hash_map)
     key[0] = '$';
     key[1] = '\0';
 
-    int i = 0;
-    hash_map_insert(gv_hash_map, key, arguments_array, &i);
+    hash_map_insert(gv_hash_map, key, arguments_array);
 
     return;
 }
@@ -96,13 +92,11 @@ void fill_star_sign_var(int argc, char *argv[], struct hash_map *gv_hash_map)
         }
     }
 
-    int i = 0;
-
     char *key = calloc(2, sizeof(char));
     key[0] = '*';
     key[1] = '\0';
 
-    hash_map_insert(gv_hash_map, key, arguments_array, &i);
+    hash_map_insert(gv_hash_map, key, arguments_array);
 }
 
 void fill_arguments_amount(int argc, struct hash_map *gv_hash_map)
@@ -117,6 +111,5 @@ void fill_arguments_amount(int argc, struct hash_map *gv_hash_map)
     key[0] = '#';
     key[1] = '\0';
 
-    int i = 0;
-    hash_map_insert(gv_hash_map, key, arguments_array, &i);
+    hash_map_insert(gv_hash_map, key, arguments_array);
 }

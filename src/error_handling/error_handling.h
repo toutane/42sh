@@ -13,6 +13,7 @@
 #include "../parser/parser.h"
 #include "../utils/hash_map/hash_map.h"
 #include "../utils/token/token.h"
+#include "utils/memory/memory.h"
 
 #define GRAMMAR_ERROR 2;
 

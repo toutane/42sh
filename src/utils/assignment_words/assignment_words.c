@@ -109,8 +109,7 @@ void update_gv_hash_map(char **argv, struct hash_map *gv_hash_map)
         char **value_arr = calloc(2, sizeof(char *));
         value_arr[0] = value;
 
-        int updated = 0;
-        hash_map_insert(gv_hash_map, key, value_arr, &updated);
+        memory_set(gv_hash_map, key, value_arr);
 
         i++;
     }

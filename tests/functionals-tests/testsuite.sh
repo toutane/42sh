@@ -99,7 +99,7 @@ run_stdin()
     # Execute testsuite in working dir ref
     cd $WORKING_DIR_REF
 
-    echo "$1" | bash --posix > $ref_stdout 2> $ref_stderr
+    bash --posix < "$1" > $ref_stdout 2> $ref_stderr
     REF_CODE=$?
 
     # Go back to previous dir
@@ -108,7 +108,7 @@ run_stdin()
     # Execute testsuite in working dir my
     cd $WORKING_DIR_MY
 
-    timeout $timeout_time echo "$1" | $BINARY > $my_stdout 2> $my_stderr
+    timeout $timeout_time $BINARY < "$1" > $my_stdout 2> $my_stderr
     MY_CODE=$?
     # WARNING, if program return 124 without timeout he will be considered as timeout
     [ $MY_CODE -eq 124 ] && WAS_TIMEOUT=1
@@ -214,7 +214,7 @@ run_test_file()
         run_file "$file"
         check_diff "$file" "$string"
         if $sucess; then
-            run_stdin "$string" 
+            run_stdin "$file" 
             check_diff "$file" "$string"
             if $sucess; then
                 echo -e "$GREEN OK$WHITE"
@@ -244,7 +244,7 @@ run_test_line()
             run_file "$file"
             check_diff "$1_$counter" "$string"
             if $sucess; then
-                run_stdin "$string"
+                run_stdin "$file"
                 check_diff "$1_$counter" "$string"
                 if $sucess; then
                     echo -e "$GREEN OK$WHITE"
