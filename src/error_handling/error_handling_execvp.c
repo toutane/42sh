@@ -9,7 +9,7 @@ int execvp_error(int err)
         fprintf(stderr, "42sh: command is not an executable utility\n");
         return 126;
     default:
-        fprintf(stderr, "42sh: command error, %s\n", strerror(errno));
+        // fprintf(stderr, "42sh: command error, %s\n", strerror(errno));
         return 127;
     }
 }

@@ -53,7 +53,7 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
         // parse { prefix }
         if (*res == NULL)
         {
-            fill_sc_node(locals.command, lexer);
+            fill_sc_node(locals.command, lexer, 0);
             lexer_pop(lexer);
         }
         else
@@ -68,7 +68,7 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
             // *res is NULL if the last token is an ASSIGNMENT_WORD
             if (*res == NULL)
             {
-                fill_sc_node(locals.command, lexer);
+                fill_sc_node(locals.command, lexer, 0);
                 lexer_pop(lexer);
             }
             else
@@ -82,7 +82,7 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
     if (lexer_peek(lexer).type == TOKEN_WORD)
     {
         // Fill node
-        fill_sc_node(locals.command, lexer);
+        fill_sc_node(locals.command, lexer, 1);
 
         // replace AST
         *res = locals.command;

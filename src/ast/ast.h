@@ -46,6 +46,8 @@ struct ast_cmd
     struct ast base;
     char **argv;
     int argc;
+    char **prefix;
+    int prefix_count;
 };
 
 struct ast_condition
@@ -96,7 +98,7 @@ void ast_free(struct ast *ast);
 /**
  * @brief Fill the ast.
  */
-void fill_sc_node(struct ast *ast, struct lexer *lexer);
+void fill_sc_node(struct ast *ast, struct lexer *lexer, int fill_argv);
 void fill_list_node(struct ast *ast, struct ast *ast_cmd);
 void fill_if_node(struct ast *ast, struct ast *ast_child);
 void fill_redirection_node(struct ast *ast, int ionumber, char *str);

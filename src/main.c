@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     fill_dollar_var(gv_hash_map);
     fill_arguments_amount(argc, gv_hash_map);
 
-    // setup_memory_with_environ(gv_hash_map);
+    initialize_memory(gv_hash_map);
 
     // Launch execution loop
     return execution_loop(&opts, stream, gv_hash_map);

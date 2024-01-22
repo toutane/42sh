@@ -109,7 +109,6 @@ void unsetenv_from_memory(struct hash_map *memory)
     hash_map_map(memory, unsetenv_from_var);
 }
 
-/*
 void initialize_memory(struct hash_map *memory)
 {
     char *pwd_value = strdup(getenv("PWD"));
@@ -123,4 +122,3 @@ void initialize_memory(struct hash_map *memory)
 
     memory_set(memory, key, value_array);
 }
-*/
