@@ -1,0 +1,3 @@
+echo $foo
+foo="foo" ./env_var/script_1.sh
+echo $foo

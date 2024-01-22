@@ -1,0 +1,3 @@
+echo $PWD
+PWD="pwd" ./env_var/script_4.sh
+echo $PWD

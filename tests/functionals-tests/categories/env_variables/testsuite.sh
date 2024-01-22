@@ -1,0 +1,9 @@
+run_test_file env_var_basic.test
+run_test_file env_var_multiple.test
+run_test_file env_var_line_per_line.test
+run_test_file env_var_glob_var.test
+run_test_file spe_env_var.test
+run_test_file update_spe_env_var.test
+run_test_file empty_env_var.test
+run_test_file env_var_with_equal.test
+run_test_file dollar.test
