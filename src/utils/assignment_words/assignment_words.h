@@ -2,6 +2,7 @@
 #define ASSIGNMENT_WORDS_H
 
 #include "../../utils/hash_map/hash_map.h"
+#include "utils/memory/memory.h"
 
 int is_valid_name_char(char c);
 

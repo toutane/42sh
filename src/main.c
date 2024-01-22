@@ -7,6 +7,7 @@
 #include "expansion/special_variables.h"
 #include "io/io.h"
 #include "options/opt_parser.h"
+#include "utils/memory/memory.h"
 
 int main(int argc, char *argv[])
 {
@@ -34,7 +35,7 @@ int main(int argc, char *argv[])
     }
 
     // Create global variables hash table
-    struct hash_map *gv_hash_map = hash_map_init(10);
+    struct hash_map *gv_hash_map = memory_new();
     fill_at_sign_var(argc, argv, gv_hash_map);
     fill_arguments_var(argc, argv, gv_hash_map);
     fill_star_sign_var(argc, argv, gv_hash_map);
