@@ -1,0 +1,4 @@
+file="sample.txt"
+while IFS= read -r line || [ -n "$line" ]; do
+    echo "Line: $line"
+done < "$file"
