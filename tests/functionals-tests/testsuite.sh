@@ -15,9 +15,6 @@ TOTAL_FAIL=0
 # grep regex to match memory leaks
 GREP_PATTERN="LeakSanitizer"
 
-# sed file format for redirection
-FILE_PATTERN="file?"
-
 # redirect files
 ref_stdout=/tmp/.ref_stdout
 ref_stderr=/tmp/.ref_stderr
@@ -158,7 +155,7 @@ check_diff()
         sucess=false
     fi
 
-    # check if stderr exists
+    # check if stderr exists and is not empty
     if { [ -s $ref_stderr ] && [ ! -s $my_stderr ] && [ $WAS_TIMEOUT -eq 0 ]; } ||
         { [ ! -s $ref_stderr ] && [ -s $my_stderr ]; }; then
         echo -ne "$RED STDERR($INPUT)$WHITE"
@@ -310,6 +307,17 @@ clear_mirror_dir()
 }
 
 #### MAIN ####
+
+# path to sources files
+if [ $# -eq 0 ]; then
+    echo -e "${RED}ERROR, no source files dir  where given$WHITE"
+    exit 1
+else
+    REPO_ROOT=$(realpath "$1")
+    #SOURCE_FILE_PATH="$1"
+    shift
+fi
+echo -e "\n\n\n SOURCE FILE PATH = $SOURCE_FILE_PATH\n\n\n\n"
 
 # path tho program
 if [ $# -eq 0 ]; then
