@@ -3,8 +3,6 @@
 < foo cat >> output.txt >> output.txt
 < faa cat > file2
 < foo < faa cat >output.txt
-if echo ok; then cat; fi < foo
-if echo ok; then cat; fi < foo > output
 cat foo 3>&1 >&3 3>&-
 cat foo 5>&1 >&5 5>&-
 cat foo 5>&1 >&5 5>&- >&- <&-

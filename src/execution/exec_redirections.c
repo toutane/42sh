@@ -1,5 +1,5 @@
 #define OPEN_FAIL 1
-#define DUP2_FAIL 127
+#define DUP2_FAIL 1
 #define CREATE_FILE_PERM 0644
 
 #include "exec.h"

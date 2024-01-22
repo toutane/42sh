@@ -5,3 +5,4 @@ run_test_line redir_GREAT.test
 run_test_line redir_LESSAND.test
 run_test_line redir_LESSGREAT.test
 run_test_line redir_LESS.test
+run_test_line redir_SHELL_COMMAND.test
