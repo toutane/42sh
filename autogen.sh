@@ -12,5 +12,5 @@ cd -
 # create a debug deirectory, like build but add debug flags
 mkdir debug
 cd debug
-../configure --enable-debug
+../configure CFLAGS='-fsanitize=address' --enable-debug
 cd -
