@@ -9,7 +9,9 @@
 
 void fill_at_sign_var(int argc, char *argv[], struct hash_map *gv_hash_map)
 {
-    char **arguments_array = calloc((argc - optind), sizeof(char *));
+    int l = argc - optind;
+    l = (l <= 0) ? 1 : l;
+    char **arguments_array = calloc(l, sizeof(char *));
 
     int k = 0;
 
@@ -101,7 +103,7 @@ void fill_star_sign_var(int argc, char *argv[], struct hash_map *gv_hash_map)
 
 void fill_arguments_amount(int argc, struct hash_map *gv_hash_map)
 {
-    int arguments_amount = argc - optind - 1;
+    int arguments_amount = argc - optind;
     char *value = int_to_string(arguments_amount);
 
     char **arguments_array = calloc(2, sizeof(char *));
