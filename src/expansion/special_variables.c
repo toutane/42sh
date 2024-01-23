@@ -119,8 +119,6 @@ void fill_arguments_amount(int argc, struct hash_map *gv_hash_map)
 
 void fill_random(struct hash_map *memory)
 {
-    // Seed the random number generator
-    srand((unsigned int)time(NULL));
     int random_number = rand() % 32768;
     char *pwd_value = int_to_string(random_number);
 

@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "expansion/special_variables.h"
 
@@ -112,6 +113,9 @@ void unsetenv_from_memory(struct hash_map *memory)
 
 void set_default_variables(int argc, char **argv, struct hash_map *memory)
 {
+    // Seed the random number generator
+    srand((unsigned int)time(NULL));
+
     /* Add special variables to shell memory:
      * $@, $*, $1...n, $$, $# */
 
