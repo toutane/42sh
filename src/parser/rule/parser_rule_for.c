@@ -49,6 +49,7 @@ enum parser_status parse_rule_for(struct ast **res, struct lexer *lexer)
                 }
                 else
                 {
+                    ast_free(for_node);
                     return PARSER_UNEXPECTED_TOKEN;
                 }
             }
