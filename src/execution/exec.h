@@ -41,6 +41,6 @@ int eval_redirection(struct ast *ast, struct hash_map *gv_hash_map);
 
 int eval_neg(struct ast *ast, struct hash_map *gv_hash_map);
 
-int eval_for(struct ast *ast);
+int eval_for(struct ast *ast, struct hash_map *gv_hash_map);
 
 #endif /* ! EXEC_H */

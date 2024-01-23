@@ -84,6 +84,7 @@ void free_ast_for(struct ast *ast)
     {
         free(ast_for->array);
     }
+    free(ast);
     return;
 }
 

@@ -119,13 +119,13 @@ void set_default_variables(int argc, char **argv, struct hash_map *memory)
     /* Add special variables to shell memory:
      * $@, $*, $1...n, $$, $# */
 
-    fill_at_sign_var(argc, argv, memory);
+    // fill_at_sign_var(argc, argv, memory);
     fill_arguments_var(argc, argv, memory);
-    fill_star_sign_var(argc, argv, memory);
+    // fill_star_sign_var(argc, argv, memory);
     fill_dollar_var(memory);
     fill_arguments_amount(argc, memory);
     set_uid_env_var(memory);
-    // fill_random(memory);
+    fill_random(memory);
 
     /* Add environment variables to shell memory:
      * PWD, OLDPWD, IFS */

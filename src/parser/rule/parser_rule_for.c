@@ -4,7 +4,6 @@ enum parser_status parse_rule_for(struct ast **res, struct lexer *lexer)
 {
     if (lexer_peek(lexer).type == TOKEN_FOR)
     {
-        // TODO: Create FOR node
         struct ast *for_node = calloc(1, sizeof(struct ast_for));
         for_node->type = AST_FOR;
 

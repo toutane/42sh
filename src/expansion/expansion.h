@@ -7,6 +7,6 @@
 #include "expansion/special_variables.h"
 #include "utils/memory/memory.h"
 
-void expand_string(char **str, struct hash_map *gv_hash_map);
+char *expand_string(char **str, struct hash_map *gv_hash_map);
 
 #endif /* ! EXPANSION_H */
