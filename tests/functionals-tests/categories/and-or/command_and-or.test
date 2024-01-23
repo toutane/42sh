@@ -1,0 +1,22 @@
+echo toto || echo tata
+matthieuuuuuuuuuu || echo tata
+echo toto || matthieuuuuuuuuuu
+|| matthieuuuuuuuuuu
+|| echo ok
+echo ok ||
+matthieuuuuuuuuuu ||
+toto || tata
+toto |||| tata
+echo toto && echo tata
+matthieuuuuuuuuuu && echo tata
+echo toto && matthieuuuuuuuuuu
+&& matthieuuuuuuuuuu
+&& echo ok
+echo ok &&
+matthieuuuuuuuuuu &&
+toto && tata
+toto &&&& tata
+echo toto ||&& echo tata
+echo toto &&||&& echo tata
+false && echo foo || echo bar
+true || echo foo && echo bar
