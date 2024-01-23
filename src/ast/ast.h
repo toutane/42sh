@@ -18,6 +18,8 @@ enum ast_type
     AST_PIPELINE,
     AST_REDIRECTION,
     AST_NEG,
+    AST_AND,
+    AST_OR,
     /*
     AST_MUL,
     AST_DIV,
@@ -88,6 +90,13 @@ struct ast_neg
 {
     struct ast base;
     struct ast *data;
+};
+
+struct ast_and_or
+{
+    struct ast base;
+    struct ast *left;
+    struct ast *right;
 };
 
 /**
