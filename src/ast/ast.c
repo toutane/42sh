@@ -9,6 +9,13 @@ void free_ast_cmd(struct ast *ast)
             free(ast_cmd->argv[i]);
     }
     free(ast_cmd->argv);
+
+    for (int i = 0; i < ast_cmd->prefix_count; ++i)
+    {
+        if (ast_cmd->prefix[i])
+            free(ast_cmd->prefix[i]);
+    }
+    free(ast_cmd->prefix);
     free(ast);
     return;
 }

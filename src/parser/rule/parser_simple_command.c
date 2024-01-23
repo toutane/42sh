@@ -32,7 +32,8 @@ static void init_locals(struct ast **redirs, struct ast **command)
 
 static struct ast *build_locals(struct ast **redirs, struct ast **command)
 {
-    if (((struct ast_cmd *)*command)->argc > 0)
+    if (((struct ast_cmd *)*command)->argc > 0
+        || ((struct ast_cmd *)*command)->prefix_count > 0)
     {
         push_back(redirs, *command);
     }
@@ -104,7 +105,7 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
     if (return_status != PARSER_FAIL && lexer_peek(lexer).type == TOKEN_WORD)
     {
         // Fill node and Pop
-        fill_sc_node(locals.command, lexer);
+        fill_sc_node(locals.command, lexer, 1);
         lexer_pop(lexer);
 
         // replace AST

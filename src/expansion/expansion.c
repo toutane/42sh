@@ -113,10 +113,23 @@ static void handle_double_quote(char **str, struct stream_info *stream,
 static void expand_variable(char **str, char *expression,
                             struct hash_map *gv_hash_map)
 {
+    if (expression == NULL)
+    {
+        return;
+    }
+
+    if (strcmp(expression, "RANDOM") == 0)
+    {
+        /* If the expression is RANDOM, we generate a random number between 0
+         * and 32767 and we update the memory with the new value. */
+        fill_random(gv_hash_map);
+    }
+
     /* Once the expression is created and filled properly, we look for the value
      * of the variable in the global variable hash map. If the variable is not
      * found, we set the value to the empty
      * string. Then, we append the value to the token_word string back. */
+
     char **value = memory_get(gv_hash_map, expression);
 
     if (value == NULL)

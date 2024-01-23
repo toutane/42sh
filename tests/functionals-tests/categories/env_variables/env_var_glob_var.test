@@ -1,0 +1,6 @@
+name="42sh"
+echo $name $nonexisting
+name="toot" ./env_var/script_3.sh; echo $name;
+name="21sh"
+name="tata" ./env_var/script_3.sh; echo $name;
+echo "name: ${name}"
