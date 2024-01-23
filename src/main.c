@@ -1,5 +1,4 @@
 #include "execution/exec.h"
-#include "expansion/special_variables.h"
 #include "io/io.h"
 #include "options/opt_parser.h"
 #include "utils/memory/memory.h"
@@ -30,16 +29,10 @@ int main(int argc, char *argv[])
                                            // program should exit with success
     }
 
-    // Create global variables hash table
-    struct hash_map *gv_hash_map = memory_new();
-    fill_at_sign_var(argc, argv, gv_hash_map);
-    fill_arguments_var(argc, argv, gv_hash_map);
-    fill_star_sign_var(argc, argv, gv_hash_map);
-    fill_dollar_var(gv_hash_map);
-    fill_arguments_amount(argc, gv_hash_map);
-
-    initialize_memory(gv_hash_map);
+    // Create shell memory hashmap
+    struct hash_map *memory = memory_new();
+    set_default_variables(argc, argv, memory);
 
     // Launch execution loop
-    return execution_loop(&opts, stream, gv_hash_map);
+    return execution_loop(&opts, stream, memory);
 }

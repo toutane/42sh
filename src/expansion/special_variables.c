@@ -1,3 +1,5 @@
+#define _XOPEN_SOURCE 500 // For strdup
+
 #include "special_variables.h"
 
 #include <getopt.h>
@@ -5,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+#include <time.h>
 #include <unistd.h>
 
 void fill_at_sign_var(int argc, char *argv[], struct hash_map *gv_hash_map)
@@ -112,4 +115,107 @@ void fill_arguments_amount(int argc, struct hash_map *gv_hash_map)
     key[1] = '\0';
 
     hash_map_insert(gv_hash_map, key, arguments_array);
+}
+
+void fill_random(struct hash_map *memory)
+{
+    // Seed the random number generator
+    srand((unsigned int)time(NULL));
+    int random_number = rand() % 32768;
+    char *pwd_value = int_to_string(random_number);
+
+    char **value_array = calloc(2, sizeof(char *));
+    value_array[0] = pwd_value;
+
+    char *key = calloc(7, sizeof(char));
+    key[0] = 'R';
+    key[1] = 'A';
+    key[2] = 'N';
+    key[3] = 'D';
+    key[4] = 'O';
+    key[5] = 'M';
+    key[6] = '\0';
+
+    memory_set(memory, key, value_array);
+}
+
+void set_uid_env_var(struct hash_map *memory)
+{
+    char *pwd_value = int_to_string(getuid());
+    char **value_array = calloc(2, sizeof(char *));
+    value_array[0] = pwd_value;
+
+    char *key = calloc(4, sizeof(char));
+    key[0] = 'U';
+    key[1] = 'I';
+    key[2] = 'D';
+    key[3] = '\0';
+
+    memory_set(memory, key, value_array);
+}
+
+void set_pwd(struct hash_map *memory)
+{
+    char *tmp = getenv("PWD");
+    if (tmp == NULL)
+    {
+        return;
+    }
+
+    char *pwd_value = strdup(tmp);
+    char **value_array = calloc(2, sizeof(char *));
+    value_array[0] = pwd_value;
+
+    char *key = calloc(4, sizeof(char));
+    key[0] = 'P';
+    key[1] = 'W';
+    key[2] = 'D';
+    key[3] = '\0';
+
+    memory_set(memory, key, value_array);
+}
+
+void set_oldpwd(struct hash_map *memory)
+{
+    char *tmp = getenv("OLDPWD");
+    if (tmp == NULL)
+    {
+        return;
+    }
+
+    char *pwd_value = strdup(tmp);
+    char **value_array = calloc(2, sizeof(char *));
+    value_array[0] = pwd_value;
+
+    char *key = calloc(7, sizeof(char));
+    key[0] = 'O';
+    key[1] = 'L';
+    key[2] = 'D';
+    key[3] = 'P';
+    key[4] = 'W';
+    key[5] = 'D';
+    key[6] = '\0';
+
+    memory_set(memory, key, value_array);
+}
+
+void set_ifs(struct hash_map *memory)
+{
+    char *tmp = getenv("IFS");
+    if (tmp == NULL)
+    {
+        return;
+    }
+
+    char *pwd_value = strdup(tmp);
+    char **value_array = calloc(2, sizeof(char *));
+    value_array[0] = pwd_value;
+
+    char *key = calloc(4, sizeof(char));
+    key[0] = 'I';
+    key[1] = 'F';
+    key[2] = 'S';
+    key[3] = '\0';
+
+    memory_set(memory, key, value_array);
 }
