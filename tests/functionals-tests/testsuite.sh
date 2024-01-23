@@ -205,7 +205,7 @@ run_test_file()
 
     echo -ne "$BLUE-->>$WHITE $1...$WHITE"
     string="$(cat "$1")"
-    file=$(realpath "$1")
+    file="$(realpath "$1")"
 
     sucess=true
     run_string "$string"
