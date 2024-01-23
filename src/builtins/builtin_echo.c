@@ -144,7 +144,7 @@ int builtin_echo(int argc, char *argv[])
         }
 
         // Print a space between arguments
-        if (i < argc - 1)
+        if (i < argc - 1 && argv[i + 1] != NULL && argv[i + 1][0] != '\0')
         {
             if (printf(" ") == EOF)
             {

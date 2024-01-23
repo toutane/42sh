@@ -1,0 +1,4 @@
+dirname $PWD
+PWD="mon chemin"; echo ${PWD} "mon chemin est: "${PWD}
+PWD=$PWD
+echo $PWD

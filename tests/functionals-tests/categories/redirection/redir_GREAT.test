@@ -1,0 +1,4 @@
+echo hi > output.txt
+echo tata > file1 > file2 > file3
+echo tata > file1 toto > file2 titi > file3
+> output.txt echo ha

@@ -1,11 +1,8 @@
-#define _POSIX_C_SOURCE 200809L
-
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "execution/exec.h"
 #include "io/io.h"
 #include "options/opt_parser.h"
+#include "utils/memory/memory.h"
+#include "utils/variables/variables.h"
 
 int main(int argc, char *argv[])
 {
@@ -32,6 +29,10 @@ int main(int argc, char *argv[])
                                            // program should exit with success
     }
 
+    // Create shell memory hashmap
+    struct hash_map *memory = memory_new();
+    set_default_variables(argc, argv, memory);
+
     // Launch execution loop
-    return execution_loop(&opts, stream);
+    return execution_loop(&opts, stream, memory);
 }

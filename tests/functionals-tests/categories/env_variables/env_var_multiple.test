@@ -1,0 +1,3 @@
+echo "${foo} ${bar} ${baz}"
+foo="foo" bar="bar" baz="baz" ./env_var/script_2.sh
+echo "${foo} ${bar} ${baz}"

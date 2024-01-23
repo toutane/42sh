@@ -40,3 +40,54 @@ int is_str_sequence_of_digits(char *str)
 
     return 1;
 }
+
+int is_char_special_variable(char c)
+{
+    return c == '?' || c == '$' || c == '#' || c == '@' || c == '*';
+}
+
+int is_name(char *str)
+{
+    for (int i = 0; str[i] != '\0'; i++)
+    {
+        if (!isalnum(str[i]) && str[i] != '_')
+        {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+char *int_to_string(int number)
+{
+    // Determine the number of digits in the integer
+    int numDigits = snprintf(NULL, 0, "%d", number);
+
+    // Allocate memory for the string (including space for null terminator)
+    char *result = (char *)malloc(numDigits + 1);
+
+    if (result != NULL)
+    {
+        // Convert the integer to a string
+        snprintf(result, numDigits + 1, "%d", number);
+    }
+
+    return result;
+}
+
+int get_index_of_char(char *str, char target)
+{
+    size_t target_pos = 0;
+    while (str[target_pos] != '\0')
+    {
+        if (str[target_pos] == target)
+        {
+            return target_pos;
+        }
+
+        target_pos++;
+    }
+
+    return 0;
+}

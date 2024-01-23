@@ -1,0 +1,3 @@
+< output.txt echo hi
+< foo cat
+bar/baz < foo cat

@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "../parser.h"
 
 /**
@@ -7,11 +9,13 @@
  */
 enum parser_status parse_prefix(struct ast **res, struct lexer *lexer)
 {
-    if (lexer_peek(lexer).type == TOKEN_ASSIGNMENT_WORD)
+    lexer_peek(lexer);
+    if (is_assignment_word(&lexer->cur_tok, 1))
     {
-        // TODO: Create node for ASSIGNMENT_WORD
         // Put it in the AST
+        fill_sc_node(*res, lexer, 0);
         lexer_pop(lexer);
+        //*res = NULL;
         return PARSER_OK;
     }
     else if (parse_redirection(res, lexer) == PARSER_OK)

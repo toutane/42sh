@@ -8,3 +8,7 @@ pd[asod] | echo hu
 das | efsdf
 echo pipe | cat -e | cat -e  | cat -e  | cat -e  | cat -e  | cat -e  | cat -e | cat -e | cat -e  | cat -e  | cat -e  | cat -e  | cat -e  | cat -e | cat -e | cat -e  | cat -e  | cat -e  | cat -e  | cat -e  | cat -e | cat -e | cat -e  | cat -e  | cat -e  | cat -e  | cat -e  | cat -e  
 echo pipe | cat -e |
+true | false
+false | true
+true|false
+false|true

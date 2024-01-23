@@ -16,9 +16,10 @@ enum ast_type
     AST_SIMPLE_COMMAND,
     AST_COMMAND_LIST,
     AST_CONDITION,
-    AST_REDIRECTION,
     AST_PIPELINE,
     AST_FOR,
+    AST_REDIRECTION,
+    AST_NEG,
     /*
     AST_MUL,
     AST_DIV,
@@ -47,6 +48,8 @@ struct ast_cmd
     struct ast base;
     char **argv;
     int argc;
+    char **prefix;
+    int prefix_count;
 };
 
 struct ast_condition
@@ -77,9 +80,16 @@ struct ast_redirection
 {
     struct ast base;
     enum redirection_type redirection_type;
-    // -1 if no ionumber during parsing
+    // /!\ 1 if no ionumber during parsing
     int ionumber;
-    char *data;
+    char *target;
+    struct ast *next; // -> next -> NULL
+};
+
+struct ast_neg
+{
+    struct ast base;
+    struct ast *data;
 };
 
 struct ast_for
@@ -104,11 +114,16 @@ void ast_free(struct ast *ast);
 /**
  * @brief Fill the ast.
  */
-void fill_sc_node(struct ast *ast, struct lexer *lexer);
+void fill_sc_node(struct ast *ast, struct lexer *lexer, int fill_argv);
 void fill_list_node(struct ast *ast, struct ast *ast_cmd);
 void fill_if_node(struct ast *ast, struct ast *ast_child);
 void fill_redirection_node(struct ast *ast, int ionumber, char *str);
 void fill_pipeline_node(struct ast *ast, struct ast *ast_child);
 void fill_for_node(struct ast *ast, struct ast *ast_child, char *data);
+
+void init_redirection_node(struct ast *ast);
+void fill_redirection_node_ionumber(struct ast *ast, int ionumber);
+void fill_redirection_node_type(struct ast *ast, struct token tok);
+void fill_redirection_node_target(struct ast *ast, char *target);
 
 #endif /* ! AST_H */
