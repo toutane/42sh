@@ -9,6 +9,6 @@ AC_DEFUN([AC_TDD_DEBUG],
     changequote([,])
 
     # Add the special gcc flags
-    DEBUG_CFLAGS="-g3 -fsanitize=address"
+    DEBUG_CFLAGS="-O0 -g3 -fsanitize=address"
     DEBUG_LDFLAGS="-fsanitize=address"
 ]) # AC_TDD_GCOV
