@@ -1,0 +1,7 @@
+! true | false
+! echo tata | ! echo toto
+echo tata | ! echo toto
+! echo tata | echo toto
+! echo tata | echo toto | ! | echo ko
+! echo tata | echo toto | ! echo ko
+! ls | cat
