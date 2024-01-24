@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "builtins.h"
 
 // TODO: put in utils module
 static int is_char_in_string(char c, char *str)
@@ -20,7 +18,7 @@ static int is_char_in_string(char c, char *str)
 /*
  * @brief: Check if argv is an option, and set the corresponding flag if it is
  */
-static int parse_options(char *argv, char *optionString, int *nflag,
+static int parse_echo_options(char *argv, char *optionString, int *nflag,
                          int *interpret)
 {
     if (argv == NULL)
@@ -119,7 +117,7 @@ int builtin_echo(int argc, char *argv[])
     char *optionString = "neE";
 
     int start_index = 1;
-    while (parse_options(argv[start_index], optionString, &nflag, &interpret))
+    while (parse_echo_options(argv[start_index], optionString, &nflag, &interpret))
     {
         start_index++;
     }
