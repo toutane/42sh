@@ -10,16 +10,15 @@ enum parser_status parse_rule_until(struct ast **res, struct lexer *lexer)
     // 'until' compound_list 'do' compound_list 'done'
     if (lexer_peek(lexer).type == TOKEN_UNTIL)
     {
-        // TODO: Create UNTIL node
-        // struct ast *if_node = calloc(1, sizeof(struct ast));
-        // init_if_node(if_node);
+        struct ast *until_node = calloc(1, sizeof(struct ast_until));
+        until_node->type = AST_UNTIL;
 
         // Pop 'until'
         lexer_pop(lexer);
 
         if (parse_compound_list(res, lexer) == PARSER_OK)
         {
-            // fill_if_node(if_node, *res);
+            fill_if_node(until_node, *res);
             if (lexer_peek(lexer).type == TOKEN_DO)
             {
                 // Pop 'do'
@@ -27,21 +26,21 @@ enum parser_status parse_rule_until(struct ast **res, struct lexer *lexer)
 
                 if (parse_compound_list(res, lexer) == PARSER_OK)
                 {
-                    // fill_if_node(if_node, *res);
+                    fill_if_node(until_node, *res);
 
                     if (lexer_peek(lexer).type == TOKEN_DONE)
                     {
                         // Pop 'done'
                         lexer_pop(lexer);
 
-                        // *res = if_node;
+                        *res = until_node;
                         return PARSER_OK;
                     }
                 }
             }
         }
-        // ast_free(if_node);
-        //*res = NULL;
+        ast_free(until_node);
+        *res = NULL;
     }
     return PARSER_UNEXPECTED_TOKEN;
 }

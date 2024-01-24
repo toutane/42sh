@@ -17,6 +17,8 @@ enum ast_type
     AST_COMMAND_LIST,
     AST_CONDITION,
     AST_PIPELINE,
+    AST_WHILE,
+    AST_UNTIL,
     AST_FOR,
     AST_REDIRECTION,
     AST_NEG,
@@ -113,6 +115,20 @@ struct ast_and_or
     struct ast base;
     struct ast *left;
     struct ast *right;
+};
+
+struct ast_while
+{
+    struct ast base;
+    struct ast *condition;
+    struct ast *data;
+};
+
+struct ast_until
+{
+    struct ast base;
+    struct ast *condition;
+    struct ast *data;
 };
 
 /**

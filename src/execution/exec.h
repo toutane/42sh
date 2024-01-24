@@ -47,4 +47,8 @@ int eval_and(struct ast *ast, struct hash_map *gv_hash_map);
 
 int eval_or(struct ast *ast, struct hash_map *gv_hash_map);
 
+int eval_while(struct ast *ast, struct hash_map *gv_hash_map);
+
+int eval_until(struct ast *ast, struct hash_map *gv_hash_map);
+
 #endif /* ! EXEC_H */

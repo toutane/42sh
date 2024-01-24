@@ -5,6 +5,8 @@ libexecution_a_SOURCES = exec.c exec.h \
 						 exec_condition.c \
 						 exec_list.c \
 						 exec_pipeline.c \
+						 exec_while.c \
+						 exec_until.c \
 						 exec_for.c \
 						 exec_redirections.c \
 						 exec_neg.c \
