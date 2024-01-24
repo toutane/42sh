@@ -25,7 +25,7 @@ int builtin_exit(int argc, char *argv[])
 
     if (argc == 2)
     {
-        // check if 
+        // check if
         if (check_number(argv[1]))
         {
             status = atoi(argv[1]);
@@ -33,7 +33,8 @@ int builtin_exit(int argc, char *argv[])
         else
         {
             status = 2;
-            fprintf(stderr, "42sh: exit: %s: numeric argument required\n", argv[1]);
+            fprintf(stderr, "42sh: exit: %s: numeric argument required\n",
+                    argv[1]);
         }
     }
 
