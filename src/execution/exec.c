@@ -17,6 +17,8 @@ int eval_ast(struct ast *ast, struct hash_map *gv_hash_map)
         [AST_FOR] = &eval_for,
         [AST_REDIRECTION] = &eval_redirection,
         [AST_NEG] = &eval_neg,
+        [AST_AND] = &eval_and,
+        [AST_OR] = &eval_or,
     };
 
     return (*functions[ast->type])(ast, gv_hash_map);

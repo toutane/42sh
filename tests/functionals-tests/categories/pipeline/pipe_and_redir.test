@@ -1,1 +1,5 @@
 ls /dev | grep tty | sort -r | rev > toto ; < toto cat | rev | wc -l > titi
+< file1.txt > output.txt echo ha | echo toto > file42
+< foo cat | cat foo > output.txt
+< foo cat | cat bar/baz | >> output.txt >> output.txt
+< foo cat | cat bar/baz >> output.txt >> output.txt

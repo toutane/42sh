@@ -20,6 +20,8 @@ enum ast_type
     AST_FOR,
     AST_REDIRECTION,
     AST_NEG,
+    AST_AND,
+    AST_OR,
     /*
     AST_MUL,
     AST_DIV,
@@ -104,6 +106,13 @@ struct ast_for
     size_t array_size;
 
     struct ast *data;
+};
+
+struct ast_and_or
+{
+    struct ast base;
+    struct ast *left;
+    struct ast *right;
 };
 
 /**

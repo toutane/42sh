@@ -1,0 +1,10 @@
+echo foo && false | ls
+echo foo || false | ls
+echo foo || false | && ls
+echo foo | false && ls
+echo foo | false || ls
+echo foo && true | ls
+echo foo || true | ls
+echo foo || true | && ls
+echo foo | true && ls
+echo foo | true || ls
