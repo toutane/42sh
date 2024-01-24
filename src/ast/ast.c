@@ -144,15 +144,12 @@ void ast_free(struct ast *ast)
         [AST_CONDITION] = &free_ast_if,
         [AST_REDIRECTION] = &free_ast_redir,
         [AST_PIPELINE] = &free_ast_pipeline,
-<<<<<<< HEAD
         [AST_WHILE] = &free_ast_while,
         [AST_UNTIL] = &free_ast_until,
-=======
         [AST_FOR] = &free_ast_for,
         [AST_NEG] = &free_ast_neg,
         [AST_AND] = &free_ast_and_or,
         [AST_OR] = &free_ast_and_or,
->>>>>>> develop
     };
     (*functions[ast->type])(ast);
 }
