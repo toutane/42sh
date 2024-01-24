@@ -18,7 +18,7 @@
 #include "../utils/hash_map/hash_map.h"
 #include "../utils/printers/printers.h"
 #include "../utils/token/token.h"
-#include "utils/variables/variables.h"
+#include "../utils/variables/variables.h"
 
 /* @brief: Executes the program in a loop, reading from the input stream while
  * eof is not reached. It creates a AST while reading the input stream and
@@ -40,6 +40,8 @@ int eval_pipeline(struct ast *ast, struct hash_map *gv_hash_map);
 int eval_redirection(struct ast *ast, struct hash_map *gv_hash_map);
 
 int eval_neg(struct ast *ast, struct hash_map *gv_hash_map);
+
+int eval_for(struct ast *ast, struct hash_map *gv_hash_map);
 
 int eval_and(struct ast *ast, struct hash_map *gv_hash_map);
 

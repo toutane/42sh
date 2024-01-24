@@ -74,6 +74,26 @@ static void free_ast_neg(struct ast *ast)
     return;
 }
 
+void free_ast_for(struct ast *ast)
+{
+    struct ast_for *ast_for = (struct ast_for *)ast;
+    if (ast_for->condition)
+        free(ast_for->condition);
+    if (ast_for->data)
+        ast_free(ast_for->data);
+
+    for (size_t i = 0; i < ast_for->array_size; ++i)
+    {
+        free(ast_for->array[i]);
+    }
+    if (ast_for->array)
+    {
+        free(ast_for->array);
+    }
+    free(ast);
+    return;
+}
+
 static void free_ast_and_or(struct ast *ast)
 {
     struct ast_and_or *ast_and_or = (struct ast_and_or *)ast;
@@ -102,6 +122,7 @@ void ast_free(struct ast *ast)
         [AST_CONDITION] = &free_ast_if,
         [AST_REDIRECTION] = &free_ast_redir,
         [AST_PIPELINE] = &free_ast_pipeline,
+        [AST_FOR] = &free_ast_for,
         [AST_NEG] = &free_ast_neg,
         [AST_AND] = &free_ast_and_or,
         [AST_OR] = &free_ast_and_or,

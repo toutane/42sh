@@ -113,6 +113,7 @@ static void handle_double_quote(char **str, struct stream_info *stream,
 static void expand_variable(char **str, char *expression,
                             struct hash_map *gv_hash_map)
 {
+    // printf("expand var: %s\n", expression);
     if (expression == NULL)
     {
         return;
@@ -295,11 +296,11 @@ static void expand_loop(struct stream_info *stream, char **str,
     }
 }
 
-void expand_string(char **str, struct hash_map *gv_hash_map)
+char *expand_string(char **str, struct hash_map *gv_hash_map)
 {
     if (*str == NULL)
     {
-        return;
+        return NULL;
     }
 
     char *expanded_str = NULL;
@@ -308,13 +309,13 @@ void expand_string(char **str, struct hash_map *gv_hash_map)
     struct stream_info *stream = stream_new(NULL, *str, &err);
     if (stream == NULL)
     {
-        return;
+        return NULL;
     }
 
     expand_loop(stream, &expanded_str, gv_hash_map);
 
     stream_free(stream);
-    free(*str);
+    // free(*str);
 
-    *str = expanded_str;
+    return expanded_str;
 }

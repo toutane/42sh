@@ -14,6 +14,7 @@ int eval_ast(struct ast *ast, struct hash_map *gv_hash_map)
         [AST_COMMAND_LIST] = &eval_list,
         [AST_CONDITION] = &eval_condition,
         [AST_PIPELINE] = &eval_pipeline,
+        [AST_FOR] = &eval_for,
         [AST_REDIRECTION] = &eval_redirection,
         [AST_NEG] = &eval_neg,
         [AST_AND] = &eval_and,
