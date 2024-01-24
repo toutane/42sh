@@ -29,6 +29,11 @@ int builtin_false(int argc, char *argv[]);
 int builtin_echo(int argc, char *argv[]);
 
 /*
+ * @brief False builtin, returns 1
+ */
+int builtin_cd(int argc, char *argv[]);
+
+/*
  * @brief Returns 1 if `node` is a builtin word
  */
 char is_builtin_word(char *word);

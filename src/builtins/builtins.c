@@ -1,4 +1,4 @@
-#define NB_BUILTINS 3
+#define NB_BUILTINS 4
 #define BUILTIN_ERROR 2
 
 #include "builtins.h"
@@ -6,7 +6,8 @@
 static struct builtin_matchs builtin_words[NB_BUILTINS] = {
     { .name = "echo", .fun = builtin_echo },
     { .name = "false", .fun = builtin_false },
-    { .name = "true", .fun = builtin_true }
+    { .name = "true", .fun = builtin_true },
+    { .name = "cd", .fun = builtin_cd }
 };
 
 char is_builtin_word(char *word)

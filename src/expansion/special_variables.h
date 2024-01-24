@@ -14,6 +14,9 @@ void fill_dollar_var(struct hash_map *gv_hash_map);
 
 void fill_arguments_amount(int argc, struct hash_map *gv_hash_map);
 
+void fill_random(struct hash_map *memory);
+
+// Set env variables
 void set_uid_env_var(struct hash_map *memory);
 
 void set_pwd(struct hash_map *memory);
@@ -22,6 +25,6 @@ void set_oldpwd(struct hash_map *memory);
 
 void set_ifs(struct hash_map *memory);
 
-void fill_random(struct hash_map *memory);
+void set_home(struct hash_map *memory);
 
 #endif /* ! SPECIAL_VARIABLES_H */
