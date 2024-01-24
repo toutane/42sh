@@ -1,5 +1,0 @@
-while true; do
-    read -p "Enter a value (type 'exit' to quit): " input
-    [ "$input" = "exit" ] && break
-    echo "You entered: $input"
-done

@@ -1,5 +1,0 @@
-status="active"
-while [ "$status" = "active" ]; do
-    echo "Processing..."
-    status="inactive"
-done
