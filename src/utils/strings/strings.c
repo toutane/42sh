@@ -27,6 +27,22 @@ void append_char_to_token_value(struct token *tok, char c)
     tok->value[len + 1] = '\0';
 }
 
+void append_char_to_string(char **str, char c)
+{
+    if (*str == NULL)
+    {
+        (*str) = calloc(2, sizeof(char));
+        (*str)[0] = c;
+        (*str)[1] = '\0';
+        return;
+    }
+
+    size_t len = strlen(*str);
+    *str = realloc(*str, (len + 2) * sizeof(char));
+    (*str)[len] = c;
+    (*str)[len + 1] = '\0';
+}
+
 int is_str_sequence_of_digits(char *str)
 {
     size_t len = strlen(str);
