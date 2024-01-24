@@ -2,6 +2,7 @@
 #define BUILTINS_H
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "../ast/ast.h"
@@ -14,6 +15,17 @@ struct builtin_matchs
 };
 
 /*
+ * @brief Returns 1 if `node` is a builtin word
+ */
+char is_builtin_word(char *word);
+
+/*
+ * @brief Returns the matching function of the builtin
+ */
+int (*builtin_fun(char *word))(int, char **);
+
+// Builtins commands
+/*
  * @brief True builtin, returns 0
  */
 int builtin_true(int argc, char *argv[]);
@@ -24,18 +36,13 @@ int builtin_true(int argc, char *argv[]);
 int builtin_false(int argc, char *argv[]);
 
 /*
- * @brief TODO: Echo builtin
+ * @brief Echo builtin
  */
 int builtin_echo(int argc, char *argv[]);
 
 /*
- * @brief Returns 1 if `node` is a builtin word
+ * @brief exit builtin
  */
-char is_builtin_word(char *word);
-
-/*
- * @brief Returns the matching function of the builtin
- */
-int (*builtin_fun(char *word))(int, char **);
+int builtin_exit(int argc, char *argv[]);
 
 #endif /* ! BUILTINS_H */
