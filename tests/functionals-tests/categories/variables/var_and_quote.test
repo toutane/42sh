@@ -1,0 +1,5 @@
+name='Peter'
+greeting='Hello World'
+echo "${greeting} ${name}!"
+greeting='"\\\"Hello, world!\\\""'
+echo "${greeting} ${name}!"

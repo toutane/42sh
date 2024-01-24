@@ -1,0 +1,1 @@
+run_test_file bad_in_var_assign.test

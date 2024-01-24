@@ -1,0 +1,13 @@
+bar='moon'
+echo $bar
+echo $bar $bar
+echo ${bar}
+
+foo='Hello World !'
+echo ${foo}
+
+foo="Hello World !\""
+echo $foo ${foo} $foo
+
+baz="\\\" \${foo} $foo "$foo$bar
+echo ${baz}

@@ -6,11 +6,11 @@ autoreconf --install
 # create a build directory
 mkdir build
 cd build
-../configure
+../configure --enable-gcov
 cd -
 
 # create a debug deirectory, like build but add debug flags
 mkdir debug
 cd debug
-../configure --enable-debug --enable-gcov
+../configure CFLAGS='-fsanitize=address' --enable-debug
 cd -

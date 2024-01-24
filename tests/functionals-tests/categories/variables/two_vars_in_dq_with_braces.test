@@ -1,0 +1,3 @@
+first_name='Peter'
+last_name='Pan'
+echo "Hi, my name is ${first_name} ${last_name}"
