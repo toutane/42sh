@@ -23,6 +23,7 @@ static void init_locals(struct ast **redirs, struct ast **command)
     // Change to locals - we need to allocate here to be able to put all
     // assignements words into sc node
     *command = calloc(1, sizeof(struct ast_cmd));
+
     if (!*command)
     {
         err(1, "42sh: Allocation failed\n");
@@ -105,7 +106,7 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
     if (return_status != PARSER_FAIL && lexer_peek(lexer).type == TOKEN_WORD)
     {
         // Fill node and Pop
-        fill_sc_node(locals.command, lexer, 1);
+        fill_sc_node_arg(locals.command, lexer);
         lexer_pop(lexer);
 
         // replace AST

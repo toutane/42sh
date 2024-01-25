@@ -13,8 +13,9 @@ enum parser_status parse_prefix(struct ast **res, struct lexer *lexer)
     if (is_assignment_word(&lexer->cur_tok, 1))
     {
         // Put it in the AST
-        fill_sc_node(*res, lexer, 0);
+        fill_sc_node_redir(*res, lexer);
         lexer_pop(lexer);
+
         //*res = NULL;
         return PARSER_OK;
     }

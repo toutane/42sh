@@ -16,7 +16,7 @@ enum parser_status parse_element(struct ast **res, struct lexer *lexer)
     if (lexer->cur_tok.type == TOKEN_WORD || is_reserved_word(lexer->cur_tok))
     {
         // Append cur_tok to AST simple-command node
-        fill_sc_node(*res, lexer, 1);
+        fill_sc_node_arg(*res, lexer);
 
         // Pop element
         lexer_pop(lexer);

@@ -139,7 +139,8 @@ void ast_free(struct ast *ast);
 /**
  * @brief Fill the ast.
  */
-void fill_sc_node(struct ast *ast, struct lexer *lexer, int fill_argv);
+void fill_sc_node_arg(struct ast *ast, struct lexer *lexer);
+void fill_sc_node_redir(struct ast *ast, struct lexer *lexer);
 void fill_list_node(struct ast *ast, struct ast *ast_cmd);
 void fill_if_node(struct ast *ast, struct ast *ast_child);
 void fill_redirection_node(struct ast *ast, int ionumber, char *str);
