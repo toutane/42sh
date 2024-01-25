@@ -9,4 +9,7 @@
 
 char *expand_string(char **str, struct hash_map *gv_hash_map);
 
+char **argv_expansions(char **original_argv, int *argc,
+                       struct hash_map *memory);
+
 #endif /* ! EXPANSION_H */

@@ -1,3 +1,5 @@
+#define _XOPEN_SOURCE 500
+
 #include "expansion.h"
 
 #include <ctype.h>
@@ -178,6 +180,7 @@ static void param_expansion(char **str, struct stream_info *stream,
     char next_char = stream_peek(stream);
     if (next_char == EOF)
     {
+        append_char_to_string(str, '$');
         return;
     }
 
@@ -188,6 +191,7 @@ static void param_expansion(char **str, struct stream_info *stream,
      * (because in this case expression is the longer valid name). All the
      * characters that forming the expression are removed from the token_word
      * string. */
+
     char *expression = NULL;
     if (next_char == '{')
     {
@@ -318,4 +322,167 @@ char *expand_string(char **str, struct hash_map *gv_hash_map)
     // free(*str);
 
     return expanded_str;
+}
+
+static char **field_split(char **expanded_argv, int *expanded_argc,
+                          char **temp_str)
+{
+    char *delimiters = " \t\n";
+
+    char *word = strtok(*temp_str, delimiters);
+    int i = 0;
+    while (word[i] != '\0')
+    {
+        append_char_to_string(&(expanded_argv[*expanded_argc]), word[i]);
+        i++;
+    }
+
+    char *next_word = strtok(NULL, delimiters);
+
+    while (next_word != NULL)
+    {
+        word = next_word;
+
+        if (word != NULL)
+        {
+            (*expanded_argc)++;
+            expanded_argv =
+                realloc(expanded_argv, (*expanded_argc + 1) * sizeof(char *));
+            expanded_argv[*expanded_argc] = strdup(word);
+        }
+
+        next_word = strtok(NULL, delimiters);
+    }
+
+    char *temp = strdup(word);
+    free(*temp_str);
+    *temp_str = temp;
+    return expanded_argv;
+}
+
+static char **word_expansions(char **expanded_argv, int *expanded_argc,
+                              struct stream_info *stream,
+                              struct hash_map *memory)
+{
+    char *temp_str = NULL;
+
+    enum QUOTING_CONTEXT context = NONE;
+
+    while (1)
+    {
+        char cur_char = stream_peek(stream);
+        if (cur_char == EOF)
+        {
+            break;
+        }
+
+        if (cur_char == '\\')
+        {
+            handle_backslash_quote(&temp_str, stream, &context);
+            continue;
+        }
+
+        if (cur_char == '\'')
+        {
+            handle_single_quote(&temp_str, stream, &context);
+            if (context == NONE)
+            {
+                int i = 0;
+                while (temp_str[i] != '\0')
+                {
+                    append_char_to_string(&(expanded_argv[*expanded_argc]),
+                                          temp_str[i]);
+                    i++;
+                }
+                free(temp_str);
+                temp_str = NULL;
+            }
+            continue;
+        }
+
+        if (cur_char == '"')
+        {
+            handle_double_quote(&temp_str, stream, &context);
+            if (context == NONE)
+            {
+                int i = 0;
+                while (temp_str[i] != '\0')
+                {
+                    append_char_to_string(&(expanded_argv[*expanded_argc]),
+                                          temp_str[i]);
+                    i++;
+                }
+                free(temp_str);
+                temp_str = NULL;
+            }
+            continue;
+        }
+
+        if (cur_char == '$')
+        {
+            param_expansion(&temp_str, stream, &context, memory);
+
+            if (context == NONE)
+            {
+                expanded_argv =
+                    field_split(expanded_argv, expanded_argc, &temp_str);
+                free(temp_str);
+                temp_str = NULL;
+            }
+
+            continue;
+        }
+
+        append_char_to_string(&temp_str, cur_char);
+        stream_pop(stream);
+    }
+
+    // Check if temp is empty, if not concatenate it to the last item of
+    // expanded_argv
+    int i = 0;
+    while (temp_str != NULL && temp_str[i] != '\0')
+    {
+        append_char_to_string(&(expanded_argv[*expanded_argc]), temp_str[i]);
+        i++;
+    }
+    // printf("%p\n", (void *)expanded_argv[*expanded_argc]);
+    (*expanded_argc)++;
+    expanded_argv =
+        realloc(expanded_argv, (*expanded_argc + 1) * sizeof(char *));
+    expanded_argv[*expanded_argc] = NULL;
+
+    return expanded_argv;
+}
+
+char **argv_expansions(char **original_argv, int *argc, struct hash_map *memory)
+{
+    int expanded_argc = 0;
+    char **expanded_argv = calloc(expanded_argc + 1, sizeof(char *));
+
+    for (int i = 0; i < *argc; i++)
+    {
+        int err = 0;
+        struct stream_info *stream = stream_new(NULL, original_argv[i], &err);
+        if (stream == NULL)
+        {
+            fprintf(stderr,
+                    "42sh: argv_expansions failed to create new stream\n");
+            _exit(EXIT_FAILURE);
+        }
+
+        expanded_argv =
+            word_expansions(expanded_argv, &expanded_argc, stream, memory);
+
+        //(expanded_argc)++;
+
+        stream_free(stream);
+    }
+
+    expanded_argv =
+        realloc(expanded_argv, (expanded_argc + 1) * sizeof(char *));
+    expanded_argv[expanded_argc] = NULL;
+
+    *argc = expanded_argc;
+
+    return expanded_argv;
 }

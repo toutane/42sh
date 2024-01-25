@@ -74,6 +74,24 @@ int eval_simple_command(struct ast *ast, struct hash_map *gv_hash_map)
     int status = 0;
     struct ast_cmd *ast_cmd = (struct ast_cmd *)ast;
 
+    int temp = ast_cmd->argc;
+
+    char **expanded_argv =
+        argv_expansions(ast_cmd->argv, &(ast_cmd->argc), gv_hash_map);
+
+    for (int i = 0; i < ast_cmd->argc; ++i)
+    {
+        printf("expanded_argv[%d]: %s\n", i, expanded_argv[i]);
+    }
+
+    for (int i = 0; i < ast_cmd->argc; ++i)
+    {
+        free(expanded_argv[i]);
+    }
+    free(expanded_argv);
+
+    ast_cmd->argc = temp;
+
     char **argv_copy = calloc(ast_cmd->argc + 1, sizeof(char *));
     arguments_expansion(ast_cmd, argv_copy, gv_hash_map);
 
