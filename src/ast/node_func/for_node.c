@@ -2,35 +2,26 @@
 
 #include "../ast.h"
 
-void fill_for_node(struct ast *ast, struct ast *ast_child, char *data)
+void fill_for_node_condition(struct ast *ast, char *data)
 {
     struct ast_for *ast_for = (struct ast_for *)ast;
 
-    if (ast_child)
-    {
-        ast_for->data = ast_child;
-    }
-    else
-    {
-        if (!ast_for->condition)
-        {
-            ast_for->condition = strdup(data);
-        }
-        else
-        {
-            if (ast_for->array_size == 0)
-            {
-                ast_for->array = calloc(1, sizeof(char *));
-                ast_for->array[0] = strdup(data);
-            }
-            else
-            {
-                ast_for->array = realloc(
-                    ast_for->array, (ast_for->array_size + 1) * sizeof(char *));
-                ast_for->array[ast_for->array_size] = strdup(data);
-            }
-            ++ast_for->array_size;
-        }
-    }
-    return;
+    ast_for->condition = strdup(data);
+}
+
+void fill_for_node_data(struct ast *ast, char *data)
+{
+    struct ast_for *ast_for = (struct ast_for *)ast;
+
+    ast_for->array =
+        realloc(ast_for->array, (ast_for->array_size + 1) * sizeof(char *));
+    ast_for->array[ast_for->array_size] = strdup(data);
+    ++ast_for->array_size;
+}
+
+void fill_for_node_child(struct ast *ast, struct ast *ast_child)
+{
+    struct ast_for *ast_for = (struct ast_for *)ast;
+
+    ast_for->data = ast_child;
 }

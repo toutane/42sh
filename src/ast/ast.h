@@ -145,7 +145,9 @@ void fill_list_node(struct ast *ast, struct ast *ast_cmd);
 void fill_if_node(struct ast *ast, struct ast *ast_child);
 void fill_redirection_node(struct ast *ast, int ionumber, char *str);
 void fill_pipeline_node(struct ast *ast, struct ast *ast_child);
-void fill_for_node(struct ast *ast, struct ast *ast_child, char *data);
+void fill_for_node_condition(struct ast *ast, char *data);
+void fill_for_node_data(struct ast *ast, char *data);
+void fill_for_node_child(struct ast *ast, struct ast *ast_child);
 
 void init_redirection_node(struct ast *ast);
 void fill_redirection_node_ionumber(struct ast *ast, int ionumber);

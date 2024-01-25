@@ -1,5 +1,11 @@
 #include "../parser.h"
 
+/*
+ * rule_for =
+ * 'for' WORD ( [';'] | [ {'\n'} 'in' { WORD } ( ';' | '\n' ) ] )
+ *      {'\n'} 'do' compound_list
+ * 'done' ;
+ */
 enum parser_status parse_rule_for(struct ast **res, struct lexer *lexer)
 {
     if (lexer_peek(lexer).type == TOKEN_FOR)
@@ -12,7 +18,7 @@ enum parser_status parse_rule_for(struct ast **res, struct lexer *lexer)
 
         if (lexer_peek(lexer).type == TOKEN_WORD)
         {
-            fill_for_node(for_node, NULL, lexer_peek(lexer).value);
+            fill_for_node_condition(for_node, lexer_peek(lexer).value);
             lexer_pop(lexer);
 
             if (lexer_peek(lexer).type == TOKEN_SEMICOLON)
@@ -38,7 +44,7 @@ enum parser_status parse_rule_for(struct ast **res, struct lexer *lexer)
                 while (lexer_peek(lexer).type == TOKEN_WORD)
                 {
                     // Treat word in node
-                    fill_for_node(for_node, NULL, lexer_peek(lexer).value);
+                    fill_for_node_data(for_node, lexer_peek(lexer).value);
                     lexer_pop(lexer);
                 }
 
@@ -66,7 +72,7 @@ enum parser_status parse_rule_for(struct ast **res, struct lexer *lexer)
 
                 if (parse_compound_list(res, lexer) == PARSER_OK)
                 {
-                    fill_for_node(for_node, *res, NULL);
+                    fill_for_node_child(for_node, *res);
 
                     if (lexer_peek(lexer).type == TOKEN_DONE)
                     {
