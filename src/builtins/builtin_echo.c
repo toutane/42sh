@@ -1,19 +1,5 @@
 #include "builtins.h"
-
-// TODO: put in utils module
-static int is_char_in_string(char c, char *str)
-{
-    int i = 0;
-    while (str[i] != '\0')
-    {
-        if (str[i] == c)
-        {
-            return 1;
-        }
-        i++;
-    }
-    return 0;
-}
+#include "utils/strings/strings.h"
 
 /*
  * @brief: Check if argv is an option, and set the corresponding flag if it is

@@ -23,4 +23,6 @@ char *int_to_string(int number);
 
 int get_index_of_char(char *str, char target);
 
+int is_char_in_string(char c, char *str);
+
 #endif /* ! STRINGS_H */

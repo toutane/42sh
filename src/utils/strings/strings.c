@@ -107,3 +107,17 @@ int get_index_of_char(char *str, char target)
 
     return 0;
 }
+
+int is_char_in_string(char c, char *str)
+{
+    int i = 0;
+    while (str[i] != '\0')
+    {
+        if (str[i] == c)
+        {
+            return 1;
+        }
+        i++;
+    }
+    return 0;
+}
