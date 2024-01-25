@@ -316,7 +316,6 @@ if [ $# -eq 0 ]; then
     exit 1
 else
     REPO_ROOT=$(realpath "$1")
-    #SOURCE_FILE_PATH="$1"
     shift
 fi
 
@@ -344,6 +343,9 @@ fi
 # run the testsuite
 run_testsuite $TEST_TO_RUN
 
+# list TODO flags in code
+TODO_FALGS=$(grep -ior TODO $REPO_ROOT/src | wc -l)
+
 # display results
 if [ $TOTAL_RUN -eq 0 ]; then
     PERCENT_SUCCES=0 
@@ -352,5 +354,8 @@ else
 fi
 
 echo -e "$BLUE==========================================="
+echo -e "$WHITE TODO_FLAGS: $TODO_FALGS"
+echo -e "$WHITE TOTAL_RUN: $TOTAL_RUN"
+echo -e "$WHITE TOTAL_FAIL: $TOTAL_FAIL"
 echo -e "$WHITE RECAP: $([ $PERCENT_SUCCES = 100 ] && echo $GREEN || echo $RED) $PERCENT_SUCCES%"
 echo -e "$BLUE===========================================$WHITE"
