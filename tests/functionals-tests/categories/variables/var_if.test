@@ -9,3 +9,8 @@ if a; then
     echo $a $b
 fi
 echo $a $b
+
+a=true;
+if $a; then
+    echo hi
+fi
