@@ -12,8 +12,8 @@ struct pair_list
 
 struct hash_map
 {
-    struct pair_list **data;
     size_t size;
+    struct pair_list **data;
 };
 
 size_t hash(const char *key);

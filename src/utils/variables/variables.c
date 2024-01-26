@@ -10,7 +10,7 @@
 
 #include "expansion/special_variables.h"
 
-static char *get_key_from_assignment_word(char *assignment_word)
+char *get_key_from_assignment_word(char *assignment_word)
 {
     char *key = NULL;
 
@@ -26,7 +26,7 @@ static char *get_key_from_assignment_word(char *assignment_word)
     return key;
 }
 
-static char *get_value_from_assignment_word(char *assignment_word)
+char *get_value_from_assignment_word(char *assignment_word)
 {
     char *value = NULL;
 
@@ -133,4 +133,88 @@ void set_default_variables(int argc, char **argv, struct hash_map *memory)
     set_pwd(memory);
     set_oldpwd(memory);
     set_ifs(memory);
+}
+
+static void update_env_var(const char *key, const char *value)
+{
+    int status = setenv(key, value, 1);
+    if (status != 0)
+    {
+        fprintf(stderr, "42sh: update_env_var: fail to setenv\n");
+        return;
+    }
+}
+
+void assign_variable(char *assignment_word, struct hm *hm)
+{
+    char *key = get_key_from_assignment_word(assignment_word);
+    char *value = get_value_from_assignment_word(assignment_word);
+
+    if (key == NULL || value == NULL)
+    {
+        free(key);
+        free(value);
+        return;
+    }
+
+    // Check if the variable is exported (so in the environment)
+    int is_exported = getenv(key) != NULL;
+
+    if (is_exported)
+    {
+        // We must update the environment with the new value of the variable
+        update_env_var(key, value);
+    }
+    else
+    {
+        // Variable isn't exported, we must update the shell internal variables
+        hm_set_var(hm, key, value);
+    }
+
+    free(key);
+    free(value);
+}
+
+char *get_variable(char *key, struct hm *hm)
+{
+    if (key == NULL || hm == NULL)
+    {
+        return NULL;
+    }
+
+    char *value = NULL;
+
+    // Check if the variable is exported (so in the environment)
+    int is_exported = getenv(key) != NULL;
+
+    if (is_exported)
+    {
+        // We must update the environment with the new value of the variable
+        value = getenv(key);
+    }
+    else
+    {
+        // Variable isn't exported, we must update the shell internal variables
+        value = hm_get(hm, key);
+    }
+
+    return value;
+}
+
+void setenv_from_hm(struct hm *hm)
+{
+    if (hm == NULL)
+    {
+        return;
+    }
+
+    for (size_t i = 0; i < hm->size; i++)
+    {
+        struct pl *cur = hm->pairs[i];
+        while (cur)
+        {
+            setenv(cur->key, cur->data, 1);
+            cur = cur->next;
+        }
+    }
 }

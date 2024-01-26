@@ -1,3 +1,4 @@
+#include "utils/variables/variables.h"
 #define _XOPEN_SOURCE
 
 #include <stdio.h>
@@ -65,21 +66,44 @@ int eval_simple_command(struct ast *ast, struct hash_map *gv_hash_map)
     char **expanded_argv =
         argv_expansions(ast_cmd->argv, &expanded_argc, gv_hash_map);
 
-    // Set global variable
     char **prefixes_copy = calloc(ast_cmd->prefix_count + 1, sizeof(char *));
+
     if (ast_cmd->argc == 0)
     {
         prefixes_expansion(ast_cmd, prefixes_copy, gv_hash_map);
+
+        struct hm *hm = hm_new(HM_VARIABLE, 10, free);
+
+        for (int i = 0; i < ast_cmd->prefix_count; i++)
+        {
+            assign_variable(prefixes_copy[i], hm);
+        }
+
+        hm_print(hm);
+
+        printf("value of a: %s\n", get_variable("a", hm));
+
+        hm_free(hm);
         free_copies(expanded_argv, expanded_argc, prefixes_copy,
                     ast_cmd->prefix_count);
         return 0;
     }
 
-    // Set env variables
     struct hash_map *cmd_env_memory = memory_new();
+
+    struct hm *temp_hm = hm_new(HM_VARIABLE, 10, free);
+
     if (ast_cmd->prefix_count > 0)
     {
         prefixes_expansion(ast_cmd, prefixes_copy, cmd_env_memory);
+
+        for (int i = 0; i < ast_cmd->prefix_count; i++)
+        {
+            char *word = prefixes_copy[i];
+            char *key = get_key_from_assignment_word(word);
+            char *value = get_value_from_assignment_word(word);
+            hm_set_var(temp_hm, key, value);
+        }
     }
 
     // check if word is a build -> no need to fork
@@ -106,7 +130,8 @@ int eval_simple_command(struct ast *ast, struct hash_map *gv_hash_map)
     }
     if (pid == 0)
     {
-        setenv_from_memory(cmd_env_memory);
+        // setenv_from_memory(cmd_env_memory);
+        setenv_from_hm(temp_hm);
 
         execvp(expanded_argv[0], expanded_argv);
 
@@ -119,6 +144,7 @@ int eval_simple_command(struct ast *ast, struct hash_map *gv_hash_map)
     {
         waitpid(pid, &status, 0);
     }
+    hm_free(temp_hm);
 
     // Check if the command was interrupted by a signal
     if (WIFSIGNALED(status))

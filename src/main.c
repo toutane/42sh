@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
     // Create shell memory hashmap
     struct hash_map *memory = memory_new();
     set_default_variables(argc, argv, memory);
+    // memory_print(memory);
 
     // Launch execution loop
     return execution_loop(&opts, stream, memory);

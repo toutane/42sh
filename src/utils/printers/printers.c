@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 
+#include "hash_map/hash_map_setup.h"
+
 #define PRINT_OPTIONS(str)                                                     \
     printf("  " #str ": %s\n", opts->str ? "active" : "inactive")
 
@@ -15,7 +17,7 @@ void options_print(struct options *opts)
     PRINT_OPTIONS(verbose);
 }
 
-void input_mode_print();
+void input_mode_print(void);
 
 void ast_print(struct ast *ast)
 {
@@ -129,4 +131,25 @@ void ast_pretty_print(struct ast *ast)
         ast_pretty_print_aux(ast);
         printf("\n");
     */
+}
+
+void hm_print(struct hm *hm)
+{
+    if (hm == NULL)
+    {
+        return;
+    }
+
+    for (size_t i = 0; i < hm->size; i++)
+    {
+        struct pl *cur = hm->pairs[i];
+        printf("%s", cur ? "[" : "");
+        while (cur != NULL)
+        {
+            printf("%s: %s", cur->key,
+                   hm->type == HM_VARIABLE ? (char *)cur->data : "ast");
+            printf("%s", cur->next ? " -> " : " ]\n");
+            cur = cur->next;
+        }
+    }
 }
