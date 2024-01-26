@@ -48,6 +48,7 @@ void my_strcat(char **str1, char *str2)
 {
     if (str2 == NULL)
     {
+        append_char_to_string(str1, '\0');
         return;
     }
 
