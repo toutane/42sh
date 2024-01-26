@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "utils/memory/memory.h"
+
 // TODO: put in utils module
 static int is_char_in_string(char c, char *str)
 {
@@ -111,8 +113,12 @@ void interpret_print(char *str)
  * -E: disable interpretation of backslash escapes (default)
  *  Return 0 on success, -1 on error
  */
-int builtin_echo(int argc, char *argv[])
+int builtin_echo(int argc, char *argv[], struct hash_map *memory)
 {
+    if (!memory)
+    {
+        return EXIT_SUCCESS;
+    }
     int nflag = 0;
     int interpret = 0;
 

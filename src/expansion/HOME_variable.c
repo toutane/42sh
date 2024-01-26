@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void set_home(char *key, struct hash_map *memory)
+void set_home(struct hash_map *memory)
 {
     char *tmp = getenv("HOME");
     if (tmp == NULL)

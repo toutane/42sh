@@ -54,11 +54,11 @@ static void prefixes_expansion(struct ast_cmd *ast_cmd, char **prefixes_copy,
 }
 
 static int handle_builtin_execution(struct ast_cmd *ast_cmd, char **argv_copy,
-                                    struct hash_map *memory)
+                                    struct hash_map *memory, struct hash_map *gv_hash_map)
 {
     setenv_from_memory(memory);
 
-    int status = (builtin_fun(argv_copy[0]))(ast_cmd->argc - 1, argv_copy);
+    int status = (builtin_fun(argv_copy[0]))(ast_cmd->argc - 1, argv_copy, gv_hash_map);
 
     // Flush stdout to avoid mixing output
     fflush(NULL);
@@ -94,7 +94,7 @@ int eval_simple_command(struct ast *ast, struct hash_map *gv_hash_map)
 
     if (is_builtin_word(argv_copy[0]))
     {
-        status = handle_builtin_execution(ast_cmd, argv_copy, cmd_env_memory);
+        status = handle_builtin_execution(ast_cmd, argv_copy, cmd_env_memory, gv_hash_map);
         free_copies(argv_copy, ast_cmd->argc, prefixes_copy,
                     ast_cmd->prefix_count);
         return status;

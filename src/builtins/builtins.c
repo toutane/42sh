@@ -22,7 +22,7 @@ char is_builtin_word(char *word)
     return 0;
 }
 
-int (*builtin_fun(char *word))(int, char **)
+int (*builtin_fun(char *word))(int, char **, struct hash_map *)
 {
     for (int i = 0; i < NB_BUILTINS; i++)
     {
@@ -34,20 +34,20 @@ int (*builtin_fun(char *word))(int, char **)
     return 0;
 }
 
-int builtin_false(int argc, char *argv[])
+int builtin_false(int argc, char *argv[], struct hash_map *memory)
 {
     // Need to use useless (because generic) arguments
-    if (!argc || !argv)
+    if (!argc || !argv || !memory)
     {
         return 1;
     }
     return 1;
 }
 
-int builtin_true(int argc, char *argv[])
+int builtin_true(int argc, char *argv[], struct hash_map *memory)
 {
     // Need to use useless (because generic) arguments
-    if (!argc || !argv)
+    if (!argc || !argv || !memory)
     {
         return 0;
     }
