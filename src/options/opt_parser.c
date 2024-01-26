@@ -8,7 +8,7 @@
 /*
  * Print usage message
  */
-static void print_usage()
+static void print_usage(void)
 {
     printf("Usage: 42sh [options] [script] [arguments...]\n");
     printf("Options:\n");

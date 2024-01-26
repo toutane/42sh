@@ -60,6 +60,8 @@ static void delimit_token(struct lexer *lexer, char delim)
         case EOF:
             fill_token(&lexer->cur_tok, TOKEN_EOF, NULL);
             break;
+        default:
+            return;
         }
         stream_pop(lexer->stream);
     }

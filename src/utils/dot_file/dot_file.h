@@ -1,5 +1,5 @@
-#ifndef AST_TO_DOT_H
-#define AST_TO_DOT_H
+#ifndef DOT_FILE_H
+#define DOT_FILE_H
 
 #include <stdio.h>
 
@@ -10,4 +10,4 @@
  */
 int create_dot_file(struct ast *ast, char *filename);
 
-#endif /* ! AST_TO_DOT_H */
+#endif /* ! DOT_FILE_H */

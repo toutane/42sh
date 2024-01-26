@@ -1,5 +1,5 @@
-#ifndef IO_BACKEND_H
-#define IO_BACKEND_H
+#ifndef IO_H
+#define IO_H
 
 #include <stdio.h>
 
@@ -41,4 +41,4 @@ int stream_peek(struct stream_info *stream);
  */
 int stream_pop(struct stream_info *stream);
 
-#endif /* ! IO_BACKEND_H */
+#endif /* ! IO_H */
