@@ -104,7 +104,8 @@ int builtin_echo(int argc, char *argv[])
 
     int start_index = 1;
     while (
-        parse_echo_options(argv[start_index], optionString, &nflag, &interpret))
+        parse_echo_options(argv[start_index], optionString, &nflag, &interpret)
+        && strlen(argv[start_index]) != 0)
     {
         start_index++;
     }
@@ -128,7 +129,7 @@ int builtin_echo(int argc, char *argv[])
             }
         }
 
-        if (i < argc - 1 && argv[i + 1] != NULL && argv[i + 1][0] != '\0')
+        if (i < argc - 1 && argv[i + 1] != NULL)
         {
             if (printf(" ") == EOF)
             {

@@ -69,7 +69,6 @@ static void handle_single_quote(char **str, struct stream_info *stream,
     else if (*context == SINGLE_QUOTE)
     {
         // if noting in quote append an empty string
-        append_char_to_string(str, '\0');
         *context = NONE;
     }
     else
@@ -89,7 +88,7 @@ static void handle_double_quote(char **str, struct stream_info *stream,
     }
     else if (*context == DOUBLE_QUOTE)
     {
-        append_char_to_string(str, '\0');
+        // if noting in quote append an empty string
         *context = NONE;
     }
     else
@@ -365,6 +364,7 @@ static char **word_expansions(char **expanded_argv, int *expanded_argc,
 
         if (cur_char == '\'')
         {
+            my_strcat(&(expanded_argv[*expanded_argc]), "");
             handle_single_quote(&(expanded_argv[*expanded_argc]), stream,
                                 &context);
             continue;
@@ -372,6 +372,7 @@ static char **word_expansions(char **expanded_argv, int *expanded_argc,
 
         if (cur_char == '"')
         {
+            my_strcat(&(expanded_argv[*expanded_argc]), "");
             handle_double_quote(&(expanded_argv[*expanded_argc]), stream,
                                 &context);
             continue;

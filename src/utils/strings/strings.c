@@ -46,9 +46,9 @@ void append_char_to_string(char **str, char c)
 // concat str2 in str1
 void my_strcat(char **str1, char *str2)
 {
+    append_char_to_string(str1, '\0');
     if (str2 == NULL)
     {
-        append_char_to_string(str1, '\0');
         return;
     }
 
