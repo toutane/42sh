@@ -1,3 +1,5 @@
+#include <limits.h>
+
 #include "builtins.h"
 
 static int is_number(char *str)
@@ -12,28 +14,30 @@ static int is_number(char *str)
 
 int builtin_continue(int argc, char *argv[])
 {
-    // more than 1 parameter
-    if (argc > 2)
-    {
-        fprintf(stderr, "42sh: invalid continue syntax error\n");
-        return 2;
-    }
-
     int n = 1;
     if (argc == 2)
     {
         // check if the parameter is a number
-        if (is_number(argv[1]) != 1)
+        if (argc >= 2 && is_number(argv[1]) != 1)
         {
+            // more than 1 parameter
+            if (argc > 2)
+            {
+                fprintf(stderr, "42sh: invalid continue syntax error\n");
+                _exit(1);
+            }
+
+            set_continue_number(INT_MAX);
             fprintf(stderr, "42sh: continue: not a number\n");
-            return 1;
+            _exit(1);
         }
 
         n = atoi(argv[1]);
 
-        // if number of loop that need to be continue is less than
+        // if number of loop that need to be break is less than
         if (n < 1)
         {
+            set_continue_number(INT_MAX);
             fprintf(stderr, "42sh: continue: < 0\n");
             return 1;
         }

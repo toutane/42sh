@@ -1,0 +1,11 @@
+while true
+do
+    echo hi;
+    break
+done
+echo hi;
+echo hq;
+echo hy;
+echo ho;
+echo hp;
+echo hq;
