@@ -6,21 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-static void append_char_to_str(char **str, char c)
-{
-    if (*str == NULL)
-    {
-        *str = calloc(2, sizeof(char));
-        (*str)[0] = c;
-        return;
-    }
-
-    size_t len = strlen(*str);
-    *str = realloc(*str, (len + 2) * sizeof(char));
-    (*str)[len] = c;
-    (*str)[len + 1] = '\0';
-}
-
 static void handle_backslash_quote(char **str, struct stream_info *stream,
                                    enum QUOTING_CONTEXT *context)
 {
@@ -37,7 +22,7 @@ static void handle_backslash_quote(char **str, struct stream_info *stream,
         }
 
         // Append the character to the string
-        append_char_to_str(str, next_char);
+        append_char_to_string(str, next_char);
         stream_pop(stream);
     }
     else
@@ -45,7 +30,7 @@ static void handle_backslash_quote(char **str, struct stream_info *stream,
         switch (*context)
         {
         case SINGLE_QUOTE:
-            append_char_to_str(str, '\\');
+            append_char_to_string(str, '\\');
             stream_pop(stream);
             break;
         case DOUBLE_QUOTE:
@@ -56,14 +41,14 @@ static void handle_backslash_quote(char **str, struct stream_info *stream,
                 return;
             }
             if (next_char == '$' || next_char == '`' || next_char == '"'
-                || next_char == '\\')
+                || next_char == '\\' || next_char == '\n')
             {
-                append_char_to_str(str, next_char);
+                append_char_to_string(str, next_char);
             }
             else
             {
-                append_char_to_str(str, '\\');
-                append_char_to_str(str, next_char);
+                append_char_to_string(str, '\\');
+                append_char_to_string(str, next_char);
             }
             stream_pop(stream);
             break;
@@ -88,7 +73,7 @@ static void handle_single_quote(char **str, struct stream_info *stream,
     else
     {
         // That means where are in a double quote context
-        append_char_to_str(str, '\'');
+        append_char_to_string(str, '\'');
     }
     stream_pop(stream);
 }
@@ -107,7 +92,7 @@ static void handle_double_quote(char **str, struct stream_info *stream,
     else
     {
         // That means where are in a single quote context
-        append_char_to_str(str, '"');
+        append_char_to_string(str, '"');
     }
     stream_pop(stream);
 }
@@ -115,7 +100,6 @@ static void handle_double_quote(char **str, struct stream_info *stream,
 static void expand_variable(char **str, char *expression,
                             struct hash_map *gv_hash_map)
 {
-    // printf("expand var: %s\n", expression);
     if (expression == NULL)
     {
         return;
@@ -147,13 +131,13 @@ static void expand_variable(char **str, char *expression,
         size_t j = 0;
         while (value[i][j] != '\0')
         {
-            append_char_to_str(str, value[i][j]);
+            append_char_to_string(str, value[i][j]);
             j++;
         }
 
         if (value[i + 1] != NULL)
         {
-            append_char_to_str(str, ' ');
+            append_char_to_string(str, ' ');
         }
         i++;
     }
@@ -168,7 +152,7 @@ static void param_expansion(char **str, struct stream_info *stream,
     if (*context == SINGLE_QUOTE)
     {
         // We are in a quote context, so we don't expand the dollar
-        append_char_to_str(str, '$');
+        append_char_to_string(str, '$');
         stream_pop(stream);
         return;
     }
@@ -211,7 +195,7 @@ static void param_expansion(char **str, struct stream_info *stream,
                 break;
             }
 
-            append_char_to_str(&expression, next_char);
+            append_char_to_string(&expression, next_char);
             stream_pop(stream);
         }
     }
@@ -219,12 +203,12 @@ static void param_expansion(char **str, struct stream_info *stream,
     {
         if (is_char_special_variable(next_char))
         {
-            append_char_to_str(&expression, next_char);
+            append_char_to_string(&expression, next_char);
             stream_pop(stream);
         }
         else if (isdigit(next_char))
         {
-            append_char_to_str(&expression, next_char);
+            append_char_to_string(&expression, next_char);
             stream_pop(stream);
         }
         else
@@ -242,7 +226,7 @@ static void param_expansion(char **str, struct stream_info *stream,
                     break;
                 }
 
-                append_char_to_str(&expression, next_char);
+                append_char_to_string(&expression, next_char);
                 stream_pop(stream);
             }
         }
@@ -288,7 +272,7 @@ static void expand_loop(struct stream_info *stream, char **str,
             continue;
         }
 
-        append_char_to_str(str, cur_char);
+        append_char_to_string(str, cur_char);
         stream_pop(stream);
     }
 
@@ -331,6 +315,7 @@ static char **field_split(char **expanded_argv, int *expanded_argc,
     {
         return expanded_argv; 
     }
+
     // Field split delimiteur
     char *delimiters = " \t\n";
 
@@ -371,7 +356,7 @@ static char **word_expansions(char **expanded_argv, int *expanded_argc,
 
         if (cur_char == '\\')
         {
-            handle_backslash_quote(&temp_str, stream, &context);
+            handle_backslash_quote(&(expanded_argv[*expanded_argc]), stream, &context);
             continue;
         }
 
@@ -400,9 +385,9 @@ static char **word_expansions(char **expanded_argv, int *expanded_argc,
             {
                 my_strcat(&(expanded_argv[*expanded_argc]), temp_str);
             }
+
             free(temp_str);
             temp_str = NULL;
-
             continue;
         }
 
@@ -410,7 +395,7 @@ static char **word_expansions(char **expanded_argv, int *expanded_argc,
         stream_pop(stream);
     }
 
-    // close the current argument if not null
+    // Close the current argument if not null
     if (expanded_argv[*expanded_argc])
     {
         (*expanded_argc)++;
