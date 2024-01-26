@@ -1,0 +1,15 @@
+a=false
+
+while ! $a;
+do
+	echo hello world
+	a=true
+done;
+
+a=true
+
+until ! $a;
+do
+	echo hello world
+	a=false
+done;
