@@ -1,2 +1,0 @@
-PWD=${dirname $PWD}
-echo hello

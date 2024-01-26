@@ -24,11 +24,6 @@ enum ast_type
     AST_NEG,
     AST_AND,
     AST_OR,
-    /*
-    AST_MUL,
-    AST_DIV,
-    AST_NUMBER,
-    */
 };
 
 enum redirection_type

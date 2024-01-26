@@ -3,12 +3,8 @@ bar="Goodbye World"
 
 echo $foo $bar
 
-#for i in $foo ${bar}; do
 for i in $foo; do
-    #echo "$i" '$i' "${i}";
-    echo $i;
-    #bar=$foo
-    #foo=$bar$bar
+    echo "$i";
 done;
 
 echo $foo $bar

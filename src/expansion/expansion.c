@@ -276,11 +276,9 @@ static void expand_loop(struct stream_info *stream, char **str,
         stream_pop(stream);
     }
 
-    // TODO: fix this wird behaviour that makes the string null
     if (*str == NULL)
     {
-        *str = calloc(2, sizeof(char));
-        (*str)[0] = '\0';
+        *str = strdup("");
     }
 }
 
@@ -313,7 +311,7 @@ static char **field_split(char **expanded_argv, int *expanded_argc,
 {
     if (!temp_str)
     {
-        return expanded_argv; 
+        return expanded_argv;
     }
 
     // Field split delimiteur
@@ -328,9 +326,10 @@ static char **field_split(char **expanded_argv, int *expanded_argc,
     {
         // Then realloc array, put NULL in last item
         (*expanded_argc)++;
-        expanded_argv = realloc(expanded_argv, (*expanded_argc + 1) * sizeof(char *));
+        expanded_argv =
+            realloc(expanded_argv, (*expanded_argc + 1) * sizeof(char *));
         expanded_argv[*expanded_argc] = NULL;
-    
+
         my_strcat(&(expanded_argv[*expanded_argc]), word);
         word = strtok(NULL, delimiters);
     }
@@ -356,19 +355,22 @@ static char **word_expansions(char **expanded_argv, int *expanded_argc,
 
         if (cur_char == '\\')
         {
-            handle_backslash_quote(&(expanded_argv[*expanded_argc]), stream, &context);
+            handle_backslash_quote(&(expanded_argv[*expanded_argc]), stream,
+                                   &context);
             continue;
         }
 
         if (cur_char == '\'')
         {
-            handle_single_quote(&(expanded_argv[*expanded_argc]), stream, &context);
+            handle_single_quote(&(expanded_argv[*expanded_argc]), stream,
+                                &context);
             continue;
         }
 
         if (cur_char == '"')
         {
-            handle_double_quote(&(expanded_argv[*expanded_argc]), stream, &context);
+            handle_double_quote(&(expanded_argv[*expanded_argc]), stream,
+                                &context);
             continue;
         }
 
@@ -395,14 +397,16 @@ static char **word_expansions(char **expanded_argv, int *expanded_argc,
         stream_pop(stream);
     }
 
-    // Close the current argument if not null
-    if (expanded_argv[*expanded_argc])
+    // Append null char if nothing
+    if (!expanded_argv[*expanded_argc])
     {
-        (*expanded_argc)++;
-        expanded_argv =
-            realloc(expanded_argv, (*expanded_argc + 1) * sizeof(char *));
-        expanded_argv[*expanded_argc] = NULL;
+        append_char_to_string(&(expanded_argv[*expanded_argc]), '\0');
     }
+
+    (*expanded_argc)++;
+    expanded_argv =
+        realloc(expanded_argv, (*expanded_argc + 1) * sizeof(char *));
+    expanded_argv[*expanded_argc] = NULL;
 
     return expanded_argv;
 }
