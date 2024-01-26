@@ -1,0 +1,28 @@
+a="hello      world"; echo $a
+a="hello      world"; echo "$a"
+a="hello      world"; echo "'$a'"
+a="hello      world"; echo '"$a"'
+a='"hello      world"'; echo $a
+a='"hello      world"'; echo "$a"
+a='"hello      world"'; echo '$a'
+a="'hello      world'"; echo $a
+a="'hello      world'"; echo "$a"
+a="'hello      world'"; echo "$a" $b $ toto tata
+a="hello      world" echo $a
+a="hello      world" echo "$a"
+a="hello      world" echo "'$a'"
+a="hello      world" echo '"$a"'
+a='"hello      world"' echo $a
+a='"hello      world"' echo "$a"
+a='"hello      world"' echo '$a'
+a="'hello      world'" echo $a
+a="'hello      world'" echo "$a"
+a="'hello      world'" echo $a $b $ toto tata
+echo ""toto""tata"" ""tatatoto "" toto
+echo ''toto''tata'' ''tatatoto '' tata
+echo "" toto""tata"" ""tatatoto "" toto
+echo '' toto''tata'' ''tatatoto '' tata
+echo -e "" toto""tata"" ""tatatoto "" toto
+echo -e '' toto''tata'' ''tatatoto '' tata
+echo "" -e toto""tata"" ""tatatoto "" toto
+echo '' -e toto''tata'' ''tatatoto '' tata

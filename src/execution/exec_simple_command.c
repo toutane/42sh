@@ -24,20 +24,6 @@ static void free_copies(char **argv_copy, int argc, char **prefixes_copy,
     return;
 }
 
-static void arguments_expansion(struct ast_cmd *ast_cmd, char **argv_copy,
-                                struct hash_map *memory)
-{
-    /* Expand the quoting of arguments, this contains backslash, double quote,
-     * single quote and parameter ('$' and '${' ) expansion. For the parameter
-     * expansion, the algorithm will search into the global variables hash_map
-     * and properly expand variable identifiers. */
-
-    for (int i = 0; i < ast_cmd->argc; i++)
-    {
-        argv_copy[i] = expand_string(&(ast_cmd->argv[i]), memory);
-    }
-}
-
 static void prefixes_expansion(struct ast_cmd *ast_cmd, char **prefixes_copy,
                                struct hash_map *memory)
 {
@@ -53,12 +39,12 @@ static void prefixes_expansion(struct ast_cmd *ast_cmd, char **prefixes_copy,
     }
 }
 
-static int handle_builtin_execution(struct ast_cmd *ast_cmd, char **argv_copy,
+static int handle_builtin_execution(int expanded_argc, char **expanded_argv,
                                     struct hash_map *memory)
 {
     setenv_from_memory(memory);
 
-    int status = (builtin_fun(argv_copy[0]))(ast_cmd->argc, argv_copy);
+    int status = (builtin_fun(expanded_argv[0]))(expanded_argc, expanded_argv);
 
     // Flush stdout to avoid mixing output
     fflush(NULL);
@@ -74,28 +60,34 @@ int eval_simple_command(struct ast *ast, struct hash_map *gv_hash_map)
     int status = 0;
     struct ast_cmd *ast_cmd = (struct ast_cmd *)ast;
 
-    char **argv_copy = calloc(ast_cmd->argc + 1, sizeof(char *));
-    arguments_expansion(ast_cmd, argv_copy, gv_hash_map);
+    // Expand arguments
+    int expanded_argc = ast_cmd->argc;
+    char **expanded_argv =
+        argv_expansions(ast_cmd->argv, &expanded_argc, gv_hash_map);
 
+    // Set global variable
     char **prefixes_copy = calloc(ast_cmd->prefix_count + 1, sizeof(char *));
     if (ast_cmd->argc == 0)
     {
         prefixes_expansion(ast_cmd, prefixes_copy, gv_hash_map);
-        free_copies(argv_copy, ast_cmd->argc, prefixes_copy,
+        free_copies(expanded_argv, expanded_argc, prefixes_copy,
                     ast_cmd->prefix_count);
         return 0;
     }
 
+    // Set env variables
     struct hash_map *cmd_env_memory = memory_new();
     if (ast_cmd->prefix_count > 0)
     {
         prefixes_expansion(ast_cmd, prefixes_copy, cmd_env_memory);
     }
 
-    if (is_builtin_word(argv_copy[0]))
+    // check if word is a build -> no need to fork
+    if (is_builtin_word(expanded_argv[0]))
     {
-        status = handle_builtin_execution(ast_cmd, argv_copy, cmd_env_memory);
-        free_copies(argv_copy, ast_cmd->argc, prefixes_copy,
+        status = handle_builtin_execution(expanded_argc, expanded_argv,
+                                          cmd_env_memory);
+        free_copies(expanded_argv, expanded_argc, prefixes_copy,
                     ast_cmd->prefix_count);
         return status;
     }
@@ -107,7 +99,7 @@ int eval_simple_command(struct ast *ast, struct hash_map *gv_hash_map)
     {
         perror("");
 
-        free_copies(argv_copy, ast_cmd->argc, prefixes_copy,
+        free_copies(expanded_argv, expanded_argc, prefixes_copy,
                     ast_cmd->prefix_count);
 
         _exit(127); // Check this value
@@ -116,10 +108,10 @@ int eval_simple_command(struct ast *ast, struct hash_map *gv_hash_map)
     {
         setenv_from_memory(cmd_env_memory);
 
-        execvp(argv_copy[0], argv_copy);
+        execvp(expanded_argv[0], expanded_argv);
 
-        fprintf(stderr, "42sh: %s: command not found\n", argv_copy[0]);
-        free_copies(argv_copy, ast_cmd->argc, prefixes_copy,
+        fprintf(stderr, "42sh: %s: command not found\n", expanded_argv[0]);
+        free_copies(expanded_argv, expanded_argc, prefixes_copy,
                     ast_cmd->prefix_count);
         _exit(execvp_error(errno));
     }
@@ -132,7 +124,7 @@ int eval_simple_command(struct ast *ast, struct hash_map *gv_hash_map)
     if (WIFSIGNALED(status))
     {
         fprintf(stderr, "42sh: command terminated because of a signal");
-        free_copies(argv_copy, ast_cmd->argc, prefixes_copy,
+        free_copies(expanded_argv, expanded_argc, prefixes_copy,
                     ast_cmd->prefix_count);
         memory_free(cmd_env_memory);
         return 129;
@@ -140,6 +132,7 @@ int eval_simple_command(struct ast *ast, struct hash_map *gv_hash_map)
 
     // Otherwise we return the status error code
     memory_free(cmd_env_memory);
-    free_copies(argv_copy, ast_cmd->argc, prefixes_copy, ast_cmd->prefix_count);
+    free_copies(expanded_argv, expanded_argc, prefixes_copy,
+                ast_cmd->prefix_count);
     return WEXITSTATUS(status);
 }

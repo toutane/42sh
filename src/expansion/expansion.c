@@ -1,23 +1,10 @@
+#define _XOPEN_SOURCE 500
+
 #include "expansion.h"
 
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-
-static void append_char_to_str(char **str, char c)
-{
-    if (*str == NULL)
-    {
-        *str = calloc(2, sizeof(char));
-        (*str)[0] = c;
-        return;
-    }
-
-    size_t len = strlen(*str);
-    *str = realloc(*str, (len + 2) * sizeof(char));
-    (*str)[len] = c;
-    (*str)[len + 1] = '\0';
-}
 
 static void handle_backslash_quote(char **str, struct stream_info *stream,
                                    enum QUOTING_CONTEXT *context)
@@ -35,7 +22,7 @@ static void handle_backslash_quote(char **str, struct stream_info *stream,
         }
 
         // Append the character to the string
-        append_char_to_str(str, next_char);
+        append_char_to_string(str, next_char);
         stream_pop(stream);
     }
     else
@@ -43,7 +30,7 @@ static void handle_backslash_quote(char **str, struct stream_info *stream,
         switch (*context)
         {
         case SINGLE_QUOTE:
-            append_char_to_str(str, '\\');
+            append_char_to_string(str, '\\');
             stream_pop(stream);
             break;
         case DOUBLE_QUOTE:
@@ -54,14 +41,14 @@ static void handle_backslash_quote(char **str, struct stream_info *stream,
                 return;
             }
             if (next_char == '$' || next_char == '`' || next_char == '"'
-                || next_char == '\\')
+                || next_char == '\\' || next_char == '\n')
             {
-                append_char_to_str(str, next_char);
+                append_char_to_string(str, next_char);
             }
             else
             {
-                append_char_to_str(str, '\\');
-                append_char_to_str(str, next_char);
+                append_char_to_string(str, '\\');
+                append_char_to_string(str, next_char);
             }
             stream_pop(stream);
             break;
@@ -81,12 +68,13 @@ static void handle_single_quote(char **str, struct stream_info *stream,
     }
     else if (*context == SINGLE_QUOTE)
     {
+        // if noting in quote append an empty string
         *context = NONE;
     }
     else
     {
         // That means where are in a double quote context
-        append_char_to_str(str, '\'');
+        append_char_to_string(str, '\'');
     }
     stream_pop(stream);
 }
@@ -100,12 +88,13 @@ static void handle_double_quote(char **str, struct stream_info *stream,
     }
     else if (*context == DOUBLE_QUOTE)
     {
+        // if noting in quote append an empty string
         *context = NONE;
     }
     else
     {
         // That means where are in a single quote context
-        append_char_to_str(str, '"');
+        append_char_to_string(str, '"');
     }
     stream_pop(stream);
 }
@@ -113,7 +102,6 @@ static void handle_double_quote(char **str, struct stream_info *stream,
 static void expand_variable(char **str, char *expression,
                             struct hash_map *gv_hash_map)
 {
-    // printf("expand var: %s\n", expression);
     if (expression == NULL)
     {
         return;
@@ -145,13 +133,13 @@ static void expand_variable(char **str, char *expression,
         size_t j = 0;
         while (value[i][j] != '\0')
         {
-            append_char_to_str(str, value[i][j]);
+            append_char_to_string(str, value[i][j]);
             j++;
         }
 
         if (value[i + 1] != NULL)
         {
-            append_char_to_str(str, ' ');
+            append_char_to_string(str, ' ');
         }
         i++;
     }
@@ -166,7 +154,7 @@ static void param_expansion(char **str, struct stream_info *stream,
     if (*context == SINGLE_QUOTE)
     {
         // We are in a quote context, so we don't expand the dollar
-        append_char_to_str(str, '$');
+        append_char_to_string(str, '$');
         stream_pop(stream);
         return;
     }
@@ -178,6 +166,7 @@ static void param_expansion(char **str, struct stream_info *stream,
     char next_char = stream_peek(stream);
     if (next_char == EOF)
     {
+        append_char_to_string(str, '$');
         return;
     }
 
@@ -188,6 +177,7 @@ static void param_expansion(char **str, struct stream_info *stream,
      * (because in this case expression is the longer valid name). All the
      * characters that forming the expression are removed from the token_word
      * string. */
+
     char *expression = NULL;
     if (next_char == '{')
     {
@@ -207,7 +197,7 @@ static void param_expansion(char **str, struct stream_info *stream,
                 break;
             }
 
-            append_char_to_str(&expression, next_char);
+            append_char_to_string(&expression, next_char);
             stream_pop(stream);
         }
     }
@@ -215,12 +205,12 @@ static void param_expansion(char **str, struct stream_info *stream,
     {
         if (is_char_special_variable(next_char))
         {
-            append_char_to_str(&expression, next_char);
+            append_char_to_string(&expression, next_char);
             stream_pop(stream);
         }
         else if (isdigit(next_char))
         {
-            append_char_to_str(&expression, next_char);
+            append_char_to_string(&expression, next_char);
             stream_pop(stream);
         }
         else
@@ -238,7 +228,7 @@ static void param_expansion(char **str, struct stream_info *stream,
                     break;
                 }
 
-                append_char_to_str(&expression, next_char);
+                append_char_to_string(&expression, next_char);
                 stream_pop(stream);
             }
         }
@@ -284,15 +274,13 @@ static void expand_loop(struct stream_info *stream, char **str,
             continue;
         }
 
-        append_char_to_str(str, cur_char);
+        append_char_to_string(str, cur_char);
         stream_pop(stream);
     }
 
-    // TODO: fix this wird behaviour that makes the string null
     if (*str == NULL)
     {
-        *str = calloc(2, sizeof(char));
-        (*str)[0] = '\0';
+        *str = strdup("");
     }
 }
 
@@ -318,4 +306,140 @@ char *expand_string(char **str, struct hash_map *gv_hash_map)
     // free(*str);
 
     return expanded_str;
+}
+
+static char **field_split(char **expanded_argv, int *expanded_argc,
+                          char *temp_str)
+{
+    if (!temp_str)
+    {
+        return expanded_argv;
+    }
+
+    // Field split delimiteur
+    char *delimiters = " \t\n";
+
+    // concat word to last item of expanded_argv
+    char *word = strtok(temp_str, delimiters);
+    my_strcat(&(expanded_argv[*expanded_argc]), word);
+    word = strtok(NULL, delimiters);
+
+    while (word != NULL)
+    {
+        // Then realloc array, put NULL in last item
+        (*expanded_argc)++;
+        expanded_argv =
+            realloc(expanded_argv, (*expanded_argc + 1) * sizeof(char *));
+        expanded_argv[*expanded_argc] = NULL;
+
+        my_strcat(&(expanded_argv[*expanded_argc]), word);
+        word = strtok(NULL, delimiters);
+    }
+
+    return expanded_argv;
+}
+
+static char **word_expansions(char **expanded_argv, int *expanded_argc,
+                              struct stream_info *stream,
+                              struct hash_map *memory)
+{
+    char *temp_str = NULL;
+
+    enum QUOTING_CONTEXT context = NONE;
+
+    while (1)
+    {
+        char cur_char = stream_peek(stream);
+        if (cur_char == EOF)
+        {
+            break;
+        }
+
+        if (cur_char == '\\')
+        {
+            handle_backslash_quote(&(expanded_argv[*expanded_argc]), stream,
+                                   &context);
+            continue;
+        }
+
+        if (cur_char == '\'')
+        {
+            my_strcat(&(expanded_argv[*expanded_argc]), "");
+            handle_single_quote(&(expanded_argv[*expanded_argc]), stream,
+                                &context);
+            continue;
+        }
+
+        if (cur_char == '"')
+        {
+            my_strcat(&(expanded_argv[*expanded_argc]), "");
+            handle_double_quote(&(expanded_argv[*expanded_argc]), stream,
+                                &context);
+            continue;
+        }
+
+        if (cur_char == '$')
+        {
+            param_expansion(&temp_str, stream, &context, memory);
+
+            if (context == NONE)
+            {
+                expanded_argv =
+                    field_split(expanded_argv, expanded_argc, temp_str);
+            }
+            else
+            {
+                my_strcat(&(expanded_argv[*expanded_argc]), temp_str);
+            }
+
+            free(temp_str);
+            temp_str = NULL;
+            continue;
+        }
+
+        append_char_to_string(&(expanded_argv[*expanded_argc]), cur_char);
+        stream_pop(stream);
+    }
+
+    // Append null char if nothing
+    if (expanded_argv[*expanded_argc])
+    {
+        (*expanded_argc)++;
+        expanded_argv =
+            realloc(expanded_argv, (*expanded_argc + 1) * sizeof(char *));
+        expanded_argv[*expanded_argc] = NULL;
+    }
+
+    return expanded_argv;
+}
+
+char **argv_expansions(char **original_argv, int *argc, struct hash_map *memory)
+{
+    int expanded_argc = 0;
+    char **expanded_argv = calloc(expanded_argc + 1, sizeof(char *));
+
+    for (int i = 0; i < *argc; i++)
+    {
+        int err = 0;
+        struct stream_info *stream = stream_new(NULL, original_argv[i], &err);
+        if (stream == NULL)
+        {
+            fprintf(stderr,
+                    "42sh: argv_expansions failed to create new stream\n");
+            _exit(EXIT_FAILURE);
+        }
+
+        expanded_argv =
+            word_expansions(expanded_argv, &expanded_argc, stream, memory);
+
+        stream_free(stream);
+    }
+
+    expanded_argv =
+        realloc(expanded_argv, (expanded_argc + 1) * sizeof(char *));
+    expanded_argv[expanded_argc] = NULL;
+
+    *argc = expanded_argc;
+
+    return expanded_argv;
 }
