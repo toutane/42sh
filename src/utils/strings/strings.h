@@ -10,6 +10,8 @@ void append_char_to_token_value(struct token *tok, char c);
 
 void append_char_to_string(char **str, char c);
 
+void my_strcat(char **str1, char *str2);
+
 /*
  * @brief: Returns 1 if the string is a sequence of digits, 0 otherwise.
  */
