@@ -1,0 +1,11 @@
+if a=5; then
+    echo $a
+fi
+
+echo $a $b
+if a; then
+    a=5;
+    b=2;
+    echo $a $b
+fi
+echo $a $b
