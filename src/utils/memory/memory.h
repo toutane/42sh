@@ -1,7 +1,7 @@
 #ifndef MEMORY_H
 #define MEMORY_H
 
-#include "utils/hash_map/hash_map.h"
+#include "../../utils/hash_map/hash_map.h"
 
 struct hash_map *memory_new(void);
 

@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#include "utils/hash_map/hash_map_setup.h"
+#include "../../utils/hash_map/hash_map_setup.h"
 
 int hash_map_contains(const struct hash_map *hash_map, char *key);
 

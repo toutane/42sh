@@ -86,6 +86,8 @@ int eval_for(struct ast *ast, struct hash_map *gv_hash_map)
     size_t items_amount = 0;
     char **items_list = args_to_list(ast_for, &items_amount);
 
+    int break_number;
+    int continue_number;
     for (size_t i = 0; i < items_amount; ++i)
     {
         char **value_array = calloc(2, sizeof(char *));
@@ -94,6 +96,18 @@ int eval_for(struct ast *ast, struct hash_map *gv_hash_map)
         memory_set(gv_hash_map, strdup(ast_for->condition), value_array);
 
         status = eval_ast(ast_for->data, gv_hash_map);
+        break_number = get_break_number();
+        if (break_number != 0)
+        {
+            set_break_number(break_number - 1);
+            break;
+        }
+        continue_number = get_continue_number();
+        if (continue_number != 0)
+        {
+            set_continue_number(continue_number - 1);
+            continue;
+        }
     }
 
     for (size_t j = 0; j < items_amount; j++)
