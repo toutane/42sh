@@ -1,2 +1,6 @@
 cd
 cd tata toto
+cd ../; ls
+cd ../../; ls
+cd /bin; ls
+cd -
