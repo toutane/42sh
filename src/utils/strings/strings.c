@@ -43,6 +43,23 @@ void append_char_to_string(char **str, char c)
     (*str)[len + 1] = '\0';
 }
 
+// concat str2 in str1
+void my_strcat(char **str1, char *str2)
+{
+    append_char_to_string(str1, '\0');
+    if (str2 == NULL)
+    {
+        return;
+    }
+
+    size_t i = 0;
+    while (str2[i] != '\0')
+    {
+        append_char_to_string(str1, str2[i]);
+        i++;
+    }
+}
+
 int is_str_sequence_of_digits(char *str)
 {
     size_t len = strlen(str);
