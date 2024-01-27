@@ -40,6 +40,8 @@ enum token_type
     TOKEN_ELIF, // 'elif'
     TOKEN_FI, // 'fi'
     TOKEN_NEG, // '!'
+    TOKEN_LBRACE, // '{'
+    TOKEN_RBRACE, // '}'
     TOKEN_FOR, // 'for'
     TOKEN_IN, // 'in'
     TOKEN_WHILE, // 'while'
