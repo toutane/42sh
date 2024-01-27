@@ -3,11 +3,11 @@
 
 #define PATH_MAX 4096
 
-#include <unistd.h>
 #include <dirent.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #include "builtins.h"
 
@@ -116,7 +116,7 @@ static int rule_6(char *arg)
     return rule_7();
 }
 
-int builtin_cd(int argc, char *argv[])
+int builtin_cd(int argc, char *argv[], struct mem *mem)
 {
     char *home = getenv("HOME");
     pwd = getcwd(NULL, PATH_MAX);
@@ -156,7 +156,7 @@ int builtin_cd(int argc, char *argv[])
             argv2[0] = argv[0];
             argv2[1] = oldpwd;
             free(pwd);
-            int res = builtin_cd(argc, argv2);
+            int res = builtin_cd(argc, argv2, mem);
             free(argv2);
             printf("%s\n", getenv("PWD"));
             return res;
