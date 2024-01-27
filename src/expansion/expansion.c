@@ -110,7 +110,7 @@ static void expand_variable(char **str, char *expression, struct hm *hm_var)
     {
         /* If the expression is RANDOM, we generate a random number between 0
          * and 32767 and we update the memory with the new value. */
-        // fill_random(gv_hash_map);
+        set_random(hm_var);
     }
 
     /* Once the expression is created and filled properly, we look for the value
@@ -118,7 +118,6 @@ static void expand_variable(char **str, char *expression, struct hm *hm_var)
      * found, we set the value to the empty
      * string. Then, we append the value to the token_word string back. */
 
-    // char **value = memory_get(gv_hash_map, expression);
     char *value = get_variable(expression, hm_var);
 
     if (value == NULL)
@@ -126,26 +125,6 @@ static void expand_variable(char **str, char *expression, struct hm *hm_var)
         free(expression);
         return;
     }
-
-    /*
-    size_t i = 0;
-    while (value[i] != NULL)
-    {
-        size_t j = 0;
-        while (value[i][j] != '\0')
-        {
-            append_char_to_string(str, value[i][j]);
-            j++;
-        }
-
-        if (value[i + 1] != NULL)
-        {
-            append_char_to_string(str, ' ');
-        }
-        i++;
-    }
-    */
-    // hm_print(hm_var);
     my_strcat(str, value);
 
     free(expression);
