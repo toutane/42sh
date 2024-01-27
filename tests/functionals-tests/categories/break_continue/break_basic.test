@@ -1,0 +1,9 @@
+a=true
+while $a
+do
+    echo hi;
+    break;
+    echo ha;
+    a=false;
+done
+echo hu;

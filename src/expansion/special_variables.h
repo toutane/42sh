@@ -1,8 +1,8 @@
 #ifndef SPECIAL_VARIABLES_H
 #define SPECIAL_VARIABLES_H
 
+#include "../utils/memory/memory.h"
 #include "../utils/strings/strings.h"
-#include "utils/memory/memory.h"
 
 void fill_at_sign_var(int argc, char *argv[], struct hash_map *gv_hash_map);
 

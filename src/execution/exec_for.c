@@ -28,6 +28,8 @@ int eval_for(struct ast *ast, struct hash_map *gv_hash_map)
     char **expanded_array =
         argv_expansions(ast_for->array, &expanded_array_size, gv_hash_map);
 
+    int break_number;
+    int continue_number;
     // eval the ast loop
     for (int i = 0; i < expanded_array_size; ++i)
     {
@@ -38,6 +40,18 @@ int eval_for(struct ast *ast, struct hash_map *gv_hash_map)
 
         // evaluation of for loop ast
         status = eval_ast(ast_for->data, gv_hash_map);
+        break_number = get_break_number();
+        if (break_number != 0)
+        {
+            set_break_number(break_number - 1);
+            break;
+        }
+        continue_number = get_continue_number();
+        if (continue_number != 0)
+        {
+            set_continue_number(continue_number - 1);
+            continue;
+        }
     }
 
     // free expanded array

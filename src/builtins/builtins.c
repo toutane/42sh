@@ -1,4 +1,4 @@
-#define NB_BUILTINS 4
+#define NB_BUILTINS 6
 #define BUILTIN_ERROR 2
 
 #include "builtins.h"
@@ -7,7 +7,9 @@ static struct builtin_matchs builtin_words[NB_BUILTINS] = {
     { .name = "echo", .fun = builtin_echo },
     { .name = "false", .fun = builtin_false },
     { .name = "true", .fun = builtin_true },
-    { .name = "exit", .fun = builtin_exit }
+    { .name = "exit", .fun = builtin_exit },
+    { .name = "break", .fun = builtin_break },
+    { .name = "continue", .fun = builtin_continue }
 };
 
 // check if the cord is a builtin command
