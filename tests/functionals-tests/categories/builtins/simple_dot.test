@@ -1,0 +1,6 @@
+. ./env_var/script_1.sh
+. ./env_var/script_2.sh
+. ./env_var/script_1.sh jadhasd
+. ./env_var/script_1.sh; ls
+echo tata; . ./env_var/script_1.sh
+echo tata; . ./env_var/script_1.sh; echo toto

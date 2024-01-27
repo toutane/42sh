@@ -8,3 +8,4 @@ run_test_line simple_exit.test
 run_test_line complex_exit.test
 run_test_file ascii_house.test
 run_test_line simple_cd.test
+run_test_line simple_dot.test
