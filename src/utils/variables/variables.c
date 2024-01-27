@@ -6,9 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
-
-#include "expansion/special_variables.h"
 
 char *get_key_from_assignment_word(char *assignment_word)
 {
@@ -42,26 +39,6 @@ char *get_value_from_assignment_word(char *assignment_word)
 
     return value;
 }
-
-/*
-void set_default_variables(int argc, char **argv, struct hash_map *memory)
-{
-    // Seed the random number generator
-    srand((unsigned int)time(NULL));
-
-    // fill_at_sign_var(argc, argv, memory);
-    //fill_arguments_var(argc, argv, memory);
-    // fill_star_sign_var(argc, argv, memory);
-    //fill_dollar_var(memory);
-    //fill_arguments_amount(argc, memory);
-    //set_uid_env_var(memory);
-    //fill_random(memory);
-
-    //set_pwd(memory);
-    //set_oldpwd(memory);
-    //set_ifs(memory);
-}
-*/
 
 static void update_env_var(const char *key, const char *value)
 {
