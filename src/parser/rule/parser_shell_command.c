@@ -25,6 +25,9 @@ enum parser_status parse_shell_command(struct ast **res, struct lexer *lexer)
             }
         }
 
+        ast_free(*res);
+        *res = NULL;
+
         return PARSER_UNEXPECTED_TOKEN;
     }
     else if (parse_rule_if(res, lexer) == PARSER_OK)
