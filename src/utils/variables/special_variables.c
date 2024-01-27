@@ -3,6 +3,7 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "utils/variables/variables.h"
 
@@ -46,6 +47,13 @@ void set_random(struct hm *hm_var)
     free(pwd_value);
 }
 
+static void set_dollar(struct hm *hm_var)
+{
+    char *pid = int_to_string(getpid());
+    assign_variable("$", pid, hm_var);
+    free(pid);
+}
+
 /*
    static void set_ifs(struct hm *hm_var)
    {
@@ -63,6 +71,7 @@ void set_default_variables(struct hm *hm_var)
     srand((unsigned int)time(NULL));
 
     // Set special variables
+    set_dollar(hm_var);
     set_random(hm_var);
     set_uid(hm_var);
 
