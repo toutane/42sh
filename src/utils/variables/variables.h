@@ -23,4 +23,6 @@ void save_env(struct hm *hm_prefixes);
 
 void restore_env(struct hm *hm_prefixes);
 
+void set_random(struct hm *hm_var);
+
 #endif /* ! VARIABLES_H */
