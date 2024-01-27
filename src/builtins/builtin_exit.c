@@ -11,8 +11,13 @@ static int check_number(char *str)
     return str[i] == 0;
 }
 
-int builtin_exit(int argc, char *argv[])
+int builtin_exit(int argc, char *argv[], struct mem *mem)
 {
+    if (mem == NULL)
+    {
+        _exit(EXIT_FAILURE);
+    }
+
     // check number of argument
     if (argc > 2)
     {

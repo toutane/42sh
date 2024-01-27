@@ -11,10 +11,10 @@ bin_PROGRAMS = 42sh
 				$(top_builddir)/src/ast/libast.a \
 				$(top_builddir)/src/io/libio.a \
 				$(top_builddir)/src/options/liboptions.a \
-			 	$(top_builddir)/src/utils/libutils.a \
 				$(top_builddir)/src/expansion/libexpansion.a \
 				$(top_builddir)/src/error_handling/liberrorhandling.a \
-				$(top_builddir)/src/builtins/libbuiltins.a
+				$(top_builddir)/src/builtins/libbuiltins.a \
+			 	$(top_builddir)/src/utils/libutils.a
 42sh_LDFLAGS =	$(DEBUG_LDFLAGS) \
 				$(COVERAGE_LDFLAGS)
 

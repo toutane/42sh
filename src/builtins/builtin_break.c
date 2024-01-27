@@ -12,8 +12,13 @@ static int is_number(char *str)
     return 1;
 }
 
-int builtin_break(int argc, char *argv[])
+int builtin_break(int argc, char *argv[], struct mem *mem)
 {
+    if (mem == NULL)
+    {
+        _exit(EXIT_FAILURE);
+    }
+
     int n = 1;
     if (argc == 2)
     {

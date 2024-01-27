@@ -26,11 +26,12 @@ static void free_copies(char **argv_copy, int argc, char **prefixes_copy,
 }
 
 static int handle_builtin_execution(int expanded_argc, char **expanded_argv,
-                                    struct hm *hm_prefixes)
+                                    struct hm *hm_prefixes, struct mem *mem)
 {
     save_env(hm_prefixes);
 
-    int status = (builtin_fun(expanded_argv[0]))(expanded_argc, expanded_argv);
+    int status =
+        (builtin_fun(expanded_argv[0]))(expanded_argc, expanded_argv, mem);
 
     // Flush stdout to avoid mixing output
     fflush(NULL);
@@ -122,8 +123,8 @@ int eval_simple_command(struct ast *ast, struct mem *mem)
     // check if word is a build -> no need to fork
     if (is_builtin_word(expanded_argv[0]))
     {
-        status =
-            handle_builtin_execution(expanded_argc, expanded_argv, hm_prefixes);
+        status = handle_builtin_execution(expanded_argc, expanded_argv,
+                                          hm_prefixes, mem);
 
         hm_free(hm_prefixes);
         free_copies(expanded_argv, expanded_argc, prefixes_copy,
