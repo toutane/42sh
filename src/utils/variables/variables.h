@@ -1,12 +1,11 @@
 #ifndef VARIABLES_H
 #define VARIABLES_H
 
-#include "expansion/special_variables.h"
 #include "utils/memory/memory.h"
 #include "utils/printers/printers.h"
 #include "utils/strings/strings.h"
 
-// void set_default_variables(int argc, char *argv[], struct hash_map *memory);
+void set_default_variables(struct hm *hm_var);
 
 char *get_key_from_assignment_word(char *assignment_word);
 

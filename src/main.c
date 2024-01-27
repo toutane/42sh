@@ -32,10 +32,7 @@ int main(int argc, char *argv[])
     }
 
     struct mem *mem = mem_new();
-
-    char *uid = int_to_string(getuid());
-    hm_set_var(mem->hm_var, "UID", uid);
-    free(uid);
+    set_default_variables(mem->hm_var);
 
     // Launch execution loop
     return execution_loop(&opts, stream, mem);
