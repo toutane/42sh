@@ -70,4 +70,9 @@ int builtin_unset(int argc, char *argv[], struct mem *mem);
 /* @brief cd builtin  */
 int builtin_cd(int argc, char *argv[], struct mem *mem);
 
+/*
+ * @brief . builtin
+ */
+int builtin_dot(int argc, char *argv[], struct mem *mem);
+
 #endif /* ! BUILTINS_H */

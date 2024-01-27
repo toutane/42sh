@@ -1,4 +1,4 @@
-#define NB_BUILTINS 9
+#define NB_BUILTINS 10
 #define BUILTIN_ERROR 2
 
 #include "builtins.h"
@@ -12,6 +12,7 @@ static struct builtin_matchs builtin_words[NB_BUILTINS] = {
     { .name = "continue", .fun = builtin_continue },
     { .name = "export", .fun = builtin_export },
     { .name = "cd", .fun = builtin_cd },
+    { .name = ".", .fun = builtin_dot },
     { .name = "unset", .fun = builtin_unset }
 };
 
