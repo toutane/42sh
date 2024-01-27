@@ -7,7 +7,8 @@ libbuiltins_a_SOURCES = builtins.c builtins.h \
 						builtin_break.c \
 						builtin_continue.c \
 						builtin_export.c \
-						builtin_cd.c
+						builtin_cd.c \
+						builtin_unset.c
 
 libbuiltins_a_CPPFLAGS = -I$(top_srcdir)/src
 libbuiltins_a_CFLAGS = 	-Wall -Wextra -Werror -std=c99 -pedantic \

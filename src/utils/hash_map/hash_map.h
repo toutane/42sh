@@ -32,8 +32,12 @@ struct hm *hm_new(enum hm_type type, size_t size, data_free_type data_free);
 
 void hm_free(struct hm *hm);
 
+void pl_free(struct pl *pair, data_free_type data_free);
+
 void *hm_get(struct hm *hm, const char *key);
 
 void hm_set_var(struct hm *hm, const char *key, const char *value);
+
+void hm_remove(struct hm *hm, const char *key);
 
 #endif /* ! HASH_MAP_H */
