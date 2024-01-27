@@ -4,6 +4,7 @@
 #include "../utils/strings/strings.h"
 #include "utils/memory/memory.h"
 
+/*
 void fill_at_sign_var(int argc, char *argv[], struct hash_map *gv_hash_map);
 
 void fill_star_sign_var(int argc, char *argv[], struct hash_map *gv_hash_map);
@@ -23,5 +24,6 @@ void set_oldpwd(struct hash_map *memory);
 void set_ifs(struct hash_map *memory);
 
 void fill_random(struct hash_map *memory);
+*/
 
 #endif /* ! SPECIAL_VARIABLES_H */

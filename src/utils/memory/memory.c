@@ -5,72 +5,35 @@
 
 #define MEMORY_SIZE 128
 
-struct hash_map *memory_new(void)
+struct mem *mem_new(void)
 {
-    struct hash_map *memory = hash_map_new(MEMORY_SIZE);
-    if (memory == NULL)
+    struct mem *mem = calloc(1, sizeof(struct mem));
+    if (mem == NULL)
     {
-        fprintf(stderr, "42sh: memory_new: error: failed to allocate memory\n");
+        fprintf(stderr, "42sh: mem_new: failed to calloc\n");
         exit(EXIT_FAILURE);
     }
 
-    return memory;
+    struct hm *hm_var = hm_new(HM_VARIABLE, MEMORY_SIZE, free);
+    struct hm *hm_fun = hm_new(HM_FUNCTION, MEMORY_SIZE, ast_free);
+
+    mem->hm_var = hm_var;
+    mem->hm_fun = hm_fun;
+
+    return mem;
 }
 
-void memory_free(struct hash_map *memory)
+void mem_free(struct mem *mem)
 {
-    if (memory == NULL)
+    if (mem == NULL)
     {
         return;
     }
 
-    hash_map_free(memory);
-    return;
-}
+    hm_free(mem->hm_var);
+    hm_free(mem->hm_fun);
 
-char **memory_get(struct hash_map *memory, char *key)
-{
-    if (memory == NULL || key == NULL)
-    {
-        return NULL;
-    }
+    free(mem);
 
-    char **value = hash_map_get(memory, key);
-    if (value == NULL)
-    {
-        return NULL;
-    }
-
-    return value;
-}
-
-void memory_set(struct hash_map *memory, char *key, char **value)
-{
-    if (memory == NULL || key == NULL || value == NULL)
-    {
-        return;
-    }
-
-    int is_key_in_memory = hash_map_contains(memory, key);
-    if (is_key_in_memory == 0)
-    {
-        hash_map_insert(memory, key, value);
-    }
-    else
-    {
-        hash_map_update(memory, key, value);
-    }
-
-    return;
-}
-
-void memory_print(struct hash_map *memory)
-{
-    if (memory == NULL)
-    {
-        return;
-    }
-
-    hash_map_print(memory);
     return;
 }

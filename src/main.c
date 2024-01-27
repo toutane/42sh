@@ -4,6 +4,8 @@
 #include "utils/memory/memory.h"
 #include "utils/variables/variables.h"
 
+#define HM_SIZE 128
+
 int main(int argc, char *argv[])
 {
     int status; // Gather error status, passed to functions
@@ -29,11 +31,12 @@ int main(int argc, char *argv[])
                                            // program should exit with success
     }
 
-    // Create shell memory hashmap
-    struct hash_map *memory = memory_new();
-    set_default_variables(argc, argv, memory);
-    // memory_print(memory);
+    struct mem *mem = mem_new();
+
+    char *uid = int_to_string(getuid());
+    hm_set_var(mem->hm_var, "UID", uid);
+    free(uid);
 
     // Launch execution loop
-    return execution_loop(&opts, stream, memory);
+    return execution_loop(&opts, stream, mem);
 }

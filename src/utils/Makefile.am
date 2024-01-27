@@ -5,9 +5,7 @@ libutils_a_SOURCES =	dot_file/dot_file.c dot_file/dot_file.h \
 						printers/printers.c printers/printers.h \
 						strings/strings.c strings/strings.h \
 						memory/memory.c memory/memory.h \
-						hash_map/hash_map.c hash_map/hash_map.h \
-						hash_map/hash_map_setup.c hash_map/hash_map_setup.h \
-						hash_map/hash_map_use.c \
+						hash_map/hash_map_setup.c hash_map/hash_map_use.c hash_map/hash_map.h \
 						assignment_words/assignment_words.c assignment_words/assignment_words.h \
 						variables/variables.c variables/variables.h
 

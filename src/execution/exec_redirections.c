@@ -5,9 +5,8 @@
 #include "exec.h"
 
 /// > as well as >| redirections
-static int
-eval_redirection_GREAT(struct ast *ast,
-                       struct hash_map *gv_hash_map) // TODO: Check returns code
+static int eval_redirection_GREAT(struct ast *ast,
+                                  struct mem *mem) // TODO: Check returns code
 {
     // assert(ast->type == AST_REDIRECTION);
     struct ast_redirection *ast_redir = (struct ast_redirection *)ast;
@@ -34,7 +33,7 @@ eval_redirection_GREAT(struct ast *ast,
     int ret_val = EXIT_SUCCESS; // Here
     if (ast_redir->next != NULL)
     {
-        ret_val = eval_ast(ast_redir->next, gv_hash_map);
+        ret_val = eval_ast(ast_redir->next, mem);
     }
 
     fflush(NULL);
@@ -47,9 +46,9 @@ eval_redirection_GREAT(struct ast *ast,
 }
 
 /// >& redirection
-static int eval_redirection_GREATAND(
-    struct ast *ast,
-    struct hash_map *gv_hash_map) // TODO: Check returns code
+static int
+eval_redirection_GREATAND(struct ast *ast,
+                          struct mem *mem) // TODO: Check returns code
 {
     // assert(ast->type == AST_REDIRECTION);
     struct ast_redirection *ast_redir = (struct ast_redirection *)ast;
@@ -60,7 +59,7 @@ static int eval_redirection_GREATAND(
     if (!strcmp(ast_redir->target, "-"))
     {
         close(ast_redir->ionumber);
-        return eval_ast(ast_redir->next, gv_hash_map);
+        return eval_ast(ast_redir->next, mem);
     }
     int fd = atoi(ast_redir->target);
 
@@ -77,7 +76,7 @@ static int eval_redirection_GREATAND(
     int ret_val = EXIT_SUCCESS; // Here
     if (ast_redir->next != NULL)
     {
-        ret_val = eval_ast(ast_redir->next, gv_hash_map);
+        ret_val = eval_ast(ast_redir->next, mem);
     }
 
     fflush(NULL);
@@ -90,9 +89,9 @@ static int eval_redirection_GREATAND(
 }
 
 /// <> redirection
-static int eval_redirection_LESSGREAT(
-    struct ast *ast,
-    struct hash_map *gv_hash_map) // TODO: Check returns code
+static int
+eval_redirection_LESSGREAT(struct ast *ast,
+                           struct mem *mem) // TODO: Check returns code
 {
     // assert(ast->type == AST_REDIRECTION);
     struct ast_redirection *ast_redir = (struct ast_redirection *)ast;
@@ -119,7 +118,7 @@ static int eval_redirection_LESSGREAT(
     int ret_val = EXIT_SUCCESS; // Here
     if (ast_redir->next != NULL)
     {
-        ret_val = eval_ast(ast_redir->next, gv_hash_map);
+        ret_val = eval_ast(ast_redir->next, mem);
     }
 
     fflush(NULL);
@@ -132,9 +131,8 @@ static int eval_redirection_LESSGREAT(
 }
 
 /// < redirection
-static int
-eval_redirection_LESS(struct ast *ast,
-                      struct hash_map *gv_hash_map) // TODO: Check returns code
+static int eval_redirection_LESS(struct ast *ast,
+                                 struct mem *mem) // TODO: Check returns code
 {
     // assert(ast->type == AST_REDIRECTION);
     struct ast_redirection *ast_redir = (struct ast_redirection *)ast;
@@ -161,7 +159,7 @@ eval_redirection_LESS(struct ast *ast,
     int ret_val = EXIT_SUCCESS; // Here
     if (ast_redir->next != NULL)
     {
-        ret_val = eval_ast(ast_redir->next, gv_hash_map);
+        ret_val = eval_ast(ast_redir->next, mem);
     }
 
     fflush(NULL);
@@ -174,9 +172,8 @@ eval_redirection_LESS(struct ast *ast,
 }
 
 /// <& redirection
-static int eval_redirection_LESSAND(
-    struct ast *ast,
-    struct hash_map *gv_hash_map) // TODO: Check returns code
+static int eval_redirection_LESSAND(struct ast *ast,
+                                    struct mem *mem) // TODO: Check returns code
 {
     // assert(ast->type == AST_REDIRECTION);
     struct ast_redirection *ast_redir = (struct ast_redirection *)ast;
@@ -185,7 +182,7 @@ static int eval_redirection_LESSAND(
     if (!strcmp(ast_redir->target, "-"))
     {
         close(ast_redir->ionumber);
-        return eval_ast(ast_redir->next, gv_hash_map);
+        return eval_ast(ast_redir->next, mem);
     }
     int fd = atoi(ast_redir->target);
 
@@ -203,7 +200,7 @@ static int eval_redirection_LESSAND(
     int ret_val = EXIT_SUCCESS; // Here
     if (ast_redir->next != NULL)
     {
-        ret_val = eval_ast(ast_redir->next, gv_hash_map);
+        ret_val = eval_ast(ast_redir->next, mem);
     }
 
     fflush(NULL);
@@ -216,9 +213,8 @@ static int eval_redirection_LESSAND(
 }
 
 /// >> redirection
-static int eval_redirection_DGREAT(
-    struct ast *ast,
-    struct hash_map *gv_hash_map) // TODO: Check returns code
+static int eval_redirection_DGREAT(struct ast *ast,
+                                   struct mem *mem) // TODO: Check returns code
 {
     // assert(ast->type == AST_REDIRECTION);
     struct ast_redirection *ast_redir = (struct ast_redirection *)ast;
@@ -245,7 +241,7 @@ static int eval_redirection_DGREAT(
     int ret_val = EXIT_SUCCESS; // Here
     if (ast_redir->next != NULL)
     {
-        ret_val = eval_ast(ast_redir->next, gv_hash_map);
+        ret_val = eval_ast(ast_redir->next, mem);
     }
 
     fflush(NULL);
@@ -258,8 +254,8 @@ static int eval_redirection_DGREAT(
 }
 
 // Should be at the end of the file
-typedef int (*eval_type)(struct ast *ast, struct hash_map *gv_hash_map);
-int eval_redirection(struct ast *ast, struct hash_map *gv_hash_map)
+typedef int (*eval_type)(struct ast *ast, struct mem *mem);
+int eval_redirection(struct ast *ast, struct mem *mem)
 {
     if (!ast)
     {
@@ -276,6 +272,6 @@ int eval_redirection(struct ast *ast, struct hash_map *gv_hash_map)
         [REDIR_LESSAND] = &eval_redirection_LESSAND,
     };
 
-    return (*functions[((struct ast_redirection *)ast)->redirection_type])(
-        ast, gv_hash_map);
+    return (*functions[((struct ast_redirection *)ast)->redirection_type])(ast,
+                                                                           mem);
 }

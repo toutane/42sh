@@ -1,16 +1,17 @@
 #ifndef MEMORY_H
 #define MEMORY_H
 
+#include "ast/ast.h"
 #include "utils/hash_map/hash_map.h"
 
-struct hash_map *memory_new(void);
+struct mem
+{
+    struct hm *hm_var;
+    struct hm *hm_fun;
+};
 
-void memory_free(struct hash_map *memory);
+struct mem *mem_new(void);
 
-char **memory_get(struct hash_map *memory, char *key);
-
-void memory_set(struct hash_map *memory, char *key, char **value);
-
-void memory_print(struct hash_map *memory);
+void mem_free(struct mem *mem);
 
 #endif /* ! MEMORY_H */

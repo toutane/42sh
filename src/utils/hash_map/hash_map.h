@@ -3,22 +3,6 @@
 
 #include <stddef.h>
 
-#include "utils/hash_map/hash_map_setup.h"
-
-int hash_map_contains(const struct hash_map *hash_map, char *key);
-
-char **hash_map_get(const struct hash_map *hash_map, char *key);
-
-void hash_map_insert(struct hash_map *hash_map, char *key, char **value);
-
-void hash_map_update(struct hash_map *hash_map, char *key, char **value);
-
-void hash_map_map(struct hash_map *hash_map, void (*f)(char *, char **));
-
-void hash_map_print(struct hash_map *hash_map);
-
-/* ==============NEW=STUFF=============== */
-
 typedef void (*data_free_type)(void *);
 
 enum hm_type
@@ -42,6 +26,8 @@ struct hm
     struct pl **pairs;
 };
 
+size_t hash(const char *key);
+
 struct hm *hm_new(enum hm_type type, size_t size, data_free_type data_free);
 
 void hm_free(struct hm *hm);
@@ -49,7 +35,5 @@ void hm_free(struct hm *hm);
 void *hm_get(struct hm *hm, const char *key);
 
 void hm_set_var(struct hm *hm, const char *key, const char *value);
-
-/* ==============NEW=STUFF=============== */
 
 #endif /* ! HASH_MAP_H */

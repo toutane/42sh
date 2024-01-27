@@ -5,7 +5,7 @@ void free_all(struct to_be_freed *to_be_freed)
     ast_free(to_be_freed->ast);
     lexer_free(to_be_freed->lexer);
     stream_free(to_be_freed->stream);
-    memory_free(to_be_freed->gv_hash_map);
+    mem_free(to_be_freed->mem);
     return;
 }
 

@@ -2,8 +2,6 @@
 
 #include <stdio.h>
 
-#include "hash_map/hash_map_setup.h"
-
 #define PRINT_OPTIONS(str)                                                     \
     printf("  " #str ": %s\n", opts->str ? "active" : "inactive")
 

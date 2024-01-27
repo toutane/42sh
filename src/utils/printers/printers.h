@@ -3,7 +3,7 @@
 
 #include "ast/ast.h"
 #include "options/opt_parser.h"
-#include "utils/hash_map/hash_map_setup.h"
+#include "utils/hash_map/hash_map.h"
 
 /*
  * @brief Prints set options (called when verbose mode is enabled)

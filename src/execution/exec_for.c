@@ -7,15 +7,16 @@
 #include "exec.h"
 #include "utils/memory/memory.h"
 #include "utils/strings/strings.h"
+#include "utils/variables/variables.h"
 
-int eval_for(struct ast *ast, struct hash_map *gv_hash_map)
+int eval_for(struct ast *ast, struct mem *mem)
 {
     int status = 0;
     struct ast_for *ast_for = (struct ast_for *)ast;
     if (!ast_for)
         return 0;
 
-    // check error
+    // Ccheck error
     if (!is_name(ast_for->condition))
     {
         fprintf(stderr, "42sh: %s: not a valid identifier\n",
@@ -23,24 +24,25 @@ int eval_for(struct ast *ast, struct hash_map *gv_hash_map)
         return 1;
     }
 
-    // expand the array of value
+    /* Expand the array of value. This correspond to the list of value
+     * that will be assigned to the variable in the for loop,
+     * ex: for i in 1 2 3 4 5, the array will be [1, 2, 3, 4, 5]. */
     int expanded_array_size = ast_for->array_size;
     char **expanded_array =
-        argv_expansions(ast_for->array, &expanded_array_size, gv_hash_map);
+        argv_expansions(ast_for->array, &expanded_array_size, mem->hm_var);
 
-    // eval the ast loop
+    // Eval the ast loop
     for (int i = 0; i < expanded_array_size; ++i)
     {
-        // set condition in memory
-        char **value_array = calloc(2, sizeof(char *));
-        value_array[0] = strdup(expanded_array[i]);
-        memory_set(gv_hash_map, strdup(ast_for->condition), value_array);
+        /* Assign variable for loop, the variable is stored in the internal
+         * variable hashmap. */
+        assign_variable(ast_for->condition, expanded_array[i], mem->hm_var);
 
-        // evaluation of for loop ast
-        status = eval_ast(ast_for->data, gv_hash_map);
+        // Evaluation of for loop ast
+        status = eval_ast(ast_for->data, mem);
     }
 
-    // free expanded array
+    // Free expanded array
     for (int j = 0; j < expanded_array_size; j++)
     {
         free(expanded_array[j]);

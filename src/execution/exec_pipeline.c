@@ -1,6 +1,6 @@
 #include "exec.h"
 
-int eval_pipeline(struct ast *ast, struct hash_map *gv_hash_map)
+int eval_pipeline(struct ast *ast, struct mem *mem)
 {
     struct ast_pipeline *ast_pipeline = (struct ast_pipeline *)ast;
     int fds[2];
@@ -30,7 +30,7 @@ int eval_pipeline(struct ast *ast, struct hash_map *gv_hash_map)
             exit(127);
         }
 
-        int res = eval_ast(ast_pipeline->left, gv_hash_map);
+        int res = eval_ast(ast_pipeline->left, mem);
         close(fds[1]);
         exit(res);
     }
@@ -59,7 +59,7 @@ int eval_pipeline(struct ast *ast, struct hash_map *gv_hash_map)
                 exit(127);
             }
 
-            int res = eval_ast(ast_pipeline->right, gv_hash_map);
+            int res = eval_ast(ast_pipeline->right, mem);
             close(fds[0]);
             exit(res);
         }

@@ -57,7 +57,7 @@ void hm_set_var(struct hm *hm, const char *key, const char *value)
         }
 
         hm->data_free(cur->data);
-        cur->data = strdup(value);
+        cur->data = value ? strdup(value) : NULL;
     }
     else
     {
