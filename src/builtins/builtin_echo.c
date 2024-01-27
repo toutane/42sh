@@ -95,8 +95,13 @@ void interpret_print(char *str)
  * -E: disable interpretation of backslash escapes (default)
  *  Return 0 on success, -1 on error
  */
-int builtin_echo(int argc, char *argv[])
+int builtin_echo(int argc, char *argv[], struct mem *mem)
 {
+    if (mem == NULL)
+    {
+        _exit(EXIT_FAILURE);
+    }
+
     int nflag = 0;
     int interpret = 0;
 
