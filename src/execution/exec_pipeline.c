@@ -27,12 +27,12 @@ int eval_pipeline(struct ast *ast, struct hash_map *gv_hash_map)
         if (dup2(fds[1], STDOUT_FILENO) == -1)
         {
             fprintf(stderr, "42sh: dup2 failed on writing\n");
-            exit(127);
+            _exit(127);
         }
 
         int res = eval_ast(ast_pipeline->left, gv_hash_map);
         close(fds[1]);
-        exit(res);
+        _exit(res);
     }
     // parent process
     else
@@ -56,12 +56,12 @@ int eval_pipeline(struct ast *ast, struct hash_map *gv_hash_map)
             if (dup2(fds[0], STDIN_FILENO) == -1)
             {
                 fprintf(stderr, "42sh: dup2 failed on reading\n");
-                exit(127);
+                _exit(127);
             }
 
             int res = eval_ast(ast_pipeline->right, gv_hash_map);
             close(fds[0]);
-            exit(res);
+            _exit(res);
         }
         // parent part 2
         else

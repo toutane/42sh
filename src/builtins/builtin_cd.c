@@ -1,7 +1,6 @@
 #define _XOPEN_SOURCE 500
 
 #include <dirent.h>
-#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
@@ -46,6 +45,7 @@ static int rule_10(struct hash_map *memory)
     memory_set(memory, strdup("PWD"), tab);
 
     free(curpath);
+    curpath = NULL;
     return 0;
 }
 
@@ -197,6 +197,18 @@ int builtin_cd(int argc, char *argv[], struct hash_map *memory)
     else
     {
         arg = argv[1];
+        char **tmp = memory_get(memory, "OLDPWD");
+        if (strlen(arg) == 1 && arg[0] == '-' && tmp)
+        {
+            char **argv2 = calloc(2, sizeof(char *));
+            argv2[0] = argv[0];
+            argv2[1] = tmp[0];
+            int res = builtin_cd(argc, argv2, memory);
+            free(argv2);
+            tmp = memory_get(memory, "PWD");
+            printf("%s\n", tmp[0]);
+            return res;
+        }
     }
 
     if (arg[0] == '/')
