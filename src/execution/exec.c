@@ -1,28 +1,5 @@
 #include "exec.h"
 
-static int break_number = 0;
-static int continue_number = 0;
-
-void set_break_number(int new_val)
-{
-    break_number = new_val;
-}
-
-void set_continue_number(int new_val)
-{
-    continue_number = new_val;
-}
-
-int get_break_number(void)
-{
-    return break_number;
-}
-
-int get_continue_number(void)
-{
-    return continue_number;
-}
-
 typedef int (*eval_type)(struct ast *ast, struct hash_map *gv_hash_map);
 
 int eval_ast(struct ast *ast, struct hash_map *gv_hash_map)
@@ -65,6 +42,7 @@ int execution_loop(struct options *opts, struct stream_info *stream,
     while (lexer_peek(lexer).type != TOKEN_EOF)
     {
         set_break_number(0);
+        set_continue_number(0);
 
         // Create a new AST
         struct ast *ast = NULL;
