@@ -1,6 +1,9 @@
 #define _XOPEN_SOURCE 500
 #define _POSIX_C_SOURCE 200112L
 
+#define PATH_MAX 4096
+
+#include <unistd.h>
 #include <dirent.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,6 +12,7 @@
 #include "builtins.h"
 
 static char *curpath = NULL;
+static char *pwd = NULL;
 
 static void set_curpath(char *str)
 {
@@ -31,17 +35,18 @@ static int rule_10(void)
         return 1;
     }
 
-    char *pwd = getenv("PWD");
     if (!pwd)
     {
         fprintf(stderr, "42sh: cd: Error getting PWD\n");
         exit(1);
     }
-    setenv("OLDPWD", pwd, 1);
 
+    setenv("OLDPWD", pwd, 1);
     setenv("PWD", curpath, 1);
 
     free(curpath);
+    free(pwd);
+    pwd = NULL;
     curpath = NULL;
 
     return 0;
@@ -60,7 +65,6 @@ static int rule_8(void)
 
 static int rule_7(void)
 {
-    char *pwd = getenv("PWD");
     if (!pwd)
     {
         fprintf(stderr, "42sh: cd: PWD not existing\n");
@@ -173,16 +177,19 @@ static int rule_5(char *arg)
         next_path =
             (strchr(seek, ':') ? strchr(seek, ':') : strchr(seek, '\0'));
     }
+
     return rule_6(arg);
 }
 
 int builtin_cd(int argc, char *argv[])
 {
     char *home = getenv("HOME");
+    pwd = getcwd(NULL, PATH_MAX);
 
     if (argc > 2)
     {
         fprintf(stderr, "42sh: cd: too many arguments\n");
+        free(pwd);
         return 1;
     }
 
@@ -194,6 +201,7 @@ int builtin_cd(int argc, char *argv[])
         {
             // if HOME is empty or undefined
             // Rule 1
+            free(pwd);
             return 0;
         }
         else
