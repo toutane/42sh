@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../ast/ast.h"
-#include "../execution/exec.h"
-#include "../utils/token/token.h"
+#include "ast/ast.h"
+#include "execution/exec.h"
+#include "utils/token/token.h"
 
 struct builtin_matchs
 {
@@ -55,5 +55,10 @@ int builtin_break(int argc, char *argv[]);
  * @brief break builtin
  */
 int builtin_continue(int argc, char *argv[]);
+
+/*
+ * @brief cd builtin
+ */
+int builtin_cd(int argc, char *argv[]);
 
 #endif /* ! BUILTINS_H */
