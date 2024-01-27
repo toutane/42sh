@@ -136,3 +136,33 @@ void hm_set_fun(struct hm *hm, const char *key, struct ast *ast)
         }
     }
 }
+
+void hm_remove(struct hm *hm, const char *key)
+{
+    if (hm == NULL || !hm_contains(hm, key))
+    {
+        return;
+    }
+
+    size_t index = hash(key) % hm->size;
+
+    struct pl *prev = hm->pairs[index];
+    struct pl *cur = hm->pairs[index];
+    while (cur != NULL && strcmp(cur->key, key) != 0)
+    {
+        prev = cur;
+        cur = cur->next;
+    }
+
+    if (cur != NULL)
+    {
+        struct pl *to_remove = cur;
+        if (prev != NULL)
+        {
+            prev->next = cur->next;
+        }
+
+        // Free old pair list
+        pl_free(to_remove, hm->data_free);
+    }
+}

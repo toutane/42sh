@@ -40,7 +40,7 @@ struct hm *hm_new(enum hm_type type, size_t size, data_free_type data_free)
     return new_hm;
 }
 
-static void pl_free(struct pl *pair, data_free_type data_free)
+void pl_free(struct pl *pair, data_free_type data_free)
 {
     if (pair == NULL)
     {
