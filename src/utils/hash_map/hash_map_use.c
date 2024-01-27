@@ -146,7 +146,7 @@ void hm_remove(struct hm *hm, const char *key)
 
     size_t index = hash(key) % hm->size;
 
-    struct pl *prev = hm->pairs[index];
+    struct pl *prev = NULL;
     struct pl *cur = hm->pairs[index];
     while (cur != NULL && strcmp(cur->key, key) != 0)
     {
@@ -164,5 +164,10 @@ void hm_remove(struct hm *hm, const char *key)
 
         // Free old pair list
         pl_free(to_remove, hm->data_free);
+
+        if (prev == NULL)
+        {
+            hm->pairs[index] = NULL;
+        }
     }
 }
