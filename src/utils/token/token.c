@@ -21,6 +21,8 @@ static struct token_map_int word_map[] = {
     { "elif", TOKEN_ELIF },
     { "fi", TOKEN_FI },
     { "!", TOKEN_NEG },
+    { "{", TOKEN_LBRACE },
+    { "}", TOKEN_RBRACE },
     { "for", TOKEN_FOR },
     { "in", TOKEN_IN },
     { "while", TOKEN_WHILE },
@@ -89,6 +91,8 @@ static struct token_map_str token_map[] = {
     { TOKEN_ELIF, "TOKEN_ELIF" },
     { TOKEN_FI, "TOKEN_FI" },
     { TOKEN_NEG, "TOKEN_NEG" },
+    { TOKEN_LBRACE, "TOKEN_LBRACE" },
+    { TOKEN_RBRACE, "TOKEN_RBRACE" },
     { TOKEN_FOR, "TOKEN_FOR" },
     { TOKEN_IN, "TOKEN_IN" },
     { TOKEN_WHILE, "TOKEN_WHILE" },
@@ -133,8 +137,9 @@ int is_reserved_word(struct token token)
     enum token_type type = token.type;
     return type == TOKEN_IF || type == TOKEN_THEN || type == TOKEN_ELSE
         || type == TOKEN_ELIF || type == TOKEN_FI || type == TOKEN_NEG
-        || type == TOKEN_FOR || type == TOKEN_IN || type == TOKEN_WHILE
-        || type == TOKEN_UNTIL || type == TOKEN_DO || type == TOKEN_DONE;
+        || type == TOKEN_LBRACE || type == TOKEN_RBRACE || type == TOKEN_FOR
+        || type == TOKEN_IN || type == TOKEN_WHILE || type == TOKEN_UNTIL
+        || type == TOKEN_DO || type == TOKEN_DONE;
 }
 
 int can_be_first_in_ope(char c)
