@@ -1,8 +1,8 @@
 #include "exec.h"
 
-typedef int (*eval_type)(struct ast *ast, struct hash_map *gv_hash_map);
+typedef int (*eval_type)(struct ast *ast, struct mem *mem);
 
-int eval_ast(struct ast *ast, struct hash_map *gv_hash_map)
+int eval_ast(struct ast *ast, struct mem *mem)
 {
     if (!ast)
     {
@@ -10,7 +10,7 @@ int eval_ast(struct ast *ast, struct hash_map *gv_hash_map)
     }
 
     static const eval_type functions[] = {
-        [AST_SIMPLE_COMMAND] = &eval_simple_command,
+        [AST_SIMPLE_COMMAND] = eval_simple_command,
         [AST_COMMAND_LIST] = &eval_list,
         [AST_CONDITION] = &eval_condition,
         [AST_PIPELINE] = &eval_pipeline,
@@ -23,14 +23,14 @@ int eval_ast(struct ast *ast, struct hash_map *gv_hash_map)
         [AST_OR] = &eval_or,
     };
 
-    return (*functions[ast->type])(ast, gv_hash_map);
+    return (*functions[ast->type])(ast, mem);
 }
 
 int execution_loop(struct options *opts, struct stream_info *stream,
-                   struct hash_map *gv_hash_map)
+                   struct mem *mem)
 {
     struct to_be_freed to_be_freed = {
-        .ast = NULL, .lexer = NULL, .stream = stream, .gv_hash_map = gv_hash_map
+        .ast = NULL, .lexer = NULL, .stream = stream, .mem = mem
     };
 
     int status = 0;
@@ -77,7 +77,7 @@ int execution_loop(struct options *opts, struct stream_info *stream,
         }
 
         // Evaluate the AST
-        status = eval_ast(ast, gv_hash_map);
+        status = eval_ast(ast, mem);
 
         // Free the AST
         ast_free(ast);

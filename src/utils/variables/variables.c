@@ -10,7 +10,7 @@
 
 #include "expansion/special_variables.h"
 
-static char *get_key_from_assignment_word(char *assignment_word)
+char *get_key_from_assignment_word(char *assignment_word)
 {
     char *key = NULL;
 
@@ -26,7 +26,7 @@ static char *get_key_from_assignment_word(char *assignment_word)
     return key;
 }
 
-static char *get_value_from_assignment_word(char *assignment_word)
+char *get_value_from_assignment_word(char *assignment_word)
 {
     char *value = NULL;
 
@@ -43,6 +43,36 @@ static char *get_value_from_assignment_word(char *assignment_word)
     return value;
 }
 
+/*
+void set_default_variables(int argc, char **argv, struct hash_map *memory)
+{
+    // Seed the random number generator
+    srand((unsigned int)time(NULL));
+
+    // fill_at_sign_var(argc, argv, memory);
+    //fill_arguments_var(argc, argv, memory);
+    // fill_star_sign_var(argc, argv, memory);
+    //fill_dollar_var(memory);
+    //fill_arguments_amount(argc, memory);
+    //set_uid_env_var(memory);
+    //fill_random(memory);
+
+    //set_pwd(memory);
+    //set_oldpwd(memory);
+    //set_ifs(memory);
+}
+*/
+
+static void update_env_var(const char *key, const char *value)
+{
+    int status = setenv(key, value, 1);
+    if (status != 0)
+    {
+        fprintf(stderr, "42sh: update_env_var: fail to setenv\n");
+        return;
+    }
+}
+
 /* Set a variable from an assignment word.
  * The variable is set in the given memory space.
  * An assignment_word takes the following form: <name>=<word>
@@ -50,87 +80,144 @@ static char *get_value_from_assignment_word(char *assignment_word)
  * This function handles the logic of checking if the variable already exists,
  * in this case, the value of the variable is updated.  */
 
-void set_var_from_assignment_word(struct hash_map *memory,
-                                  char *assignment_word_str)
+void assign_variable_from_ass_word(char *assignment_word, struct hm *hm)
 {
-    if (memory == NULL || assignment_word_str == NULL)
-    {
-        return;
-    }
+    char *key = get_key_from_assignment_word(assignment_word);
+    char *value = get_value_from_assignment_word(assignment_word);
 
-    char *key = get_key_from_assignment_word(assignment_word_str);
-    char *value = get_value_from_assignment_word(assignment_word_str);
+    assign_variable(key, value, hm);
 
-    /* Because memory stores variables as arrays of strings (null terminated),
-     * we need to convert the value into an array of strings. */
-
-    // Allocate memory for the array of strings
-    char **value_array = calloc(2, sizeof(char *));
-    value_array[0] = value;
-
-    memory_set(memory, key, value_array);
-
-    return;
+    free(key);
+    free(value);
 }
 
-static void setenv_from_var(char *key, char **value)
+void assign_variable(char *key, char *value, struct hm *hm)
 {
     if (key == NULL || value == NULL)
     {
         return;
     }
 
-    if (setenv(key, value[0], 1))
+    // Check if the variable is exported (so in the environment)
+    int is_exported = getenv(key) != NULL;
+
+    if (is_exported)
     {
-        fprintf(stderr, "42sh: setenv: %s\n", strerror(errno));
-        exit(EXIT_FAILURE);
+        // We must update the environment with the new value of the variable
+        update_env_var(key, value);
+    }
+    else
+    {
+        // Variable isn't exported, we must update the shell internal variables
+        hm_set_var(hm, key, value);
     }
 }
 
-void setenv_from_memory(struct hash_map *memory)
+char *get_variable(char *key, struct hm *hm)
 {
-    hash_map_map(memory, setenv_from_var);
+    if (key == NULL || hm == NULL)
+    {
+        return NULL;
+    }
+
+    char *value = NULL;
+
+    // Check if the variable is exported (so in the environment)
+    int is_exported = getenv(key) != NULL;
+
+    if (is_exported)
+    {
+        // We must update the environment with the new value of the variable
+        value = getenv(key);
+    }
+    else
+    {
+        // Variable isn't exported, we must update the shell internal variables
+        value = hm_get(hm, key);
+    }
+
+    return value;
 }
 
-static void unsetenv_from_var(char *key, char **value)
+void setenv_from_hm(struct hm *hm)
 {
-    if (key == NULL || value == NULL)
+    if (hm == NULL)
     {
         return;
     }
 
-    if (unsetenv(key))
+    for (size_t i = 0; i < hm->size; i++)
     {
-        fprintf(stderr, "42sh: unsetenv: %s\n", strerror(errno));
-        exit(EXIT_FAILURE);
+        struct pl *cur = hm->pairs[i];
+        while (cur)
+        {
+            setenv(cur->key, cur->data, 1);
+            cur = cur->next;
+        }
     }
 }
 
-void unsetenv_from_memory(struct hash_map *memory)
+void save_env(struct hm *hm_prefixes)
 {
-    hash_map_map(memory, unsetenv_from_var);
+    if (hm_prefixes == NULL)
+    {
+        return;
+    }
+
+    for (size_t i = 0; i < hm_prefixes->size; i++)
+    {
+        struct pl *cur = hm_prefixes->pairs[i];
+        while (cur)
+        {
+            /* If the value of the prefix is already in the environment,
+             * we change it, and save the original env value into the
+             * prefixes hash_map. Its like a swap */
+
+            char *env_value = getenv(cur->key);
+            if (env_value != NULL)
+            {
+                setenv(cur->key, cur->data, 1);
+                hm_set_var(hm_prefixes, cur->key, env_value);
+            }
+            else
+            {
+                setenv(cur->key, cur->data, 1);
+                hm_set_var(hm_prefixes, cur->key, NULL);
+            }
+
+            cur = cur->next;
+        }
+    }
 }
 
-void set_default_variables(int argc, char **argv, struct hash_map *memory)
+void restore_env(struct hm *hm_prefixes)
 {
-    // Seed the random number generator
-    srand((unsigned int)time(NULL));
+    if (hm_prefixes == NULL)
+    {
+        return;
+    }
 
-    /* Add special variables to shell memory:
-     * $@, $*, $1...n, $$, $# */
+    for (size_t i = 0; i < hm_prefixes->size; i++)
+    {
+        struct pl *cur = hm_prefixes->pairs[i];
+        while (cur)
+        {
+            /* We restore the shell env with the value contained in the
+             * hm_prefixes, which are the original environment variables before
+             * the execution of the builtin. If the var is null in hm_prefixes,
+             * that means that the variable was not in the original env, so, we
+             * remove it from the env. */
 
-    // fill_at_sign_var(argc, argv, memory);
-    fill_arguments_var(argc, argv, memory);
-    // fill_star_sign_var(argc, argv, memory);
-    fill_dollar_var(memory);
-    fill_arguments_amount(argc, memory);
-    set_uid_env_var(memory);
-    fill_random(memory);
+            if (cur->data != NULL)
+            {
+                setenv(cur->key, cur->data, 1);
+            }
+            else
+            {
+                unsetenv(cur->key);
+            }
 
-    /* Add environment variables to shell memory:
-     * PWD, OLDPWD, IFS */
-
-    set_pwd(memory);
-    set_oldpwd(memory);
-    set_ifs(memory);
+            cur = cur->next;
+        }
+    }
 }

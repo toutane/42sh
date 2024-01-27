@@ -1,6 +1,7 @@
-#include "hash_map_setup.h"
-
+#include <stdio.h>
 #include <stdlib.h>
+
+#include "utils/hash_map/hash_map.h"
 
 size_t hash(const char *key)
 {
@@ -16,73 +17,63 @@ size_t hash(const char *key)
     return hash;
 }
 
-struct hash_map *hash_map_new(size_t size)
+struct hm *hm_new(enum hm_type type, size_t size, data_free_type data_free)
 {
-    struct hash_map *new_hash_map = calloc(1, sizeof(struct hash_map));
-    if (new_hash_map == NULL)
+    struct hm *new_hm = calloc(1, sizeof(struct hm));
+    if (new_hm == NULL)
     {
-        return NULL;
+        fprintf(stderr, "42sh: hm_new: fail to calloc hash_map\n");
+        exit(EXIT_FAILURE);
     }
 
-    new_hash_map->size = size;
-    new_hash_map->data = calloc(size, sizeof(struct pair_list *));
-    return new_hash_map;
+    new_hm->type = type;
+    new_hm->size = size;
+    new_hm->data_free = data_free;
+
+    new_hm->pairs = calloc(size, sizeof(struct pl *));
+    if (new_hm->pairs == NULL)
+    {
+        fprintf(stderr, "42sh: hm_new: fail to calloc pairs\n");
+        exit(EXIT_FAILURE);
+    }
+
+    return new_hm;
 }
 
-static void pair_list_free(struct pair_list *pair_list)
+static void pl_free(struct pl *pair, data_free_type data_free)
 {
-    if (pair_list == NULL)
+    if (pair == NULL)
     {
         return;
     }
 
-    free(pair_list->key);
+    pl_free(pair->next, data_free);
 
-    size_t i = 0;
-    while (pair_list->value[i] != NULL)
-    {
-        free(pair_list->value[i]);
-        i++;
-    }
+    data_free(pair->data);
 
-    free(pair_list->value);
-    free(pair_list);
-    return;
+    free(pair->key);
+
+    free(pair);
 }
 
-static void chained_pair_lists_free(struct pair_list *pair_list)
+void hm_free(struct hm *hm)
 {
-    if (pair_list == NULL)
+    if (hm == NULL)
     {
         return;
     }
 
-    struct pair_list *next = pair_list->next;
-    pair_list_free(pair_list);
-
-    while (next)
+    if (hm->pairs != NULL)
     {
-        pair_list = next;
-        next = pair_list->next;
-        pair_list_free(pair_list);
+        // Free each pairs of the array
+        for (size_t i = 0; i < hm->size; i++)
+        {
+            pl_free(hm->pairs[i], hm->data_free);
+        }
+
+        // Free the array
+        free(hm->pairs);
     }
 
-    return;
-}
-
-void hash_map_free(struct hash_map *hash_map)
-{
-    if (hash_map == NULL)
-    {
-        return;
-    }
-
-    for (size_t i = 0; i < hash_map->size; i++)
-    {
-        chained_pair_lists_free(hash_map->data[i]);
-    }
-
-    free(hash_map->data);
-    free(hash_map);
-    return;
+    free(hm);
 }

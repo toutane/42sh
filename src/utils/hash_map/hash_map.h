@@ -3,18 +3,37 @@
 
 #include <stddef.h>
 
-#include "../../utils/hash_map/hash_map_setup.h"
+typedef void (*data_free_type)(void *);
 
-int hash_map_contains(const struct hash_map *hash_map, char *key);
+enum hm_type
+{
+    HM_VARIABLE,
+    HM_FUNCTION,
+};
 
-char **hash_map_get(const struct hash_map *hash_map, char *key);
+struct pl
+{
+    char *key;
+    void *data;
+    struct pl *next;
+};
 
-void hash_map_insert(struct hash_map *hash_map, char *key, char **value);
+struct hm
+{
+    enum hm_type type;
+    size_t size;
+    data_free_type data_free;
+    struct pl **pairs;
+};
 
-void hash_map_update(struct hash_map *hash_map, char *key, char **value);
+size_t hash(const char *key);
 
-void hash_map_map(struct hash_map *hash_map, void (*f)(char *, char **));
+struct hm *hm_new(enum hm_type type, size_t size, data_free_type data_free);
 
-void hash_map_print(struct hash_map *hash_map);
+void hm_free(struct hm *hm);
+
+void *hm_get(struct hm *hm, const char *key);
+
+void hm_set_var(struct hm *hm, const char *key, const char *value);
 
 #endif /* ! HASH_MAP_H */

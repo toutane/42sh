@@ -99,8 +99,7 @@ static void handle_double_quote(char **str, struct stream_info *stream,
     stream_pop(stream);
 }
 
-static void expand_variable(char **str, char *expression,
-                            struct hash_map *gv_hash_map)
+static void expand_variable(char **str, char *expression, struct hm *hm_var)
 {
     if (expression == NULL)
     {
@@ -111,7 +110,7 @@ static void expand_variable(char **str, char *expression,
     {
         /* If the expression is RANDOM, we generate a random number between 0
          * and 32767 and we update the memory with the new value. */
-        fill_random(gv_hash_map);
+        // fill_random(gv_hash_map);
     }
 
     /* Once the expression is created and filled properly, we look for the value
@@ -119,7 +118,8 @@ static void expand_variable(char **str, char *expression,
      * found, we set the value to the empty
      * string. Then, we append the value to the token_word string back. */
 
-    char **value = memory_get(gv_hash_map, expression);
+    // char **value = memory_get(gv_hash_map, expression);
+    char *value = get_variable(expression, hm_var);
 
     if (value == NULL)
     {
@@ -127,6 +127,7 @@ static void expand_variable(char **str, char *expression,
         return;
     }
 
+    /*
     size_t i = 0;
     while (value[i] != NULL)
     {
@@ -143,13 +144,15 @@ static void expand_variable(char **str, char *expression,
         }
         i++;
     }
+    */
+    // hm_print(hm_var);
+    my_strcat(str, value);
 
     free(expression);
 }
 
 static void param_expansion(char **str, struct stream_info *stream,
-                            enum QUOTING_CONTEXT *context,
-                            struct hash_map *gv_hash_map)
+                            enum QUOTING_CONTEXT *context, struct hm *hm_var)
 {
     if (*context == SINGLE_QUOTE)
     {
@@ -234,11 +237,11 @@ static void param_expansion(char **str, struct stream_info *stream,
         }
     }
 
-    expand_variable(str, expression, gv_hash_map);
+    expand_variable(str, expression, hm_var);
 }
 
 static void expand_loop(struct stream_info *stream, char **str,
-                        struct hash_map *gv_hash_map)
+                        struct hm *hm_var)
 {
     enum QUOTING_CONTEXT context = NONE;
 
@@ -270,7 +273,7 @@ static void expand_loop(struct stream_info *stream, char **str,
 
         if (cur_char == '$')
         {
-            param_expansion(str, stream, &context, gv_hash_map);
+            param_expansion(str, stream, &context, hm_var);
             continue;
         }
 
@@ -284,7 +287,7 @@ static void expand_loop(struct stream_info *stream, char **str,
     }
 }
 
-char *expand_string(char **str, struct hash_map *gv_hash_map)
+char *expand_string(char **str, struct hm *hm_var)
 {
     if (*str == NULL)
     {
@@ -300,7 +303,7 @@ char *expand_string(char **str, struct hash_map *gv_hash_map)
         return NULL;
     }
 
-    expand_loop(stream, &expanded_str, gv_hash_map);
+    expand_loop(stream, &expanded_str, hm_var);
 
     stream_free(stream);
     // free(*str);
@@ -340,8 +343,7 @@ static char **field_split(char **expanded_argv, int *expanded_argc,
 }
 
 static char **word_expansions(char **expanded_argv, int *expanded_argc,
-                              struct stream_info *stream,
-                              struct hash_map *memory)
+                              struct stream_info *stream, struct hm *hm_var)
 {
     char *temp_str = NULL;
 
@@ -380,7 +382,7 @@ static char **word_expansions(char **expanded_argv, int *expanded_argc,
 
         if (cur_char == '$')
         {
-            param_expansion(&temp_str, stream, &context, memory);
+            param_expansion(&temp_str, stream, &context, hm_var);
 
             if (context == NONE)
             {
@@ -413,7 +415,7 @@ static char **word_expansions(char **expanded_argv, int *expanded_argc,
     return expanded_argv;
 }
 
-char **argv_expansions(char **original_argv, int *argc, struct hash_map *memory)
+char **argv_expansions(char **original_argv, int *argc, struct hm *hm_var)
 {
     int expanded_argc = 0;
     char **expanded_argv = calloc(expanded_argc + 1, sizeof(char *));
@@ -430,7 +432,7 @@ char **argv_expansions(char **original_argv, int *argc, struct hash_map *memory)
         }
 
         expanded_argv =
-            word_expansions(expanded_argv, &expanded_argc, stream, memory);
+            word_expansions(expanded_argv, &expanded_argc, stream, hm_var);
 
         stream_free(stream);
     }

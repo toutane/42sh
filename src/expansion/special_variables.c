@@ -10,6 +10,7 @@
 #include <time.h>
 #include <unistd.h>
 
+/*
 void fill_at_sign_var(int argc, char *argv[], struct hash_map *gv_hash_map)
 {
     int l = argc - optind;
@@ -118,7 +119,9 @@ void fill_arguments_amount(int argc, struct hash_map *gv_hash_map)
 
     hash_map_insert(gv_hash_map, key, arguments_array);
 }
+*/
 
+/*
 void fill_random(struct hash_map *memory)
 {
     int random_number = rand() % 32768;
@@ -219,3 +222,4 @@ void set_ifs(struct hash_map *memory)
 
     memory_set(memory, key, value_array);
 }
+*/

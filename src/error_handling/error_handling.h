@@ -20,7 +20,7 @@
 struct to_be_freed
 {
     struct ast *ast;
-    struct hash_map *gv_hash_map;
+    struct mem *mem;
     struct lexer *lexer;
     struct stream_info *stream;
 };

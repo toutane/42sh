@@ -25,31 +25,31 @@
  * executes it. It returns 0 if the execution was successful, an error code
  * otherwise. */
 int execution_loop(struct options *opts, struct stream_info *stream,
-                   struct hash_map *gv_hash_map);
+                   struct mem *mem);
 
-int eval_ast(struct ast *ast, struct hash_map *gv_hash_map);
+int eval_ast(struct ast *ast, struct mem *mem);
 
-int eval_simple_command(struct ast *ast, struct hash_map *gv_hash_map);
+int eval_simple_command(struct ast *ast, struct mem *mem);
 
-int eval_condition(struct ast *ast, struct hash_map *gv_hash_map);
+int eval_condition(struct ast *ast, struct mem *mem);
 
-int eval_list(struct ast *ast, struct hash_map *gv_hash_map);
+int eval_list(struct ast *ast, struct mem *mem);
 
-int eval_pipeline(struct ast *ast, struct hash_map *gv_hash_map);
+int eval_pipeline(struct ast *ast, struct mem *mem);
 
-int eval_redirection(struct ast *ast, struct hash_map *gv_hash_map);
+int eval_redirection(struct ast *ast, struct mem *mem);
 
-int eval_neg(struct ast *ast, struct hash_map *gv_hash_map);
+int eval_neg(struct ast *ast, struct mem *mem);
 
-int eval_for(struct ast *ast, struct hash_map *gv_hash_map);
+int eval_for(struct ast *ast, struct mem *mem);
 
-int eval_and(struct ast *ast, struct hash_map *gv_hash_map);
+int eval_and(struct ast *ast, struct mem *mem);
 
-int eval_or(struct ast *ast, struct hash_map *gv_hash_map);
+int eval_or(struct ast *ast, struct mem *mem);
 
-int eval_while(struct ast *ast, struct hash_map *gv_hash_map);
+int eval_while(struct ast *ast, struct mem *mem);
 
-int eval_until(struct ast *ast, struct hash_map *gv_hash_map);
+int eval_until(struct ast *ast, struct mem *mem);
 
 void set_break_number(int new_val);
 

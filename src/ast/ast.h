@@ -129,7 +129,7 @@ struct ast_until
 /**
  * @brief Frees the ast.
  */
-void ast_free(struct ast *ast);
+void ast_free(void *ast);
 
 /**
  * @brief Fill the ast.

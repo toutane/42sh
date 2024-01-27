@@ -131,7 +131,8 @@ static void free_ast_and_or(struct ast *ast)
 }
 
 typedef void (*free_type)(struct ast *ast);
-void ast_free(struct ast *ast)
+
+void ast_free(void *ast)
 {
     if (!ast)
     {
@@ -151,5 +152,5 @@ void ast_free(struct ast *ast)
         [AST_AND] = &free_ast_and_or,
         [AST_OR] = &free_ast_and_or,
     };
-    (*functions[ast->type])(ast);
+    (*functions[((struct ast *)ast)->type])(ast);
 }
