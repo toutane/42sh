@@ -19,7 +19,7 @@ static void set_curpath(char *str)
     else
     {
         free(curpath);
-        curpath = strdup(str);
+        curpath = strdup((str ? str : ""));
     }
 }
 

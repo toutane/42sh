@@ -27,4 +27,6 @@ void set_ifs(struct hash_map *memory);
 
 void set_home(struct hash_map *memory);
 
+void set_cdpath(struct hash_map *memory);
+
 #endif /* ! SPECIAL_VARIABLES_H */

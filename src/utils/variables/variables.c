@@ -128,10 +128,11 @@ void set_default_variables(int argc, char **argv, struct hash_map *memory)
     fill_random(memory);
 
     /* Add environment variables to shell memory:
-     * PWD, OLDPWD, IFS, HOME */
+     * PWD, OLDPWD, IFS, HOME, CDPATH */
 
     set_pwd(memory);
     set_oldpwd(memory);
     set_ifs(memory);
     set_home(memory);
+    set_cdpath(memory);
 }
