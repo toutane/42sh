@@ -41,6 +41,9 @@ int execution_loop(struct options *opts, struct stream_info *stream,
 
     while (lexer_peek(lexer).type != TOKEN_EOF)
     {
+        set_break_number(0);
+        set_continue_number(0);
+
         // Create a new AST
         struct ast *ast = NULL;
 

@@ -51,4 +51,12 @@ int eval_while(struct ast *ast, struct mem *mem);
 
 int eval_until(struct ast *ast, struct mem *mem);
 
+void set_break_number(int new_val);
+
+int get_break_number(void);
+
+void set_continue_number(int new_val);
+
+int get_continue_number(void);
+
 #endif /* ! EXEC_H */

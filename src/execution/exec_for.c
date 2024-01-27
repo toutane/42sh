@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "exec.h"
+#include "execution/exec.h"
 #include "utils/memory/memory.h"
 #include "utils/strings/strings.h"
 #include "utils/variables/variables.h"
@@ -32,6 +32,8 @@ int eval_for(struct ast *ast, struct mem *mem)
         argv_expansions(ast_for->array, &expanded_array_size, mem->hm_var);
 
     // Eval the ast loop
+    int break_number;
+    int continue_number;
     for (int i = 0; i < expanded_array_size; ++i)
     {
         /* Assign variable for loop, the variable is stored in the internal
@@ -40,6 +42,18 @@ int eval_for(struct ast *ast, struct mem *mem)
 
         // Evaluation of for loop ast
         status = eval_ast(ast_for->data, mem);
+        break_number = get_break_number();
+        if (break_number != 0)
+        {
+            set_break_number(break_number - 1);
+            break;
+        }
+        continue_number = get_continue_number();
+        if (continue_number != 0)
+        {
+            set_continue_number(continue_number - 1);
+            continue;
+        }
     }
 
     // Free expanded array

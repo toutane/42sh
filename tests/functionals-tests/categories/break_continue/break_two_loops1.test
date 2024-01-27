@@ -1,0 +1,15 @@
+echo visible
+a=true
+while $a;
+do
+    echo basic
+    while true 
+    do 
+        echo ha;
+        break;
+        echo hu;
+    done
+    echo complex;
+    a=false
+done
+echo end
