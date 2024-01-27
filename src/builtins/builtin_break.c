@@ -1,4 +1,4 @@
-#include <limits.h>
+#define INT_MAX 2147483647
 
 #include "builtins.h"
 
