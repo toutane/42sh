@@ -8,5 +8,5 @@ cd -; ls
 cd /bin; ls
 cd /toto
 cd /toto; ls
-CDPATH=/etc cd fonts
 PWD=/etc cd fonts
+OLDPWD=/etc cd -

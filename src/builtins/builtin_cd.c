@@ -116,71 +116,6 @@ static int rule_6(char *arg)
     return rule_7();
 }
 
-static int rule_5(char *arg)
-{
-    char *cdpath = getenv("CDPATH");
-    if (!cdpath)
-    {
-        cdpath = "";
-    }
-
-    char *seek = cdpath;
-    char *next_path =
-        (strchr(seek, ':') ? strchr(seek, ':') : strchr(seek, '\0'));
-    while (next_path)
-    {
-        char *built_path = NULL;
-        if (next_path != seek)
-        {
-            // Build the path : path + / +  arg
-            size_t len = next_path - seek + strlen(arg) + 1;
-            built_path = malloc(sizeof(char) * (len + 1));
-
-            memcpy(built_path, seek, next_path - seek);
-
-            built_path[next_path - seek] = '/';
-
-            memcpy(built_path + (next_path - seek) + 1, arg, strlen(arg));
-            built_path[len] = '\0';
-        }
-        else
-        {
-            // pathname is null
-            // Build the path : . + / +  arg
-            size_t len = strlen(arg) + 2;
-            built_path = malloc(sizeof(char) * (len + 1));
-
-            built_path[0] = '.';
-
-            built_path[1] = '/';
-
-            memcpy(built_path + 2, arg, strlen(arg));
-            built_path[len] = '\0';
-        }
-
-        // Check if exists
-        DIR *dir = opendir(built_path);
-        if (dir)
-        {
-            set_curpath(built_path);
-            closedir(dir);
-            free(built_path);
-            return rule_7();
-        }
-        free(built_path);
-
-        if (*next_path == '\0')
-        {
-            break;
-        }
-        seek = next_path + 1;
-        next_path =
-            (strchr(seek, ':') ? strchr(seek, ':') : strchr(seek, '\0'));
-    }
-
-    return rule_6(arg);
-}
-
 int builtin_cd(int argc, char *argv[])
 {
     char *home = getenv("HOME");
@@ -220,6 +155,7 @@ int builtin_cd(int argc, char *argv[])
             char **argv2 = calloc(2, sizeof(char *));
             argv2[0] = argv[0];
             argv2[1] = oldpwd;
+            free(pwd);
             int res = builtin_cd(argc, argv2);
             free(argv2);
             printf("%s\n", getenv("PWD"));
@@ -243,6 +179,6 @@ int builtin_cd(int argc, char *argv[])
     else
     {
         // Rule 5
-        return rule_5(argv[1]);
+        return rule_6(argv[1]);
     }
 }
