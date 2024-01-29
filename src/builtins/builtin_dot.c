@@ -1,6 +1,86 @@
 #include "builtins.h"
 #include "execution/exec.h"
 
+static char *path_search(char *arg)
+{
+    char *PATH = getenv("PATH");
+
+    char *seek = PATH;
+    char *next_path =
+        (strchr(seek, ':') ? strchr(seek, ':') : strchr(seek, '\0'));
+    char *built_path = NULL;
+    while (next_path)
+    {
+        if (next_path != seek)
+        {
+            // Build the path : path + / +  arg
+            size_t len = next_path - seek + strlen(arg) + 1;
+            built_path = malloc(sizeof(char) * (len + 1));
+
+            memcpy(built_path, seek, next_path - seek);
+
+            built_path[next_path - seek] = '/';
+
+            memcpy(built_path + (next_path - seek) + 1, arg, strlen(arg));
+            built_path[len] = '\0';
+        }
+        else
+        {
+            // pathname is null
+            // Build the path : . + / +  arg
+            size_t len = strlen(arg) + 2;
+            built_path = malloc(sizeof(char) * (len + 1));
+
+            built_path[0] = '.';
+
+            built_path[1] = '/';
+
+            memcpy(built_path + 2, arg, strlen(arg));
+            built_path[len] = '\0';
+        }
+
+        // Check if exists
+        FILE *file = fopen(built_path, "r");
+        if (file)
+        {
+            fclose(file);
+            return built_path;
+        }
+        free(built_path);
+
+        if (*next_path == '\0')
+        {
+            break;
+        }
+        seek = next_path + 1;
+        next_path =
+            (strchr(seek, ':') ? strchr(seek, ':') : strchr(seek, '\0'));
+    }
+    return NULL;
+}
+
+static struct stream_info *create_stream_from_file(char *file, int *status)
+{
+    struct stream_info *stream = NULL;
+    if (!strchr(file, '/'))
+    {
+        stream = stream_new(file, NULL, status);
+    }
+    else
+    {
+        char *path_concat = path_search(file);
+        if (!path_concat)
+        {
+            free(path_concat);
+            fprintf(stderr, "42sh: .: File not found in PATH\n");
+            _exit(1);
+        }
+        stream = stream_new(path_concat, NULL, status);
+        free(path_concat);
+    }
+    return stream;
+}
+
 int builtin_dot(int argc, char *argv[], struct mem *mem)
 {
     if (argc != 2)
@@ -17,7 +97,7 @@ int builtin_dot(int argc, char *argv[], struct mem *mem)
     int status = 0;
 
     // Create stream from file
-    struct stream_info *stream = stream_new(argv[1], NULL, &status);
+    struct stream_info *stream = create_stream_from_file(argv[1], &status);
     if (!stream)
     {
         _exit(1);
