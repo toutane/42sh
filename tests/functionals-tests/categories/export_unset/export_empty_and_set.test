@@ -1,0 +1,8 @@
+export var
+
+echo $var
+
+var="toto"
+
+echo $var
+env | grep var

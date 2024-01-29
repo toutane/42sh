@@ -1,0 +1,9 @@
+abba=42
+
+echo $abba
+env | grep abba
+
+export a
+
+echo $abba
+env | grep abba

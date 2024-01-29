@@ -1,0 +1,3 @@
+export beta alpha
+
+echo hello $beta $alpha world

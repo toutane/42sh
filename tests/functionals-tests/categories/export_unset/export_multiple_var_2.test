@@ -1,0 +1,7 @@
+export toto tata
+
+#echo $toto $tata
+
+toto="hello" tata="world"
+
+echo $toto $tata

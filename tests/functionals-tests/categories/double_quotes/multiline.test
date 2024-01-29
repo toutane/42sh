@@ -1,0 +1,74 @@
+echo "   \   
+		   "
+
+echo "   \\   
+		   "
+
+echo "  \\\   
+		   "
+
+echo "   \\\\  
+		   "
+
+echo "  \\\\\  
+		   "
+
+
+echo "\/	\\/		\\\/	 \\\\/    \/   \//   \/// "
+
+
+echo "\n \\n /\n //\n"
+
+echo -e "\\n \\n /\n //\n"
+
+echo -E "   \\\n   \\n /\n //\n"
+
+echo -e  "\
+		 hello \\
+		 world"
+
+echo "\
+		 hello \\
+		 world"
+
+
+echo "\
+
+
+	 \
+		 kk
+		 l
+
+		 jj"
+
+echo "\\
+		 
+	 k"
+
+echo "\
+/		 \$
+		 \\\
+		 \\\\
+		 \\ \\
+		 \\ \ \
+		 \\ \ \\ \\\ \
+		 \\
+
+		 \ \ \
+\
+		 \\
+\\
+
+		 \\"
+
+
+echo hello \
+
+	 echo toto \\
+
+	 echo "toto" "\
+		 echo tata"
+
+echo "Hello World\"" \\ "tata" \
+		 "titia" \\n
+		 echo $\n

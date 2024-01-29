@@ -1,0 +1,16 @@
+export beta alpha="hello"
+
+echo $beta $alpha
+env | grep alpha
+
+beta="toto"
+
+echo $beta $alpha
+env | grep beta
+env | grep alpha
+
+alpha="omega"
+
+echo $beta $alpha
+env | grep beta
+env | grep alpha

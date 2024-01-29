@@ -1,0 +1,8 @@
+export foo bar="hello"
+
+echo $bar
+
+unset bar foo
+
+env | grep bar
+env | grep foo

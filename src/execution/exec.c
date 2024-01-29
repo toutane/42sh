@@ -23,7 +23,13 @@ int eval_ast(struct ast *ast, struct mem *mem)
         [AST_OR] = &eval_or,
     };
 
-    return (*functions[ast->type])(ast, mem);
+    int status = (*functions[ast->type])(ast, mem);
+
+    char *status_str = int_to_string(status);
+    assign_variable("?", status_str, mem->hm_var);
+    free(status_str);
+
+    return status;
 }
 
 int execution_loop(struct options *opts, struct stream_info *stream,

@@ -1,0 +1,3 @@
+#echo $n
+echo "hello"
+echo $\n

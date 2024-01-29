@@ -1,0 +1,5 @@
+env | grep foo
+
+unset foo
+
+env | grep foo

@@ -1,0 +1,5 @@
+echo toto
+echo "The return code of last commande is: $?"
+echo "The return code of last commande is: $?"
+
+ech tata; echo "return code: "$?

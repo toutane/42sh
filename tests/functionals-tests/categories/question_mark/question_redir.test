@@ -1,0 +1,4 @@
+cat not_exist > /dev/full  ; echo $?
+echo $?
+cat not_exist > /dev/null  ; echo $?
+echo $?
