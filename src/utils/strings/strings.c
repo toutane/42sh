@@ -74,6 +74,12 @@ int is_str_sequence_of_digits(char *str)
     return 1;
 }
 
+int is_char_valid_in_name(char c)
+{
+    return isalnum(c) || c == '_' || is_char_special_variable(c) || c == '{'
+        || c == '}';
+}
+
 int is_char_special_variable(char c)
 {
     return c == '?' || c == '$' || c == '#' || c == '@' || c == '*';

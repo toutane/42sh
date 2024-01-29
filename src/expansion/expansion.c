@@ -146,7 +146,7 @@ static void param_expansion(char **str, struct stream_info *stream,
 
     // Get the next character
     char next_char = stream_peek(stream);
-    if (next_char == EOF)
+    if (next_char == EOF || !is_char_valid_in_name(next_char))
     {
         append_char_to_string(str, '$');
         return;
