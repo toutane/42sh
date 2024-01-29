@@ -10,6 +10,7 @@ run_test_file assign_before_export_3.test
 #run_test_file multiple_export_diff.test
 #run_test_file export_empty_space.test
 run_test_file export_then_set_to_null.test
+run_test_file reassign_without_value.test
 
 run_test_file unset_not_exported.test
 run_test_file unset_exported.test

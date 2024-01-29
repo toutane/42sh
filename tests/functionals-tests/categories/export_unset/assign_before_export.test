@@ -1,9 +1,9 @@
 abba=42
 
 echo $abba
-env | grep abba
+printenv | grep abba
 
-export a
+export abba
 
 echo $abba
-env | grep abba
+printenv | grep abba
