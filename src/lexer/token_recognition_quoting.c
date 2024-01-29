@@ -9,7 +9,7 @@ void handle_escape_quote(struct lexer *lexer, enum QUOTING_CONTEXT *quoting_ctx)
 
     // If a <newline> follows the <backslash>, the shell shall interpret
     // this as line continuation.
-    if (next_char == '\n')
+    if (next_char == '\n' && *quoting_ctx != SINGLE_QUOTE)
     {
         stream_pop(lexer->stream);
         return;
