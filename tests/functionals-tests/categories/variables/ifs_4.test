@@ -1,0 +1,18 @@
+IFS=';'
+
+#echo $IFS
+echo "$IFS"
+
+IFS='
+
+'
+echo "$IFS"
+
+printenv IFS
+
+export IFS="turlututu"
+
+export IFS="turlututuuuuuuuuuuu"
+export IFS="suuuuuuuuuuuuuuuu"
+
+#echo $IFS

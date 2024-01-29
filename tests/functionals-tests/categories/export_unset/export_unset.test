@@ -1,9 +1,9 @@
-export var="foo"
+export vara="foo"
 
 echo $a
-env | grep var
+env | grep vara
 
-unset var
+unset vara
 
 echo $a
-env | grep var
+env | grep vara

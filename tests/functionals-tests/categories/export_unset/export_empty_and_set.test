@@ -1,8 +1,8 @@
-export var
+export varranne
 
-echo $var
+echo $varranne
 
-var="toto"
+varranne="toto"
 
-echo $var
-env | grep var
+echo $varranne
+env | grep varranne

@@ -64,16 +64,14 @@ static void set_sharp(struct hm *hm_var)
     assign_variable("#", "0", hm_var);
 }
 
-/*
-   static void set_ifs(struct hm *hm_var)
-   {
-   char *ifs = getenv("IFS");
-   if (ifs)
-   {
-   hm_set_var(hm_var, "IFS", ifs);
-   }
-   }
-   */
+static void set_ifs(struct hm *hm_var)
+{
+    char *ifs = getenv("IFS");
+    if (ifs == NULL)
+    {
+        assign_variable("IFS", " \t\n", hm_var);
+    }
+}
 
 void set_default_variables(struct hm *hm_var)
 {
@@ -90,5 +88,5 @@ void set_default_variables(struct hm *hm_var)
     // Set environment variables
     set_pwd();
     set_oldpwd();
-    // set_ifs(hm_var);
+    set_ifs(hm_var);
 }
