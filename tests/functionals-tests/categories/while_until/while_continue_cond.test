@@ -1,0 +1,5 @@
+while continue
+do
+	echo toto;
+	break;
+done

@@ -1,0 +1,8 @@
+while break; do
+	echo toto
+done
+
+
+#while echo; do
+#	echo toto
+#done

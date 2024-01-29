@@ -22,7 +22,9 @@ run_test_file neg_while_until.test
 run_test_file two_loops.test
 run_test_file multiple_lines.test
 
-
+run_test_file while_break_cond.test
+run_test_file until_break_cond.test
+#run_test_file while_continue_cond.test
 
 
 #run_test_file ./counter.test
