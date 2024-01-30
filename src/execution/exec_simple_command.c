@@ -133,7 +133,9 @@ int eval_simple_command(struct ast *ast, struct mem *mem)
         // fill cpy hm with argv[1] to argv[argc - 1]
         for (int i = 1; i < expanded_argc; ++i)
         {
-            hm_set_var(mem->hm_var, int_to_string(i), expanded_argv[i]);
+            char *temp = int_to_string(i);
+            hm_set_var(mem->hm_var, temp, expanded_argv[i]);
+            free(temp);
         }
 
         // exec function, by evaluating ast func
