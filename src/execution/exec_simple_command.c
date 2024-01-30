@@ -68,6 +68,39 @@ static int handle_empty_command(struct ast_cmd *ast_cmd, struct mem *mem)
     return 0;
 }
 
+static void fill_specials_variables(int argc, char **argv, struct mem *mem)
+{
+    char *star_at_var = NULL;
+    char *temp = NULL;
+    for (int i = 1; i < argc; ++i)
+    {
+        // fill $1, $2, $3 ...
+        temp = int_to_string(i);
+        hm_set_var(mem->hm_var, temp, argv[i]);
+        free(temp);
+
+        // fill star_at_func
+        my_strcat(&star_at_var, argv[i]);
+        if (i < argc - 1)
+        {
+            my_strcat(&star_at_var, " ");
+        }
+    }
+
+    // fill $#
+    temp = int_to_string(argc - 1);
+    hm_set_var(mem->hm_var, "#", temp);
+    free(temp);
+
+    // fill $* and $@
+    if (star_at_var != NULL)
+    {
+        hm_set_var(mem->hm_var, "*", star_at_var);
+        hm_set_var(mem->hm_var, "@", star_at_var);
+        free(star_at_var);
+    }
+}
+
 int eval_simple_command(struct ast *ast, struct mem *mem)
 {
     int status = 0;
@@ -129,13 +162,8 @@ int eval_simple_command(struct ast *ast, struct mem *mem)
         struct hm *old_hm_var = mem->hm_var;
         mem->hm_var = cpy_hm_var(mem->hm_var);
 
-        // fill cpy hm with argv[1] to argv[argc - 1]
-        for (int i = 1; i < expanded_argc; ++i)
-        {
-            char *temp = int_to_string(i);
-            hm_set_var(mem->hm_var, temp, expanded_argv[i]);
-            free(temp);
-        }
+        // fill specials variables
+        fill_specials_variables(expanded_argc, expanded_argv, mem);
 
         // exec function, by evaluating ast func
         status = eval_ast(hm_get(mem->hm_fun, expanded_argv[0]), mem);
