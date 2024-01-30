@@ -90,8 +90,9 @@ void hm_set_var(struct hm *hm, const char *key, const char *value)
     }
 }
 
-void hm_set_fun(struct hm *hm, const char *key, struct ast *ast)
+void hm_set_fun(struct hm *hm, const char *key, void *ast_void)
 {
+    struct ast *ast = (struct ast *)ast_void;
     size_t index = hash(key) % hm->size;
 
     if (hm_contains(hm, key))

@@ -5,20 +5,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../ast/ast.h"
-#include "../builtins/builtins.h"
-#include "../error_handling/error_handling.h"
-#include "../expansion/expansion.h"
-#include "../io/io.h"
-#include "../lexer/lexer.h"
-#include "../options/opt_parser.h"
-#include "../parser/parser.h"
-#include "../utils/assignment_words/assignment_words.h"
-#include "../utils/dot_file/dot_file.h"
-#include "../utils/hash_map/hash_map.h"
-#include "../utils/printers/printers.h"
-#include "../utils/token/token.h"
-#include "../utils/variables/variables.h"
+#include "ast/ast.h"
+#include "builtins/builtins.h"
+#include "error_handling/error_handling.h"
+#include "expansion/expansion.h"
+#include "io/io.h"
+#include "lexer/lexer.h"
+#include "options/opt_parser.h"
+#include "parser/parser.h"
+#include "utils/assignment_words/assignment_words.h"
+#include "utils/dot_file/dot_file.h"
+#include "utils/hash_map/hash_map.h"
+#include "utils/printers/printers.h"
+#include "utils/token/token.h"
+#include "utils/variables/variables.h"
 
 /* @brief: Executes the program in a loop, reading from the input stream while
  * eof is not reached. It creates a AST while reading the input stream and
@@ -50,6 +50,8 @@ int eval_or(struct ast *ast, struct mem *mem);
 int eval_while(struct ast *ast, struct mem *mem);
 
 int eval_until(struct ast *ast, struct mem *mem);
+
+int eval_func(struct ast *ast, struct mem *mem);
 
 void set_break_number(int new_val);
 

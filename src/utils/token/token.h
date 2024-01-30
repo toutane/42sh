@@ -42,6 +42,8 @@ enum token_type
     TOKEN_NEG, // '!'
     TOKEN_LBRACE, // '{'
     TOKEN_RBRACE, // '}'
+    TOKEN_LPAR, // '('
+    TOKEN_RPAR, // ')'
     TOKEN_FOR, // 'for'
     TOKEN_IN, // 'in'
     TOKEN_WHILE, // 'while'

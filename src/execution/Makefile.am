@@ -11,7 +11,8 @@ libexecution_a_SOURCES = exec.c exec.h \
 						 exec_redirections.c \
 						 exec_neg.c \
 						 exec_and_or.c \
-						 break_continue_number.c
+						 break_continue_number.c \
+						 exec_func.c
 
 libexecution_a_CPPFLAGS = -I$(top_srcdir)/src
 libexecution_a_CFLAGS = -Wall -Wextra -Werror -std=c99 -pedantic \

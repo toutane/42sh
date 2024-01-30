@@ -1,11 +1,12 @@
-#include "utils/variables/variables.h"
 #define _XOPEN_SOURCE
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "exec.h"
+#include "utils/hash_map/hash_map.h"
 #include "utils/memory/memory.h"
+#include "utils/variables/variables.h"
 
 static void free_copies(char **argv_copy, int argc, char **prefixes_copy,
                         int prefix_count)
@@ -120,7 +121,12 @@ int eval_simple_command(struct ast *ast, struct mem *mem)
         free(value);
     }
 
-    // check if word is a build -> no need to fork
+    // check if word is a function -> no need to fork
+    if (hm_contains(mem->hm_fun, expanded_argv[0]))
+    {
+    }
+
+    // check if word is a build -> no need to fork either
     if (is_builtin_word(expanded_argv[0]))
     {
         status = handle_builtin_execution(expanded_argc, expanded_argv,

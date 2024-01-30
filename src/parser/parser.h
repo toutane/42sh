@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../ast/ast.h"
-#include "../lexer/lexer.h"
-#include "../utils/token/token.h"
+#include "ast/ast.h"
+#include "lexer/lexer.h"
+#include "utils/token/token.h"
 
 enum parser_status
 {
@@ -34,6 +34,7 @@ enum parser_status parse_rule_until(struct ast **res, struct lexer *lexer);
 enum parser_status parse_rule_while(struct ast **res, struct lexer *lexer);
 enum parser_status parse_shell_command(struct ast **res, struct lexer *lexer);
 enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer);
+enum parser_status parse_fundec(struct ast **res, struct lexer *lexer);
 
 void push_back(struct ast **list, struct ast *to_push);
 
