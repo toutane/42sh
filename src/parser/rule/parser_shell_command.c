@@ -44,6 +44,7 @@ enum parser_status parse_shell_command(struct ast **res, struct lexer *lexer)
 
         ast_free(*res);
         *res = NULL;
+        return PARSER_FAIL;
     }
     else if (lexer->cur_tok.type == TOKEN_LPAREN)
     {
@@ -60,6 +61,7 @@ enum parser_status parse_shell_command(struct ast **res, struct lexer *lexer)
 
         ast_free(*res);
         *res = NULL;
+        return PARSER_FAIL;
     }
     else if (parse_rule_for(res, lexer) == PARSER_OK)
     {
