@@ -21,5 +21,5 @@ int eval_subshell(struct ast *ast, struct mem *mem)
         waitpid(pid, &ret_val, 0);
     }
 
-    return ret_val;
+    return WEXITSTATUS(ret_val);
 }

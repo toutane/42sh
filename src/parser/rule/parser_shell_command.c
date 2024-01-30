@@ -1,4 +1,4 @@
-#include "../parser.h"
+#include "parser.h"
 
 static char create_subshell(struct ast **res, struct lexer *lexer)
 {
