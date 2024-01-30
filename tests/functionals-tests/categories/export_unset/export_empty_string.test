@@ -1,0 +1,9 @@
+export foo=""
+
+echo $foo
+env | grep foo
+
+foo="hello world"
+
+echo $foo
+env | grep foo

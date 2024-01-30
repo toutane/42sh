@@ -22,7 +22,7 @@ int eval_until(struct ast *ast, struct mem *mem)
         if (continue_number != 0)
         {
             set_continue_number(continue_number - 1);
-            continue;
+            break;
         }
     }
 

@@ -17,6 +17,8 @@ void my_strcat(char **str1, char *str2);
  */
 int is_str_sequence_of_digits(char *str);
 
+int is_char_valid_in_name(char c);
+
 int is_char_special_variable(char c);
 
 int is_name(char *str);

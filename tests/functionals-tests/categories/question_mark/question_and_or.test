@@ -1,0 +1,4 @@
+ech sklf && echo $?
+echo $?
+ech sklf || echo $?
+echo $?

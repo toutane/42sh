@@ -1,0 +1,9 @@
+export toto="toto"
+
+echo $toto
+env | grep toto
+
+unset toto
+
+echo $toto
+env | grep toto

@@ -1,0 +1,14 @@
+export foo=42
+
+echo $foo
+env | grep foo
+
+unset foo
+
+echo $foo
+env | grep foo
+
+unset foo
+
+echo $foo
+env | grep foo

@@ -1,0 +1,7 @@
+foo=1 bar=2
+
+echo $foo $bar
+
+unset foo bar
+
+echo $foo $bar

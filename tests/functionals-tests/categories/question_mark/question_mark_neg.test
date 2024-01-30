@@ -1,0 +1,3 @@
+echo toto; echo $?; ! echo tata; echo $?
+
+! echo $?

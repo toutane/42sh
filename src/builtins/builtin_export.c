@@ -30,6 +30,11 @@ int builtin_export(int argc, char *argv[], struct mem *mem)
         {
             // Case "export name"
             // TODO: Try temp hm implementation to follow bash --posix
+            if (getenv(word) != NULL)
+            {
+                return 0;
+            }
+
             char *internal_value = hm_get(mem->hm_var, word);
             setenv(word, !internal_value ? "" : internal_value, 1);
         }

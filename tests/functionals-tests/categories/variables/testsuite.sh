@@ -10,3 +10,7 @@ run_test_file var_and_quote.test
 run_test_file var_with_space.test
 run_test_line var_in_quote.test
 run_test_file var_if.test
+run_test_file ifs_1.test
+run_test_file ifs_2.test
+run_test_file ifs_3.test
+run_test_file ifs_4.test

@@ -1,0 +1,11 @@
+export foo='bar' baz='toto'
+
+echo $foo $baz
+env | grep foo
+env | grep baz
+
+unset foo baz
+
+echo $foo $baz
+env | grep foo
+env | grep baz

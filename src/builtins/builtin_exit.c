@@ -18,6 +18,11 @@ int builtin_exit(int argc, char *argv[], struct mem *mem)
         _exit(EXIT_FAILURE);
     }
 
+    if (argc == 1)
+    {
+        _exit(atoi(get_variable("?", mem->hm_var)));
+    }
+
     // check number of argument
     if (argc > 2)
     {

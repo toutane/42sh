@@ -1,0 +1,7 @@
+echo "$IFS"
+printenv IFS
+
+IFS="lalala"
+printenv IFS
+
+echo "$IFS"

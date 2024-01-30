@@ -7,7 +7,8 @@ int eval_while(struct ast *ast, struct mem *mem)
 
     int break_number;
     int continue_number;
-    while (eval_ast(ast_while->condition, mem) == EXIT_SUCCESS)
+    while (eval_ast(ast_while->condition, mem) == EXIT_SUCCESS
+           && get_break_number() == 0)
     {
         status = eval_ast(ast_while->data, mem);
 
@@ -22,7 +23,7 @@ int eval_while(struct ast *ast, struct mem *mem)
         if (continue_number != 0)
         {
             set_continue_number(continue_number - 1);
-            continue;
+            break;
         }
     }
 

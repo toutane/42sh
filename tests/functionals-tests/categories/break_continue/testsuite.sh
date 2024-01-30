@@ -18,3 +18,4 @@ run_test_file continue_two_loops2.test
 run_test_file continue_more_than_exists.test
 run_test_file continue_minus.test
 run_test_file continue_tricky.test
+run_test_file hard_continue3.test
