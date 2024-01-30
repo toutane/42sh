@@ -10,3 +10,7 @@ cd /toto
 cd /toto; ls
 PWD=/etc cd fonts
 OLDPWD=/etc cd -
+cd ../working-dir/sym_bar2; echo $PWD
+cd syZXZX; cd ../; echo $PWD
+cd ../working-dir/sym_bar2; echo $PWD; cd ../; echo $PWD
+cd ../working-dir/sym_bar2; echo $PWD; cd ../; cd -
