@@ -10,6 +10,7 @@
 #include <unistd.h>
 
 #include "builtins.h"
+#include "utils/my_realpath/my_realpath.h"
 
 static char *curpath = NULL;
 static char *pwd = NULL;
@@ -55,7 +56,8 @@ static int rule_10(void)
 static int rule_8(void)
 {
     // To canonical form
-    char *rlpath = realpath(curpath, NULL);
+    char *rlpath = my_realpath(curpath);
+
     set_curpath(rlpath);
     free(rlpath);
 
