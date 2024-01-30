@@ -51,6 +51,8 @@ int eval_while(struct ast *ast, struct mem *mem);
 
 int eval_until(struct ast *ast, struct mem *mem);
 
+int eval_subshell(struct ast *ast, struct mem *mem);
+
 int eval_func(struct ast *ast, struct mem *mem);
 
 void set_break_number(int new_val);
