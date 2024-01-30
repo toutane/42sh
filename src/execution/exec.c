@@ -57,7 +57,6 @@ int execution_loop(struct options *opts, struct stream_info *stream,
     }
     */
     /* DEBUG */
-
     while (lexer_peek(lexer).type != TOKEN_EOF)
     {
         set_break_number(0);

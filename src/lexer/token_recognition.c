@@ -171,7 +171,7 @@ static int handle_dollar_and_backtick(struct lexer *lexer, struct ctx_info *ctx)
      * matching '}' character.} */
 
     if (*(ctx->quoting_ctx) == NONE
-        && (cur_char == '$' || cur_char == '}' || cur_char == ')'))
+        && (cur_char == '$' || cur_char == '}' || (cur_char == ')' && ctx->paren_depth > 0)))
     {
         if (lexer->next_tok.type == TOKEN_NONE)
         {
