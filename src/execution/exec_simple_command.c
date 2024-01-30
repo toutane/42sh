@@ -6,6 +6,8 @@
 #include "exec.h"
 #include "utils/hash_map/hash_map.h"
 #include "utils/memory/memory.h"
+#include "utils/printers/printers.h"
+#include "utils/strings/strings.h"
 #include "utils/variables/variables.h"
 
 static void free_copies(char **argv_copy, int argc, char **prefixes_copy,
@@ -121,9 +123,29 @@ int eval_simple_command(struct ast *ast, struct mem *mem)
         free(value);
     }
 
+    hm_print(NULL);
+
     // check if word is a function -> no need to fork
     if (hm_contains(mem->hm_fun, expanded_argv[0]))
     {
+        // cpy hash_map
+        struct hm *old_hm_var = mem->hm_var;
+        mem->hm_var = cpy_hm_var(mem->hm_var);
+
+        // fill cpy hm with argv[1] to argv[argc - 1]
+        for (int i = 1; i < expanded_argc; ++i)
+        {
+            hm_set_var(mem->hm_var, int_to_string(i), expanded_argv[i]);
+        }
+
+        // exec function, by evaluating ast func
+        status = eval_ast(hm_get(mem->hm_fun, expanded_argv[0]), mem);
+
+        // replace correct hm and free
+        hm_free(mem->hm_var);
+        mem->hm_var = old_hm_var;
+
+        return status;
     }
 
     // check if word is a build -> no need to fork either

@@ -44,4 +44,6 @@ void hm_set_fun(struct hm *hm, const char *key, void *ast_void);
 
 int hm_contains(struct hm *hm, const char *key);
 
+struct hm *cpy_hm_var(struct hm *hm);
+
 #endif /* ! HASH_MAP_H */

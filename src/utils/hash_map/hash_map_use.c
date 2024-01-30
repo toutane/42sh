@@ -172,3 +172,32 @@ void hm_remove(struct hm *hm, const char *key)
         }
     }
 }
+
+struct hm *cpy_hm_var(struct hm *hm)
+{
+    if (hm == NULL)
+    {
+        return NULL;
+    }
+
+    // create empty cpy hm
+    struct hm *cpy_hm = hm_new(hm->type, hm->size, hm->data_free);
+
+    // cpy pairs from hm to cpy_hm
+    for (size_t i = 0; i < hm->size; ++i)
+    {
+        if (hm->pairs[i] == NULL)
+        {
+            continue;
+        }
+
+        struct pl *cur = hm->pairs[i];
+        while (cur != NULL)
+        {
+            hm_set_var(cpy_hm, cur->key, cur->data);
+            cur = cur->next;
+        }
+    }
+
+    return cpy_hm;
+}
