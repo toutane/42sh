@@ -1,4 +1,4 @@
-#include "../parser.h"
+#include "parser.h"
 
 // create the and or node
 static void create_and_or_node(struct ast_and_or **node, struct lexer *lexer)

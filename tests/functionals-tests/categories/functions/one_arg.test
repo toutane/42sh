@@ -1,0 +1,6 @@
+func ()
+{
+    echo "tata" $1
+}
+
+func hi

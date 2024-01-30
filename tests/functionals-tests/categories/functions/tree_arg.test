@@ -1,0 +1,6 @@
+func ()
+{
+    echo "ta" $1 $3
+}
+
+func hi hu ho
