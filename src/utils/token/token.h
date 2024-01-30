@@ -57,6 +57,8 @@ enum token_type
     TOKEN_UNTIL, // 'until'
     TOKEN_DO, // 'do'
     TOKEN_DONE, // 'done'
+    TOKEN_CASE, // 'case'
+    TOKEN_ESAC // 'esac'
 };
 
 /*

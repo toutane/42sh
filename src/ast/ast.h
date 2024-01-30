@@ -25,7 +25,8 @@ enum ast_type
     AST_AND,
     AST_OR,
     AST_SUBSHELL,
-    AST_FUNC
+    AST_FUNC,
+    AST_CASE
 };
 
 enum redirection_type
@@ -139,6 +140,13 @@ struct ast_func
     struct ast base;
     char *name;
     struct ast *shell_command;
+};
+
+struct ast_case
+{
+    struct ast base;
+    char *base_name;
+    struct hm *cases;
 };
 
 /**
