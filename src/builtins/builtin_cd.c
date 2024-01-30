@@ -33,6 +33,9 @@ static int rule_10(void)
     if (chdir(curpath) == -1)
     {
         fprintf(stderr, "42sh: cd: Error changing directory\n");
+        free(curpath);
+        curpath = NULL;
+        free(pwd);
         return 1;
     }
 
@@ -158,6 +161,7 @@ int builtin_cd(int argc, char *argv[], struct mem *mem)
             argv2[0] = argv[0];
             argv2[1] = oldpwd;
             free(pwd);
+            pwd = NULL;
             int res = builtin_cd(argc, argv2, mem);
             free(argv2);
             printf("%s\n", getenv("PWD"));
