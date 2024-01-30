@@ -1,0 +1,6 @@
+a=sh; (a=42; echo -n $a);echo $a
+a=sh; (b=42);echo $a; echo $b
+a="OKKK"; my_fun ( ) { echo tata; } ; echo $a ; my_fun ; (echo $a ; my_fun) ; echo $a ; my_fun
+a="OKKK";my_fun () { echo tata; }; echo $a; my_fun; (echo $a; my_fun; unset -f my_fun; unset a; echo $a; my_fun ; ); echo $a; my_fun
+a="OKKK";my_fun () { echo tata; }; echo $a; my_fun; (echo $a; my_fun; unset -f my_fun; unset a; echo $a; my_fun ; ); echo $a; my_fun
+a="OKKK";my_fun () { echo tata }; echo $a; my_fun; (echo $a; my_fun; unset -f my_fun; unset a; echo $a; my_fun ; ); echo $a; my_fun
