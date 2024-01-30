@@ -12,6 +12,7 @@ static void get_string_command(char **command, struct stream_info *stream,
      * characters that forming the expression are removed from the token_word
      * string. */
 
+    int depth = 1;
     char next_char;
     while (1)
     {
@@ -21,7 +22,16 @@ static void get_string_command(char **command, struct stream_info *stream,
             break;
         }
 
-        if (next_char == delimiter)
+        if (delimiter == ')' && next_char == '(')
+        {
+            depth++;
+        }
+        else if (next_char == delimiter)
+        {
+            depth--;
+        }
+
+        if (next_char == delimiter && depth == 0)
         {
             stream_pop(stream);
             break;
@@ -125,6 +135,13 @@ void command_substitution(char **str, struct stream_info *stream,
     // Gather the command in a string
     char *command = NULL;
     get_string_command(&command, stream, delimiter);
+
+    // If the command is empty, we do nothing and return
+    if (command == NULL || command[0] == '\0')
+    {
+        free(command);
+        return;
+    }
 
     // Create pipe
     int fds[2];

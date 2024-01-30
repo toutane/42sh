@@ -194,13 +194,13 @@ static int handle_dollar_and_backtick(struct lexer *lexer, struct ctx_info *ctx)
 
             if (stream_peek(lexer->stream) == '{')
             {
-                ((ctx->braces_depth))++;
+                (ctx->braces_depth)++;
                 append_char_to_token_value(&lexer->next_tok, '$');
                 append_consume(lexer, '{');
             }
             else if (stream_peek(lexer->stream) == '(')
             {
-                ((ctx->paren_depth))++;
+                (ctx->paren_depth)++;
                 append_char_to_token_value(&lexer->next_tok, '$');
                 append_consume(lexer, '(');
             }
