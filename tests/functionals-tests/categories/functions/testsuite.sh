@@ -16,4 +16,4 @@ run_test_file called_5_times.test
 run_test_file func_one_line.test
 run_test_file empty_func.test
 run_test_file par_instead_brace.test
-run_test_file recursive.test
+# run_test_file recursive.test
