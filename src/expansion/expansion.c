@@ -130,8 +130,76 @@ static void expand_variable(char **str, char *expression, struct hm *hm_var)
     free(expression);
 }
 
-static void param_expansion(char **str, struct stream_info *stream,
-                            enum QUOTING_CONTEXT *context, struct hm *hm_var)
+static void recognize_expr_in_braces(char next_char, char **expression,
+                                     struct stream_info *stream)
+{
+    // Consume the opening brace
+    stream_pop(stream);
+
+    /* In this step, we read until we find a closing brace. All the
+     * characters that forming the expression are removed from the token_word
+     * string. */
+
+    while (1)
+    {
+        next_char = stream_peek(stream);
+        if (next_char == EOF)
+        {
+            return;
+        }
+
+        if (next_char == '}')
+        {
+            stream_pop(stream);
+            return;
+        }
+
+        append_char_to_string(expression, next_char);
+        stream_pop(stream);
+    }
+}
+
+static void recognize_expr(char next_char, char **expression,
+                           struct stream_info *stream)
+{
+    /* In this step, we read until we find a character that is not an
+     * alphanumeric character or an underscore (because in this case expression
+     * is the longer valid name). All the characters that forming the expression
+     * are removed from the token_word string. */
+
+    if (is_char_special_variable(next_char))
+    {
+        append_char_to_string(expression, next_char);
+        stream_pop(stream);
+    }
+    else if (isdigit(next_char))
+    {
+        append_char_to_string(expression, next_char);
+        stream_pop(stream);
+    }
+    else
+    {
+        while (1)
+        {
+            next_char = stream_peek(stream);
+            if (next_char == EOF)
+            {
+                break;
+            }
+
+            if (!isalnum(next_char) && next_char != '_')
+            {
+                break;
+            }
+
+            append_char_to_string(expression, next_char);
+            stream_pop(stream);
+        }
+    }
+}
+
+static void handle_dollar(char **str, struct stream_info *stream,
+                          enum QUOTING_CONTEXT *context, struct mem *mem)
 {
     if (*context == SINGLE_QUOTE)
     {
@@ -146,7 +214,8 @@ static void param_expansion(char **str, struct stream_info *stream,
 
     // Get the next character
     char next_char = stream_peek(stream);
-    if (next_char == EOF || !is_char_valid_in_name(next_char))
+    if ((next_char == EOF || !is_char_valid_in_name(next_char))
+        && (next_char != '(' && next_char != ')'))
     {
         append_char_to_string(str, '$');
         return;
@@ -161,66 +230,23 @@ static void param_expansion(char **str, struct stream_info *stream,
      * string. */
 
     char *expression = NULL;
-    if (next_char == '{')
+    switch (next_char)
     {
-        // Consume the opening brace
-        stream_pop(stream);
-        while (1)
-        {
-            next_char = stream_peek(stream);
-            if (next_char == EOF)
-            {
-                break;
-            }
-
-            if (next_char == '}')
-            {
-                stream_pop(stream);
-                break;
-            }
-
-            append_char_to_string(&expression, next_char);
-            stream_pop(stream);
-        }
-    }
-    else
-    {
-        if (is_char_special_variable(next_char))
-        {
-            append_char_to_string(&expression, next_char);
-            stream_pop(stream);
-        }
-        else if (isdigit(next_char))
-        {
-            append_char_to_string(&expression, next_char);
-            stream_pop(stream);
-        }
-        else
-        {
-            while (1)
-            {
-                next_char = stream_peek(stream);
-                if (next_char == EOF)
-                {
-                    break;
-                }
-
-                if (!isalnum(next_char) && next_char != '_')
-                {
-                    break;
-                }
-
-                append_char_to_string(&expression, next_char);
-                stream_pop(stream);
-            }
-        }
+    case '{':
+        recognize_expr_in_braces(next_char, &expression, stream);
+        break;
+    case '(':
+        command_substitution(str, stream, mem);
+        return;
+    default:
+        recognize_expr(next_char, &expression, stream);
+        break;
     }
 
-    expand_variable(str, expression, hm_var);
+    expand_variable(str, expression, mem->hm_var);
 }
 
-static void expand_loop(struct stream_info *stream, char **str,
-                        struct hm *hm_var)
+static void expand_loop(struct stream_info *stream, char **str, struct mem *mem)
 {
     enum QUOTING_CONTEXT context = NONE;
 
@@ -252,7 +278,7 @@ static void expand_loop(struct stream_info *stream, char **str,
 
         if (cur_char == '$')
         {
-            param_expansion(str, stream, &context, hm_var);
+            handle_dollar(str, stream, &context, mem);
             continue;
         }
 
@@ -266,7 +292,7 @@ static void expand_loop(struct stream_info *stream, char **str,
     }
 }
 
-char *expand_string(char **str, struct hm *hm_var)
+char *expand_string(char **str, struct mem *mem)
 {
     if (*str == NULL)
     {
@@ -282,7 +308,7 @@ char *expand_string(char **str, struct hm *hm_var)
         return NULL;
     }
 
-    expand_loop(stream, &expanded_str, hm_var);
+    expand_loop(stream, &expanded_str, mem);
 
     stream_free(stream);
     // free(*str);
@@ -322,7 +348,7 @@ static char **field_split(char **expanded_argv, int *expanded_argc,
 }
 
 static char **word_expansions(char **expanded_argv, int *expanded_argc,
-                              struct stream_info *stream, struct hm *hm_var)
+                              struct stream_info *stream, struct mem *mem)
 {
     char *temp_str = NULL;
 
@@ -361,7 +387,7 @@ static char **word_expansions(char **expanded_argv, int *expanded_argc,
 
         if (cur_char == '$')
         {
-            param_expansion(&temp_str, stream, &context, hm_var);
+            handle_dollar(&temp_str, stream, &context, mem);
 
             if (context == NONE)
             {
@@ -394,7 +420,7 @@ static char **word_expansions(char **expanded_argv, int *expanded_argc,
     return expanded_argv;
 }
 
-char **argv_expansions(char **original_argv, int *argc, struct hm *hm_var)
+char **argv_expansions(char **original_argv, int *argc, struct mem *mem)
 {
     int expanded_argc = 0;
     char **expanded_argv = calloc(expanded_argc + 1, sizeof(char *));
@@ -411,7 +437,7 @@ char **argv_expansions(char **original_argv, int *argc, struct hm *hm_var)
         }
 
         expanded_argv =
-            word_expansions(expanded_argv, &expanded_argc, stream, hm_var);
+            word_expansions(expanded_argv, &expanded_argc, stream, mem);
 
         stream_free(stream);
     }

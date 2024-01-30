@@ -29,7 +29,7 @@ int eval_for(struct ast *ast, struct mem *mem)
      * ex: for i in 1 2 3 4 5, the array will be [1, 2, 3, 4, 5]. */
     int expanded_array_size = ast_for->array_size;
     char **expanded_array =
-        argv_expansions(ast_for->array, &expanded_array_size, mem->hm_var);
+        argv_expansions(ast_for->array, &expanded_array_size, mem);
 
     // Eval the ast loop
     int break_number;
