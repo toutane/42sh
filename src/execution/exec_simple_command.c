@@ -68,7 +68,7 @@ static int handle_empty_command(struct ast_cmd *ast_cmd, struct mem *mem)
     return 0;
 }
 
-static void fill_specials_variables(int argc, char ** argv, struct mem* mem)
+static void fill_specials_variables(int argc, char **argv, struct mem *mem)
 {
     char *star_at_var = NULL;
     char *temp = NULL;
@@ -90,9 +90,12 @@ static void fill_specials_variables(int argc, char ** argv, struct mem* mem)
     free(temp);
 
     // fill $* and $@
-    hm_set_var(mem->hm_var, "*", star_at_var);
-    hm_set_var(mem->hm_var, "@", star_at_var);
-    free(star_at_var);
+    if (star_at_var != NULL)
+    {
+        hm_set_var(mem->hm_var, "*", star_at_var);
+        hm_set_var(mem->hm_var, "@", star_at_var);
+        free(star_at_var);
+    }
 }
 
 int eval_simple_command(struct ast *ast, struct mem *mem)
