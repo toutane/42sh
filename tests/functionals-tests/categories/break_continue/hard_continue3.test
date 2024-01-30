@@ -1,0 +1,14 @@
+a=true
+while $a
+do
+	echo toto
+	a=false
+	b=true
+	while $b
+	do
+		echo titi
+		echo hu
+		continue 2
+	done
+	continue 2
+done
