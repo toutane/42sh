@@ -8,6 +8,7 @@
 enum parser_status parse_list(struct ast **res, struct lexer *lexer)
 {
     // | and_or
+    enum parser_status parse_status = PARSER_OK;
     if (parse_and_or(res, lexer) == PARSER_OK)
     {
         // Create list node for AST
@@ -23,11 +24,17 @@ enum parser_status parse_list(struct ast **res, struct lexer *lexer)
             // Consume ';' token
             lexer_pop(lexer);
 
-            if (parse_and_or(res, lexer) == PARSER_OK)
+            if ((parse_status = parse_and_or(res, lexer)) == PARSER_OK)
             {
                 // { ';' and_or } case
                 // Add previously parsed `and_or` to AST
                 fill_list_node(list_node, *res);
+            }
+            else if (parse_status == PARSER_FAIL)
+            {
+                ast_free(list_node);
+                *res = NULL;
+                return PARSER_FAIL;
             }
             else
             {

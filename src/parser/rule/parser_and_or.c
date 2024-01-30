@@ -30,7 +30,8 @@ static void create_and_or_node(struct ast_and_or **node, struct lexer *lexer)
 enum parser_status parse_and_or(struct ast **res, struct lexer *lexer)
 {
     // | pipeline
-    if (parse_pipeline(res, lexer) == PARSER_OK)
+    enum parser_status parse_status = PARSER_OK;
+    if ((parse_status = parse_pipeline(res, lexer)) == PARSER_OK)
     {
         // { ( '&&' | '||' ) {'\n'} pipeline }
         while (lexer_peek(lexer).type == TOKEN_AND
@@ -50,7 +51,7 @@ enum parser_status parse_and_or(struct ast **res, struct lexer *lexer)
             };
 
             // parse first pipeline node
-            if (parse_pipeline(res, lexer) == PARSER_OK)
+            if ((parse_status = parse_pipeline(res, lexer)) == PARSER_OK)
             {
                 // fill and or right node
                 ast_and_or->right = *res;
@@ -61,10 +62,10 @@ enum parser_status parse_and_or(struct ast **res, struct lexer *lexer)
             // Free node(s)
             ast_free((struct ast *)ast_and_or);
             *res = NULL;
-            return PARSER_UNEXPECTED_TOKEN;
+            return parse_status;
         }
         return PARSER_OK;
     }
     // Free node(s)
-    return PARSER_UNEXPECTED_TOKEN;
+    return parse_status;
 }
