@@ -20,3 +20,4 @@ run_test_file unset_two_times.test
 run_test_file unset_not_exists.test
 run_test_file unset_in_loop.test
 run_test_file unset_var_flag.test
+run_test_file unset_function.test
