@@ -1,0 +1,6 @@
+func ()
+{
+    echo hu;
+    func hi
+}
+func

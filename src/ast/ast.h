@@ -24,6 +24,8 @@ enum ast_type
     AST_NEG,
     AST_AND,
     AST_OR,
+    AST_SUBSHELL,
+    AST_FUNC
 };
 
 enum redirection_type
@@ -126,6 +128,19 @@ struct ast_until
     struct ast *data;
 };
 
+struct ast_subshell
+{
+    struct ast base;
+    struct ast *compound_list;
+};
+
+struct ast_func
+{
+    struct ast base;
+    char *name;
+    struct ast *shell_command;
+};
+
 /**
  * @brief Frees the ast.
  */
@@ -143,6 +158,8 @@ void fill_pipeline_node(struct ast *ast, struct ast *ast_child);
 void fill_for_node_condition(struct ast *ast, char *data);
 void fill_for_node_data(struct ast *ast, char *data);
 void fill_for_node_child(struct ast *ast, struct ast *ast_child);
+void fill_word_func(struct ast *ast, char *func_name);
+void fill_func_node(struct ast *ast, struct ast *ast_child);
 
 void init_redirection_node(struct ast *ast);
 void fill_redirection_node_ionumber(struct ast *ast, int ionumber);

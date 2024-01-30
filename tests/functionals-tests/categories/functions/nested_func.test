@@ -1,0 +1,15 @@
+func ()
+{
+    echo "tata" $1
+    funcb ()
+    {
+        echo $1
+    }
+
+    funcb hi
+    echo $1
+}
+
+func hi
+funb o
+echo $1

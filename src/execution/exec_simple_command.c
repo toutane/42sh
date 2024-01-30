@@ -1,11 +1,14 @@
-#include "utils/variables/variables.h"
 #define _XOPEN_SOURCE
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "exec.h"
+#include "utils/hash_map/hash_map.h"
 #include "utils/memory/memory.h"
+#include "utils/printers/printers.h"
+#include "utils/strings/strings.h"
+#include "utils/variables/variables.h"
 
 static void free_copies(char **argv_copy, int argc, char **prefixes_copy,
                         int prefix_count)
@@ -119,7 +122,37 @@ int eval_simple_command(struct ast *ast, struct mem *mem)
         free(value);
     }
 
-    // check if word is a build -> no need to fork
+    // check if word is a function -> no need to fork
+    if (hm_contains(mem->hm_fun, expanded_argv[0]))
+    {
+        // cpy hash_map
+        struct hm *old_hm_var = mem->hm_var;
+        mem->hm_var = cpy_hm_var(mem->hm_var);
+
+        // fill cpy hm with argv[1] to argv[argc - 1]
+        for (int i = 1; i < expanded_argc; ++i)
+        {
+            char *temp = int_to_string(i);
+            hm_set_var(mem->hm_var, temp, expanded_argv[i]);
+            free(temp);
+        }
+
+        // exec function, by evaluating ast func
+        status = eval_ast(hm_get(mem->hm_fun, expanded_argv[0]), mem);
+
+        // replace correct hm and free
+        hm_free(mem->hm_var);
+        mem->hm_var = old_hm_var;
+
+        // free alloc prefix and copies
+        hm_free(hm_prefixes);
+        free_copies(expanded_argv, expanded_argc, prefixes_copy,
+                    ast_cmd->prefix_count);
+
+        return status;
+    }
+
+    // check if word is a build -> no need to fork either
     if (is_builtin_word(expanded_argv[0]))
     {
         status = handle_builtin_execution(expanded_argc, expanded_argv,

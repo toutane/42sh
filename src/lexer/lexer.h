@@ -3,11 +3,11 @@
 
 #include <stddef.h>
 
-#include "../io/io.h"
-#include "../options/opt_parser.h"
-#include "../utils/hash_map/hash_map.h"
-#include "../utils/strings/strings.h"
-#include "../utils/token/token.h"
+#include "io/io.h"
+#include "options/opt_parser.h"
+#include "utils/hash_map/hash_map.h"
+#include "utils/strings/strings.h"
+#include "utils/token/token.h"
 
 enum LEXER_ERROR
 {

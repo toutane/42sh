@@ -21,6 +21,8 @@ int eval_ast(struct ast *ast, struct mem *mem)
         [AST_NEG] = &eval_neg,
         [AST_AND] = &eval_and,
         [AST_OR] = &eval_or,
+        [AST_SUBSHELL] = &eval_subshell,
+        [AST_FUNC] = &eval_func,
     };
 
     int status = (*functions[ast->type])(ast, mem);
@@ -55,7 +57,6 @@ int execution_loop(struct options *opts, struct stream_info *stream,
     }
     */
     /* DEBUG */
-
     while (lexer_peek(lexer).type != TOKEN_EOF)
     {
         set_break_number(0);

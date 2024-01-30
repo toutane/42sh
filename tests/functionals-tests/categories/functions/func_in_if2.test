@@ -1,0 +1,14 @@
+if false; then
+    func ()
+    {
+        echo ha $1
+    }
+    func
+else
+    func2 ()
+    {
+        echo hu $2
+    }
+fi
+func
+func2
