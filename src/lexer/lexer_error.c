@@ -29,29 +29,35 @@ char *get_lexer_error_msg(enum LEXER_ERROR error)
     return "Unknown error";
 }
 
-void set_lexer_last_error(struct lexer *lexer,
-                          enum QUOTING_CONTEXT *quoting_ctx, int braces_depth,
-                          int paren_depth)
+void set_lexer_last_error(struct lexer *lexer, struct ctx_info *ctx)
 {
-    if (*quoting_ctx != NONE)
+    enum QUOTING_CONTEXT quoting_ctx = *(ctx->quoting_ctx);
+    if (quoting_ctx != NONE)
     {
-        lexer->last_error = *quoting_ctx == SINGLE_QUOTE
+        lexer->last_error = quoting_ctx == SINGLE_QUOTE
             ? UNMATCHED_SINGLE_QUOTE
             : UNMATCHED_DOUBLE_QUOTE;
         lexer->cur_tok.type = TOKEN_ERROR;
         return;
     }
 
-    if (braces_depth != 0)
+    if (ctx->braces_depth != 0)
     {
         lexer->last_error = UNMATCHED_BRACE;
         lexer->cur_tok.type = TOKEN_ERROR;
         return;
     }
 
-    if (paren_depth != 0)
+    if (ctx->paren_depth != 0)
     {
         lexer->last_error = UNMATCHED_PARENTHESIS;
+        lexer->cur_tok.type = TOKEN_ERROR;
+        return;
+    }
+
+    if (ctx->backtick_depth != 0)
+    {
+        lexer->last_error = UNMATCHED_BACKTICK;
         lexer->cur_tok.type = TOKEN_ERROR;
         return;
     }

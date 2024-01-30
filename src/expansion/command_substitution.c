@@ -5,12 +5,14 @@
 #include "expansion.h"
 #include "lexer/lexer.h"
 
-static void get_string_command(char **command, struct stream_info *stream)
+static void get_string_command(char **command, struct stream_info *stream,
+                               char delimiter)
 {
     /* In this step, we read until we find a closing brace. All the
      * characters that forming the expression are removed from the token_word
      * string. */
 
+    int depth = 1;
     char next_char;
     while (1)
     {
@@ -20,7 +22,16 @@ static void get_string_command(char **command, struct stream_info *stream)
             break;
         }
 
-        if (next_char == ')')
+        if (delimiter == ')' && next_char == '(')
+        {
+            depth++;
+        }
+        else if (next_char == delimiter)
+        {
+            depth--;
+        }
+
+        if (next_char == delimiter && depth == 0)
         {
             stream_pop(stream);
             break;
@@ -110,17 +121,27 @@ static void wait_and_replace(pid_t pid, char **str, int fds[2])
 void command_substitution(char **str, struct stream_info *stream,
                           struct mem *mem)
 {
-    if (stream_peek(stream) != '(' || str == NULL || mem == NULL)
+    char cur_char = stream_peek(stream);
+    if (cur_char != '(' && cur_char != '`')
     {
         return;
     }
 
-    // Consume the '('
+    char delimiter = cur_char == '(' ? ')' : '`';
+
+    // Consume the '(' or '``'
     stream_pop(stream);
 
     // Gather the command in a string
     char *command = NULL;
-    get_string_command(&command, stream);
+    get_string_command(&command, stream, delimiter);
+
+    // If the command is empty, we do nothing and return
+    if (command == NULL || command[0] == '\0')
+    {
+        free(command);
+        return;
+    }
 
     // Create pipe
     int fds[2];
