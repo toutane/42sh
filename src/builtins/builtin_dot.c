@@ -62,7 +62,16 @@ static char *path_search(char *arg)
 static struct stream_info *create_stream_from_file(char *file, int *status)
 {
     struct stream_info *stream = NULL;
-    if (!strchr(file, '/'))
+
+    char *first_elt = (strchr(file, '/') ? strchr(file, '/') : strchr(file, '\0'));
+
+    // If path starts with ../ or ./
+    if (((first_elt - file == 1) && !memcmp(file, ".", 1))
+        || ((first_elt - file == 2) && !memcmp(file, "..", 2)))
+    {
+        stream = stream_new(file, NULL, status);
+    }
+    else if (file[0] == '/')
     {
         stream = stream_new(file, NULL, status);
     }
@@ -71,7 +80,6 @@ static struct stream_info *create_stream_from_file(char *file, int *status)
         char *path_concat = path_search(file);
         if (!path_concat)
         {
-            free(path_concat);
             fprintf(stderr, "42sh: .: File not found in PATH\n");
             _exit(1);
         }
