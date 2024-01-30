@@ -17,3 +17,8 @@ run_test_file func_one_line.test
 run_test_file empty_func.test
 run_test_file par_instead_brace.test
 # run_test_file recursive.test
+run_test_file func_var#.test
+run_test_file func_var_star.test
+run_test_file func_var_star_expand.test
+run_test_file func_var_at.test
+run_test_file func_var_at_expand.test
