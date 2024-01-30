@@ -81,7 +81,10 @@ static void fill_specials_variables(int argc, char **argv, struct mem *mem)
 
         // fill star_at_func
         my_strcat(&star_at_var, argv[i]);
-        my_strcat(&star_at_var, " ");
+        if (i < argc - 1)
+        {
+            my_strcat(&star_at_var, " ");
+        }
     }
 
     // fill $#
