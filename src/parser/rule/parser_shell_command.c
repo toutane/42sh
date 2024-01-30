@@ -45,16 +45,13 @@ enum parser_status parse_shell_command(struct ast **res, struct lexer *lexer)
         ast_free(*res);
         *res = NULL;
     }
-    // TODO: change to TOKEN_LPAR
-    else if (lexer->cur_tok.type == TOKEN_WORD
-             && !strcmp(lexer->cur_tok.value, "("))
+    else if (lexer->cur_tok.type == TOKEN_LPAREN)
     {
         lexer_pop(lexer);
 
         if (create_subshell(res, lexer))
         {
-            if (lexer->cur_tok.type == TOKEN_WORD
-                && !strcmp(lexer->cur_tok.value, ")"))
+            if (lexer->cur_tok.type == TOKEN_RPAREN)
             {
                 lexer_pop(lexer);
                 return PARSER_OK;
