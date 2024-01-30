@@ -317,7 +317,7 @@ char *expand_string(char **str, struct mem *mem)
 }
 
 static char **field_split(char **expanded_argv, int *expanded_argc,
-                          char *temp_str)
+                          char *temp_str, struct hm *hm_var)
 {
     if (!temp_str)
     {
@@ -325,7 +325,7 @@ static char **field_split(char **expanded_argv, int *expanded_argc,
     }
 
     // Field split delimiteur
-    char *delimiters = " \t\n";
+    char *delimiters = get_variable("IFS", hm_var);
 
     // concat word to last item of expanded_argv
     char *word = strtok(temp_str, delimiters);
@@ -347,6 +347,36 @@ static char **field_split(char **expanded_argv, int *expanded_argc,
     return expanded_argv;
 }
 
+static int handle_quotes(char **expanded_argv, int *expanded_argc,
+                         struct stream_info *stream,
+                         enum QUOTING_CONTEXT *context)
+{
+    char cur_char = stream_peek(stream);
+
+    if (cur_char == '\\')
+    {
+        handle_backslash_quote(&(expanded_argv[*expanded_argc]), stream,
+                               context);
+        return 1;
+    }
+
+    if (cur_char == '\'')
+    {
+        my_strcat(&(expanded_argv[*expanded_argc]), "");
+        handle_single_quote(&(expanded_argv[*expanded_argc]), stream, context);
+        return 1;
+    }
+
+    if (cur_char == '"')
+    {
+        my_strcat(&(expanded_argv[*expanded_argc]), "");
+        handle_double_quote(&(expanded_argv[*expanded_argc]), stream, context);
+        return 1;
+    }
+
+    return 0;
+}
+
 static char **word_expansions(char **expanded_argv, int *expanded_argc,
                               struct stream_info *stream, struct mem *mem)
 {
@@ -362,41 +392,40 @@ static char **word_expansions(char **expanded_argv, int *expanded_argc,
             break;
         }
 
-        if (cur_char == '\\')
+        if (handle_quotes(expanded_argv, expanded_argc, stream, &context))
         {
-            handle_backslash_quote(&(expanded_argv[*expanded_argc]), stream,
-                                   &context);
-            continue;
-        }
-
-        if (cur_char == '\'')
-        {
-            my_strcat(&(expanded_argv[*expanded_argc]), "");
-            handle_single_quote(&(expanded_argv[*expanded_argc]), stream,
-                                &context);
-            continue;
-        }
-
-        if (cur_char == '"')
-        {
-            my_strcat(&(expanded_argv[*expanded_argc]), "");
-            handle_double_quote(&(expanded_argv[*expanded_argc]), stream,
-                                &context);
             continue;
         }
 
         if (cur_char == '$')
         {
             handle_dollar(&temp_str, stream, &context, mem);
-
             if (context == NONE)
             {
-                expanded_argv =
-                    field_split(expanded_argv, expanded_argc, temp_str);
+                expanded_argv = field_split(expanded_argv, expanded_argc,
+                                            temp_str, mem->hm_var);
             }
             else
             {
-                my_strcat(&(expanded_argv[*expanded_argc]), temp_str);
+                my_strcat(&expanded_argv[*expanded_argc], temp_str);
+            }
+
+            free(temp_str);
+            temp_str = NULL;
+            continue;
+        }
+
+        if (context != SINGLE_QUOTE && cur_char == '`')
+        {
+            command_substitution(&temp_str, stream, mem);
+            if (context == NONE)
+            {
+                expanded_argv = field_split(expanded_argv, expanded_argc,
+                                            temp_str, mem->hm_var);
+            }
+            else
+            {
+                my_strcat(&expanded_argv[*expanded_argc], temp_str);
             }
 
             free(temp_str);
@@ -406,15 +435,6 @@ static char **word_expansions(char **expanded_argv, int *expanded_argc,
 
         append_char_to_string(&(expanded_argv[*expanded_argc]), cur_char);
         stream_pop(stream);
-    }
-
-    // Append null char if nothing
-    if (expanded_argv[*expanded_argc])
-    {
-        (*expanded_argc)++;
-        expanded_argv =
-            realloc(expanded_argv, (*expanded_argc + 1) * sizeof(char *));
-        expanded_argv[*expanded_argc] = NULL;
     }
 
     return expanded_argv;
@@ -438,6 +458,15 @@ char **argv_expansions(char **original_argv, int *argc, struct mem *mem)
 
         expanded_argv =
             word_expansions(expanded_argv, &expanded_argc, stream, mem);
+
+        // Append null char if nothing
+        if (expanded_argv[expanded_argc])
+        {
+            (expanded_argc)++;
+            expanded_argv =
+                realloc(expanded_argv, (expanded_argc + 1) * sizeof(char *));
+            expanded_argv[expanded_argc] = NULL;
+        }
 
         stream_free(stream);
     }

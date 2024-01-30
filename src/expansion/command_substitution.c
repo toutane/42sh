@@ -5,7 +5,8 @@
 #include "expansion.h"
 #include "lexer/lexer.h"
 
-static void get_string_command(char **command, struct stream_info *stream)
+static void get_string_command(char **command, struct stream_info *stream,
+                               char delimiter)
 {
     /* In this step, we read until we find a closing brace. All the
      * characters that forming the expression are removed from the token_word
@@ -20,7 +21,7 @@ static void get_string_command(char **command, struct stream_info *stream)
             break;
         }
 
-        if (next_char == ')')
+        if (next_char == delimiter)
         {
             stream_pop(stream);
             break;
@@ -110,17 +111,20 @@ static void wait_and_replace(pid_t pid, char **str, int fds[2])
 void command_substitution(char **str, struct stream_info *stream,
                           struct mem *mem)
 {
-    if (stream_peek(stream) != '(' || str == NULL || mem == NULL)
+    char cur_char = stream_peek(stream);
+    if (cur_char != '(' && cur_char != '`')
     {
         return;
     }
 
-    // Consume the '('
+    char delimiter = cur_char == '(' ? ')' : '`';
+
+    // Consume the '(' or '``'
     stream_pop(stream);
 
     // Gather the command in a string
     char *command = NULL;
-    get_string_command(&command, stream);
+    get_string_command(&command, stream, delimiter);
 
     // Create pipe
     int fds[2];

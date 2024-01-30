@@ -5,16 +5,6 @@
 
 #include "lexer/lexer_error.h"
 
-struct ctx_info
-{
-    enum QUOTING_CONTEXT *quoting_ctx;
-    char cur_char;
-    char prev_char;
-    size_t token_len;
-    int braces_depth;
-    int paren_depth;
-};
-
 /* Initialize the context information needed by the algorithm. */
 
 static void set_context(struct lexer *lexer, struct ctx_info *ctx)
@@ -84,8 +74,7 @@ static int handle_eof(struct lexer *lexer, struct ctx_info ctx)
     if (ctx.cur_char == EOF)
     {
         delimit_token(lexer, EOF);
-        set_lexer_last_error(lexer, ctx.quoting_ctx, ctx.braces_depth,
-                             ctx.paren_depth);
+        set_lexer_last_error(lexer, &ctx);
         return 1;
     }
 
@@ -170,8 +159,29 @@ static int handle_dollar_and_backtick(struct lexer *lexer, struct ctx_info *ctx)
      * introductory unquoted character sequences: '$' or "${", up to the
      * matching '}' character.} */
 
+    if (*(ctx->quoting_ctx) == NONE && cur_char == '`')
+    {
+        if (ctx->backtick_depth > 0)
+        {
+            ctx->backtick_depth--;
+        }
+        else
+        {
+            ctx->backtick_depth++;
+        }
+
+        if (lexer->next_tok.type == TOKEN_NONE)
+        {
+            fill_token(&lexer->next_tok, TOKEN_WORD, NULL);
+        }
+
+        append_consume(lexer, '`');
+        return 1;
+    }
+
     if (*(ctx->quoting_ctx) == NONE
-        && (cur_char == '$' || cur_char == '}' || cur_char == ')'))
+        && (cur_char == '$' || cur_char == '}'
+            || (cur_char == ')' && ctx->paren_depth > 0)))
     {
         if (lexer->next_tok.type == TOKEN_NONE)
         {
@@ -261,6 +271,7 @@ static int handle_delimiter(struct lexer *lexer, struct ctx_info ctx)
     enum QUOTING_CONTEXT *quoting_ctx = ctx.quoting_ctx;
     int braces_depth = ctx.braces_depth;
     int paren_depth = ctx.paren_depth;
+    int backtick_depth = ctx.backtick_depth;
 
     /* Token Recognition Algorithm Rule 7 (modified)
      * If the current character is an unquoted <blank>, '\n' or ';', any
@@ -270,7 +281,7 @@ static int handle_delimiter(struct lexer *lexer, struct ctx_info ctx)
      * TOKEN_SEMICOLON*/
 
     if (*quoting_ctx == NONE && !(braces_depth > 0) && !(paren_depth > 0)
-        && is_delimiter(cur_char))
+        && !(backtick_depth > 0) && is_delimiter(cur_char))
     {
         delimit_token(lexer, cur_char);
 
@@ -308,7 +319,8 @@ void recognize_token(struct lexer *lexer, enum QUOTING_CONTEXT *quoting_ctx)
     struct ctx_info ctx = { .quoting_ctx = quoting_ctx,
                             .token_len = 0,
                             .braces_depth = 0,
-                            .paren_depth = 0 };
+                            .paren_depth = 0,
+                            .backtick_depth = 0 };
 
     while (1)
     {
