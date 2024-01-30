@@ -101,6 +101,67 @@ static void fill_specials_variables(int argc, char **argv, struct mem *mem)
     }
 }
 
+struct args_info
+{
+    char **expanded_argv;
+    int expanded_argc;
+};
+
+static int fork_execution(struct hm *hm_prefixes, char **prefixes_copy,
+                          struct args_info *args_info, struct ast *ast)
+{
+    char **expanded_argv = args_info->expanded_argv;
+    int expanded_argc = args_info->expanded_argc;
+
+    int status = 0;
+    struct ast_cmd *ast_cmd = (struct ast_cmd *)ast;
+    int pid = fork();
+
+    // Check if fork suceed
+    if (pid == -1)
+    {
+        perror("");
+
+        hm_free(hm_prefixes);
+        free_copies(expanded_argv, expanded_argc, prefixes_copy,
+                    ast_cmd->prefix_count);
+
+        _exit(127); // Check this value
+    }
+    if (pid == 0)
+    {
+        setenv_from_hm(hm_prefixes);
+
+        execvp(expanded_argv[0], expanded_argv);
+
+        fprintf(stderr, "42sh: %s: command not found\n", expanded_argv[0]);
+
+        hm_free(hm_prefixes);
+        free_copies(expanded_argv, expanded_argc, prefixes_copy,
+                    ast_cmd->prefix_count);
+
+        _exit(execvp_error(errno));
+    }
+    else
+    {
+        waitpid(pid, &status, 0);
+    }
+
+    hm_free(hm_prefixes);
+    free_copies(expanded_argv, expanded_argc, prefixes_copy,
+                ast_cmd->prefix_count);
+
+    // Check if the command was interrupted by a signal
+    if (WIFSIGNALED(status))
+    {
+        fprintf(stderr, "42sh: command terminated because of a signal");
+        return 129;
+    }
+
+    // Otherwise we return the status error code
+    return WEXITSTATUS(status);
+}
+
 int eval_simple_command(struct ast *ast, struct mem *mem)
 {
     int status = 0;
@@ -192,49 +253,8 @@ int eval_simple_command(struct ast *ast, struct mem *mem)
         return status;
     }
 
-    int pid = fork();
+    struct args_info infos = { .expanded_argc = expanded_argc,
+                               .expanded_argv = expanded_argv };
 
-    // Check if fork suceed
-    if (pid == -1)
-    {
-        perror("");
-
-        hm_free(hm_prefixes);
-        free_copies(expanded_argv, expanded_argc, prefixes_copy,
-                    ast_cmd->prefix_count);
-
-        _exit(127); // Check this value
-    }
-    if (pid == 0)
-    {
-        setenv_from_hm(hm_prefixes);
-
-        execvp(expanded_argv[0], expanded_argv);
-
-        fprintf(stderr, "42sh: %s: command not found\n", expanded_argv[0]);
-
-        hm_free(hm_prefixes);
-        free_copies(expanded_argv, expanded_argc, prefixes_copy,
-                    ast_cmd->prefix_count);
-
-        _exit(execvp_error(errno));
-    }
-    else
-    {
-        waitpid(pid, &status, 0);
-    }
-
-    hm_free(hm_prefixes);
-    free_copies(expanded_argv, expanded_argc, prefixes_copy,
-                ast_cmd->prefix_count);
-
-    // Check if the command was interrupted by a signal
-    if (WIFSIGNALED(status))
-    {
-        fprintf(stderr, "42sh: command terminated because of a signal");
-        return 129;
-    }
-
-    // Otherwise we return the status error code
-    return WEXITSTATUS(status);
+    return fork_execution(hm_prefixes, prefixes_copy, &infos, ast);
 }
