@@ -128,18 +128,17 @@ struct ast_until
     struct ast *data;
 };
 
-<<<<<<< HEAD
 struct ast_subshell
 {
     struct ast base;
     struct ast *compound_list;
-=======
+};
+
 struct ast_func
 {
     struct ast base;
     char *name;
     struct ast *shell_command;
->>>>>>> develop
 };
 
 /**

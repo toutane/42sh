@@ -141,6 +141,16 @@ static void free_ast_and_or(struct ast *ast)
     free(ast);
 }
 
+static void free_ast_subshell(struct ast *ast)
+{
+    struct ast_subshell *ast_subshell = (struct ast_subshell *)ast;
+    if (ast_subshell->compound_list)
+    {
+        ast_free(ast_subshell->compound_list);
+    }
+    free(ast);
+}
+
 typedef void (*free_type)(struct ast *ast);
 
 void ast_free(void *ast)
@@ -163,6 +173,7 @@ void ast_free(void *ast)
         [AST_AND] = &free_ast_and_or,
         [AST_OR] = &free_ast_and_or,
         [AST_FUNC] = &free_func,
+        [AST_SUBSHELL] = &free_ast_subshell,
     };
     (*functions[((struct ast *)ast)->type])(ast);
 }
