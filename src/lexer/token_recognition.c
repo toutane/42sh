@@ -23,16 +23,16 @@ static void set_context(struct lexer *lexer, struct ctx_info *ctx)
 
     // Set the length of the value of the current token
     ctx->token_len = 0;
-    if (lexer->cur_tok.type != TOKEN_NONE && lexer->cur_tok.value != NULL)
+    if (lexer->next_tok.type != TOKEN_NONE && lexer->next_tok.value != NULL)
     {
-        ctx->token_len = strlen(lexer->cur_tok.value);
+        ctx->token_len = strlen(lexer->next_tok.value);
     }
 
     // Set the preivous char analyzed if any
     ctx->prev_char = '\0';
-    if (lexer->cur_tok.type != TOKEN_NONE && ctx->token_len > 0)
+    if (lexer->next_tok.type != TOKEN_NONE && ctx->token_len > 0)
     {
-        ctx->prev_char = lexer->cur_tok.value[ctx->token_len - 1];
+        ctx->prev_char = lexer->next_tok.value[ctx->token_len - 1];
     }
 }
 
@@ -47,18 +47,24 @@ static void delimit_token(struct lexer *lexer, char delim)
 
     /* If the current token is TOKEN_NONE, we set the current token type to the
      * delimiter. */
-    if (lexer->cur_tok.type == TOKEN_NONE)
+    if (lexer->next_tok.type == TOKEN_NONE)
     {
         switch (delim)
         {
         case '\n':
-            fill_token(&lexer->cur_tok, TOKEN_NEWLINE, NULL);
+            fill_token(&lexer->next_tok, TOKEN_NEWLINE, NULL);
+            break;
+        case '(':
+            fill_token(&lexer->next_tok, TOKEN_LPAREN, NULL);
+            break;
+        case ')':
+            fill_token(&lexer->next_tok, TOKEN_RPAREN, NULL);
             break;
         case ';':
-            fill_token(&lexer->cur_tok, TOKEN_SEMICOLON, NULL);
+            fill_token(&lexer->next_tok, TOKEN_SEMICOLON, NULL);
             break;
         case EOF:
-            fill_token(&lexer->cur_tok, TOKEN_EOF, NULL);
+            fill_token(&lexer->next_tok, TOKEN_EOF, NULL);
             break;
         default:
             return;
@@ -97,7 +103,7 @@ static int handle_second_operator_char(struct lexer *lexer, struct ctx_info ctx)
      * characters to form an operator, it shall be used as part of that
      * (operator) token. */
 
-    if (lexer->cur_tok.type == TOKEN_OPERATOR && !(*quoting_ctx != NONE)
+    if (lexer->next_tok.type == TOKEN_OPERATOR && !(*quoting_ctx != NONE)
         && len == 1 && can_be_second_in_ope(prev_char, cur_char))
     {
         append_consume(lexer, cur_char);
@@ -105,7 +111,7 @@ static int handle_second_operator_char(struct lexer *lexer, struct ctx_info ctx)
     }
 
     /* Token Recognition Algorithm Rule 3 */
-    if (lexer->cur_tok.type == TOKEN_OPERATOR
+    if (lexer->next_tok.type == TOKEN_OPERATOR
         && (!can_be_second_in_ope(prev_char, cur_char) || len == 2))
     {
         return 2;
@@ -164,9 +170,9 @@ static int handle_parameter_expansion(struct lexer *lexer, struct ctx_info *ctx)
 
     if (*(ctx->quoting_ctx) == NONE && (cur_char == '$' || cur_char == '}'))
     {
-        if (lexer->cur_tok.type == TOKEN_NONE)
+        if (lexer->next_tok.type == TOKEN_NONE)
         {
-            fill_token(&lexer->cur_tok, TOKEN_WORD, NULL);
+            fill_token(&lexer->next_tok, TOKEN_WORD, NULL);
         }
 
         if (cur_char == '$')
@@ -176,12 +182,12 @@ static int handle_parameter_expansion(struct lexer *lexer, struct ctx_info *ctx)
             if (stream_peek(lexer->stream) == '{')
             {
                 ((ctx->braces_depth))++;
-                append_char_to_token_value(&lexer->cur_tok, '$');
+                append_char_to_token_value(&lexer->next_tok, '$');
                 append_consume(lexer, '{');
             }
             else
             {
-                append_char_to_token_value(&lexer->cur_tok, '$');
+                append_char_to_token_value(&lexer->next_tok, '$');
             }
         }
         else
@@ -208,7 +214,7 @@ static int handle_first_operator_char(struct lexer *lexer, struct ctx_info ctx)
 
     if (*quoting_ctx == NONE && can_be_first_in_ope(cur_char))
     {
-        if (lexer->cur_tok.type == TOKEN_NONE)
+        if (lexer->next_tok.type == TOKEN_NONE)
         {
             set_append_consume(lexer, TOKEN_OPERATOR, cur_char);
             return 1;
@@ -219,11 +225,11 @@ static int handle_first_operator_char(struct lexer *lexer, struct ctx_info ctx)
          * consider it as a word anymore and we consider it as an
          * io_number (only if the current char is a '<' or a '>'). */
 
-        if (lexer->cur_tok.type == TOKEN_WORD
-            && is_str_sequence_of_digits(lexer->cur_tok.value)
+        if (lexer->next_tok.type == TOKEN_WORD
+            && is_str_sequence_of_digits(lexer->next_tok.value)
             && (cur_char == '<' || cur_char == '>'))
         {
-            lexer->cur_tok.type = TOKEN_IONUMBER;
+            lexer->next_tok.type = TOKEN_IONUMBER;
         }
 
         return 2;
@@ -249,7 +255,7 @@ static int handle_delimiter(struct lexer *lexer, struct ctx_info ctx)
     {
         delimit_token(lexer, cur_char);
 
-        if (isblank(cur_char) && lexer->cur_tok.type != TOKEN_WORD)
+        if (isblank(cur_char) && lexer->next_tok.type != TOKEN_WORD)
         {
             return 1;
         }
@@ -321,7 +327,7 @@ void recognize_token(struct lexer *lexer, enum QUOTING_CONTEXT *quoting_ctx)
          * If the previous token is part of a word, the current character is
          * appended to the that word. */
 
-        if (lexer->cur_tok.type == TOKEN_WORD)
+        if (lexer->next_tok.type == TOKEN_WORD)
         {
             append_consume(lexer, ctx.cur_char);
             continue;
