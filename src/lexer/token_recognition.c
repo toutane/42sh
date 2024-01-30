@@ -54,6 +54,12 @@ static void delimit_token(struct lexer *lexer, char delim)
         case '\n':
             fill_token(&lexer->next_tok, TOKEN_NEWLINE, NULL);
             break;
+        case '(':
+            fill_token(&lexer->next_tok, TOKEN_LPAREN, NULL);
+            break;
+        case ')':
+            fill_token(&lexer->next_tok, TOKEN_RPAREN, NULL);
+            break;
         case ';':
             fill_token(&lexer->next_tok, TOKEN_SEMICOLON, NULL);
             break;

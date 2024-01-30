@@ -29,5 +29,5 @@ void set_append_consume(struct lexer *lexer, enum token_type type, char c)
 
 int is_delimiter(char c)
 {
-    return isblank(c) || c == '\n' || c == ';';
+    return isblank(c) || c == '\n' || c == ';' || c == '(' || c == ')';
 }

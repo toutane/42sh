@@ -82,6 +82,8 @@ static struct token_map_str token_map[] = {
     { TOKEN_SEMICOLON, "TOKEN_SEMICOLON" },
     { TOKEN_ERROR, "TOKEN_ERROR" },
     { TOKEN_EOF, "TOKEN_EOF" },
+    { TOKEN_LPAREN, "TOKEN_LPAREN" },
+    { TOKEN_RPAREN, "TOKEN_RPAREN" },
 
     /* Reserved words */
 

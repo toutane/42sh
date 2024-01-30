@@ -11,13 +11,6 @@
 #include "lexer/lexer_error.h"
 #include "lexer/token_recognition.h"
 
-#define PRINT_TOKEN(verbose, tok, action, order)                               \
-    if (verbose)                                                               \
-    {                                                                          \
-        printf("[LEXER] (" order ") " action " token: %s: %s\n",               \
-               token_type_to_str(tok.type), tok.value);                        \
-    }
-
 struct token parse_input_for_tok(struct lexer *lexer)
 {
     enum QUOTING_CONTEXT quoting_context = NONE;
