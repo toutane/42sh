@@ -13,8 +13,13 @@ struct lexer *lexer_new(struct stream_info *stream, struct options *opts)
 
     lexer->opts = opts;
     lexer->stream = stream;
+
     lexer->cur_tok.type = TOKEN_NONE;
     lexer->cur_tok.value = NULL;
+
+    lexer->next_tok.type = TOKEN_NONE;
+    lexer->next_tok.value = NULL;
+
     lexer->must_parse_next_tok = 1;
     lexer->last_error = NO_ERROR;
 
@@ -37,6 +42,11 @@ void lexer_free(struct lexer *lexer)
     if (lexer->cur_tok.value != NULL)
     {
         free(lexer->cur_tok.value); // Free the current token value if any
+    }
+
+    if (lexer->next_tok.value != NULL)
+    {
+        free(lexer->next_tok.value); // Free the next token value if any
     }
 
     int is_verbose = lexer->opts->verbose;

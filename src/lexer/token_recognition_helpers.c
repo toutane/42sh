@@ -15,7 +15,7 @@ void fill_token(struct token *tok, enum token_type type, char *value)
  * consume it. */
 void append_consume(struct lexer *lexer, char c)
 {
-    append_char_to_token_value(&lexer->cur_tok, c);
+    append_char_to_token_value(&lexer->next_tok, c);
     stream_pop(lexer->stream);
 }
 
@@ -23,7 +23,7 @@ void append_consume(struct lexer *lexer, char c)
  * the given character its value. */
 void set_append_consume(struct lexer *lexer, enum token_type type, char c)
 {
-    fill_token(&lexer->cur_tok, type, NULL);
+    fill_token(&lexer->next_tok, type, NULL);
     append_consume(lexer, c);
 }
 
