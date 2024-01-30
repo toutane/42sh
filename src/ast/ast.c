@@ -1,5 +1,16 @@
 #include "ast.h"
 
+static void free_func(struct ast *ast)
+{
+    struct ast_func *ast_func = (struct ast_func *)ast;
+    free(ast_func->name);
+
+    ast_free(ast_func->shell_command);
+
+    free(ast);
+    return;
+}
+
 static void free_ast_cmd(struct ast *ast)
 {
     struct ast_cmd *ast_cmd = (struct ast_cmd *)ast;
@@ -151,6 +162,7 @@ void ast_free(void *ast)
         [AST_NEG] = &free_ast_neg,
         [AST_AND] = &free_ast_and_or,
         [AST_OR] = &free_ast_and_or,
+        [AST_FUNC] = &free_func,
     };
     (*functions[((struct ast *)ast)->type])(ast);
 }
