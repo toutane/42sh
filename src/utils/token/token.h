@@ -3,6 +3,13 @@
 
 #include <unistd.h>
 
+#define PRINT_TOKEN(verbose, tok, action, order)                               \
+    if (verbose)                                                               \
+    {                                                                          \
+        printf("[LEXER] (" order ") " action " token: %s: %s\n",               \
+               token_type_to_str(tok.type), tok.value);                        \
+    }
+
 /*
  * @brief The different types of tokens
  */
@@ -17,6 +24,8 @@ enum token_type
     TOKEN_IONUMBER, // an io number (sequence of digits delimited by '<' or '>')
     TOKEN_NEWLINE, // '\n'
     TOKEN_SEMICOLON, // ';'
+    TOKEN_LPAREN, // '('
+    TOKEN_RPAREN, // ')'
     TOKEN_EOF, // end of input marker
 
     /* Operators */

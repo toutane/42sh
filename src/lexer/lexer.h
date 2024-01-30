@@ -36,7 +36,8 @@ struct lexer
 {
     struct options *opts; // The options of the program
     struct stream_info *stream; // The input stream
-    struct token cur_tok; // The next token, if processed
+    struct token cur_tok; // The current token, if processed
+    struct token next_tok; // The next token, if processed
     int must_parse_next_tok; // 1 if the next token must be parsed, 0 otherwise
     enum LEXER_ERROR last_error; // The last error that occured
 };
