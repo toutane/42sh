@@ -32,6 +32,10 @@ enum parser_status parse_fundec(struct ast **res, struct lexer *lexer)
                     *res = func_node;
                     return PARSER_OK;
                 }
+
+                ast_free(func_node);
+                *res = NULL;
+                return PARSER_FAIL;
             }
         }
 

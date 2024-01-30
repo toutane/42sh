@@ -25,8 +25,9 @@ enum parser_status parse_command(struct ast **res, struct lexer *lexer)
     // simple_command
     // | shell_command { redirecton }
     // | funcdec { redirecton }
+    enum parser_status func_call = PARSER_OK;
     if (lexer->next_tok.type == TOKEN_LPAREN
-        && parse_fundec(res, lexer) == PARSER_OK)
+        && (func_call = parse_fundec(res, lexer)) == PARSER_OK)
     {
         init_locals(&locals.redirs, &locals.main, res);
 
@@ -42,11 +43,13 @@ enum parser_status parse_command(struct ast **res, struct lexer *lexer)
         *res = locals.redirs;
         return PARSER_OK;
     }
-    else if (parse_simple_command(res, lexer) == PARSER_OK)
+    else if (func_call != PARSER_FAIL
+             && parse_simple_command(res, lexer) == PARSER_OK)
     {
         return PARSER_OK;
     }
-    else if (parse_shell_command(res, lexer) == PARSER_OK)
+    else if (func_call != PARSER_FAIL
+             && parse_shell_command(res, lexer) == PARSER_OK)
     {
         init_locals(&locals.redirs, &locals.main, res);
 
