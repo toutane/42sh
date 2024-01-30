@@ -24,6 +24,7 @@ enum ast_type
     AST_NEG,
     AST_AND,
     AST_OR,
+    AST_SUBSHELL,
 };
 
 enum redirection_type
@@ -124,6 +125,12 @@ struct ast_until
     struct ast base;
     struct ast *condition;
     struct ast *data;
+};
+
+struct ast_subshell
+{
+    struct ast base;
+    struct ast *compound_list;
 };
 
 /**
