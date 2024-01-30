@@ -15,7 +15,8 @@ int builtin_unset(int argc, char *argv[], struct mem *mem)
     int fun_flag = 0;
 
     // Parse options
-    int opt;
+    int opt = 0;
+    optind = 0;
     while ((opt = getopt(argc, argv, "fv")) != -1)
     {
         switch (opt)
