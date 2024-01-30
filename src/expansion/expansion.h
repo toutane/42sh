@@ -8,8 +8,11 @@
 #include "utils/printers/printers.h"
 #include "utils/variables/variables.h"
 
-char *expand_string(char **str, struct hm *hm_var);
+char *expand_string(char **str, struct mem *mem);
 
-char **argv_expansions(char **original_argv, int *argc, struct hm *hm_var);
+char **argv_expansions(char **original_argv, int *argc, struct mem *mem);
+
+void command_substitution(char **str, struct stream_info *stream,
+                          struct mem *mem);
 
 #endif /* ! EXPANSION_H */

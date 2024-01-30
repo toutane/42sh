@@ -45,6 +45,17 @@ int execution_loop(struct options *opts, struct stream_info *stream,
     struct lexer *lexer = lexer_new(stream, opts);
     to_be_freed.lexer = lexer;
 
+    /* DEBUG */
+    /*
+    struct token token = lexer_pop(lexer);
+    while (token.type != TOKEN_EOF)
+    {
+        printf("type: %s | value: %s\n", token_type_to_str(token.type),
+    token.value); token = lexer_pop(lexer);
+    }
+    */
+    /* DEBUG */
+
     while (lexer_peek(lexer).type != TOKEN_EOF)
     {
         set_break_number(0);

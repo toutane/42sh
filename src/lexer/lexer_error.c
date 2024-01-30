@@ -11,6 +11,7 @@ struct LEXER_ERROR_MSG_INFO lexer_error_msg_map[] = {
     { UNMATCHED_SINGLE_QUOTE, "unexpected EOF while looking for match \'" },
     { UNMATCHED_DOUBLE_QUOTE, "unexpected EOF while looking for matching \"" },
     { UNMATCHED_BRACE, "unmatched brace" },
+    { UNMATCHED_PARENTHESIS, "unmatched parenthesis" },
     { BAD_SUBSTITUTION, "bad substitution" },
 };
 
@@ -29,7 +30,8 @@ char *get_lexer_error_msg(enum LEXER_ERROR error)
 }
 
 void set_lexer_last_error(struct lexer *lexer,
-                          enum QUOTING_CONTEXT *quoting_ctx, int braces_depth)
+                          enum QUOTING_CONTEXT *quoting_ctx, int braces_depth,
+                          int paren_depth)
 {
     if (*quoting_ctx != NONE)
     {
@@ -43,6 +45,13 @@ void set_lexer_last_error(struct lexer *lexer,
     if (braces_depth != 0)
     {
         lexer->last_error = UNMATCHED_BRACE;
+        lexer->cur_tok.type = TOKEN_ERROR;
+        return;
+    }
+
+    if (paren_depth != 0)
+    {
+        lexer->last_error = UNMATCHED_PARENTHESIS;
         lexer->cur_tok.type = TOKEN_ERROR;
         return;
     }

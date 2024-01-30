@@ -41,7 +41,7 @@ static int handle_builtin_execution(int expanded_argc, char **expanded_argv,
     return status;
 }
 
-static int handle_empty_command(struct ast_cmd *ast_cmd, struct hm *hm_var)
+static int handle_empty_command(struct ast_cmd *ast_cmd, struct mem *mem)
 {
     char **prefixes_copy = calloc(ast_cmd->prefix_count + 1, sizeof(char *));
 
@@ -52,8 +52,8 @@ static int handle_empty_command(struct ast_cmd *ast_cmd, struct hm *hm_var)
          * parameter expansion, the algorithm will search into the given
          * hash_map and properly expand variable identifiers. */
 
-        prefixes_copy[i] = expand_string(&(ast_cmd->prefix[i]), hm_var);
-        assign_variable_from_ass_word(prefixes_copy[i], hm_var);
+        prefixes_copy[i] = expand_string(&(ast_cmd->prefix[i]), mem);
+        assign_variable_from_ass_word(prefixes_copy[i], mem->hm_var);
     }
 
     for (int i = 0; i < ast_cmd->prefix_count; ++i)
@@ -79,7 +79,7 @@ int eval_simple_command(struct ast *ast, struct mem *mem)
     int is_command_empty = (ast_cmd->argc == 0);
     if (is_command_empty)
     {
-        return handle_empty_command(ast_cmd, mem->hm_var);
+        return handle_empty_command(ast_cmd, mem);
     }
 
     /* We expand the arguments of the command, this contains backslash,
@@ -90,8 +90,7 @@ int eval_simple_command(struct ast *ast, struct mem *mem)
      */
 
     int expanded_argc = ast_cmd->argc;
-    char **expanded_argv =
-        argv_expansions(ast_cmd->argv, &expanded_argc, mem->hm_var);
+    char **expanded_argv = argv_expansions(ast_cmd->argv, &expanded_argc, mem);
 
     /* If the command is not empty, we need to expand the prefixes if any and
      * assign the variables to the environment of the command that will be
@@ -108,7 +107,7 @@ int eval_simple_command(struct ast *ast, struct mem *mem)
          * the parameter expansion, the algorithm will search into the given
          * hash_map and properly expand variable identifiers. */
 
-        prefixes_copy[i] = expand_string(&(ast_cmd->prefix[i]), mem->hm_var);
+        prefixes_copy[i] = expand_string(&(ast_cmd->prefix[i]), mem);
 
         char *word = prefixes_copy[i];
         char *key = get_key_from_assignment_word(word);
