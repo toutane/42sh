@@ -63,7 +63,8 @@ static struct stream_info *create_stream_from_file(char *file, int *status)
 {
     struct stream_info *stream = NULL;
 
-    char *first_elt = (strchr(file, '/') ? strchr(file, '/') : strchr(file, '\0'));
+    char *first_elt =
+        (strchr(file, '/') ? strchr(file, '/') : strchr(file, '\0'));
 
     // If path starts with ../ or ./
     if (((first_elt - file == 1) && !memcmp(file, ".", 1))
