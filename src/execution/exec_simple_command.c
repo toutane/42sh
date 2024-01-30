@@ -123,8 +123,6 @@ int eval_simple_command(struct ast *ast, struct mem *mem)
         free(value);
     }
 
-    hm_print(NULL);
-
     // check if word is a function -> no need to fork
     if (hm_contains(mem->hm_fun, expanded_argv[0]))
     {
@@ -144,6 +142,11 @@ int eval_simple_command(struct ast *ast, struct mem *mem)
         // replace correct hm and free
         hm_free(mem->hm_var);
         mem->hm_var = old_hm_var;
+
+        // free alloc prefix and copies
+        hm_free(hm_prefixes);
+        free_copies(expanded_argv, expanded_argc, prefixes_copy,
+                    ast_cmd->prefix_count);
 
         return status;
     }

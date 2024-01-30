@@ -5,7 +5,7 @@ static void free_func(struct ast *ast)
     struct ast_func *ast_func = (struct ast_func *)ast;
     free(ast_func->name);
 
-    ast_free(ast);
+    ast_free(ast_func->shell_command);
 
     free(ast);
     return;

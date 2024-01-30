@@ -12,13 +12,11 @@ enum parser_status parse_fundec(struct ast **res, struct lexer *lexer)
         lexer_pop(lexer);
 
         // replace WORD by a RPAR
-        if (lexer_peek(lexer).type == TOKEN_WORD
-            && !strcmp(lexer->cur_tok.value, "("))
+        if (lexer_peek(lexer).type == TOKEN_LPAREN)
         {
             lexer_pop(lexer);
 
-            if (lexer_peek(lexer).type == TOKEN_WORD
-                && !strcmp(lexer->cur_tok.value, ")"))
+            if (lexer_peek(lexer).type == TOKEN_RPAREN)
             {
                 lexer_pop(lexer);
 
