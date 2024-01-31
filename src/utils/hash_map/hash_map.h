@@ -9,6 +9,7 @@ enum hm_type
 {
     HM_VARIABLE,
     HM_FUNCTION,
+    HM_ALIAS,
 };
 
 struct pl

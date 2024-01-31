@@ -42,6 +42,7 @@ struct lexer
     struct token next_tok; // The next token, if processed
     int must_parse_next_tok; // 1 if the next token must be parsed, 0 otherwise
     enum LEXER_ERROR last_error; // The last error that occured
+    struct hm *hm_alias; // The hash_map containing all alias
 };
 
 /*

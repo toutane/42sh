@@ -145,7 +145,7 @@ void hm_print(struct hm *hm)
         while (cur != NULL)
         {
             printf("%s: %s", cur->key,
-                   hm->type == HM_VARIABLE ? (char *)cur->data : "ast");
+                   hm->type == HM_FUNCTION ? "ast" : (char *)cur->data);
             printf("%s", cur->next ? " -> " : " ]\n");
             cur = cur->next;
         }

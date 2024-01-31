@@ -2,7 +2,8 @@
 
 #include "lexer.h"
 
-struct lexer *lexer_new(struct stream_info *stream, struct options *opts)
+struct lexer *lexer_new(struct stream_info *stream, struct options *opts,
+                        struct hm *hm_alias)
 {
     struct lexer *lexer = calloc(1, sizeof(struct lexer));
     if (lexer == NULL)
@@ -22,6 +23,8 @@ struct lexer *lexer_new(struct stream_info *stream, struct options *opts)
 
     lexer->must_parse_next_tok = 1;
     lexer->last_error = NO_ERROR;
+
+    lexer->hm_alias = hm_alias;
 
     if (lexer->opts->verbose)
     {

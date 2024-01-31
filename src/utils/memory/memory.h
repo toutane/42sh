@@ -8,6 +8,7 @@ struct mem
 {
     struct hm *hm_var;
     struct hm *hm_fun;
+    struct hm *hm_alias;
 };
 
 struct mem *mem_new(void);

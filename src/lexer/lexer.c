@@ -10,6 +10,7 @@
 
 #include "lexer/lexer_error.h"
 #include "lexer/token_recognition.h"
+#include "utils/hash_map/hash_map.h"
 
 struct token parse_input_for_tok(struct lexer *lexer)
 {
@@ -26,6 +27,24 @@ struct token parse_input_for_tok(struct lexer *lexer)
     categorize_token(&(lexer->next_tok));
 
     return lexer->next_tok;
+}
+
+// Try to replace cur_tok.value with it's value in hm_alias
+static void check_alias(struct lexer *lexer)
+{
+    // Check alias only if token is a token word
+    if (lexer->cur_tok.type != TOKEN_WORD)
+    {
+        return;
+    }
+
+    char *alias_value = hm_get(lexer->hm_alias, lexer->cur_tok.value);
+    if (alias_value != NULL)
+    {
+        // alias found, replace value and free older
+        free(lexer->cur_tok.value);
+        lexer->cur_tok.value = strdup(alias_value);
+    }
 }
 
 struct token lexer_peek(struct lexer *lexer)
@@ -53,9 +72,11 @@ struct token lexer_peek(struct lexer *lexer)
         }
 
         lexer->must_parse_next_tok = 0;
+
         // Update the current token with the next token
         lexer->cur_tok.type = lexer->next_tok.type;
         lexer->cur_tok.value = lexer->next_tok.value;
+
         // Update the next token
         parse_input_for_tok(lexer);
 
@@ -73,6 +94,9 @@ struct token lexer_peek(struct lexer *lexer)
             fprintf(stderr, "42sh: %s: %s\n", lexer->cur_tok.value,
                     get_lexer_error_msg(lexer->last_error));
         }
+
+        // Replace token.value with it's alias if exist
+        check_alias(lexer);
 
         PRINT_TOKEN(is_verbose, lexer->cur_tok, "Peek", "current");
         return lexer->cur_tok;
