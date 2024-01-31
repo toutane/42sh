@@ -1,0 +1,25 @@
+funca ()
+{
+    b=3
+    echo $b
+    echo $c
+    echo $1 $2
+    funcb pw pqe pp
+    funcb ()
+    {
+        c=2
+        echo $b
+        echo $c
+        echo $1 $2 $3
+    }
+    echo $b
+    echo $c
+    echo $1 $2
+    funcb pw pqe pp
+}
+
+funca we oi
+funcb ewr wepro wp
+funca we oi
+
+echo $b $c $1 $2 $3

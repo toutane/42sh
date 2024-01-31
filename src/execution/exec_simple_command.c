@@ -107,6 +107,35 @@ struct args_info
     int expanded_argc;
 };
 
+static void restore_var(struct mem *mem, struct hm *oldvar)
+{
+    hm_set_var(mem->hm_var, "#", hm_get(oldvar, "#"));
+
+    // restore variables
+    int i = 1;
+    char *temp;
+    char *temp_int_to_string = int_to_string(i);
+    while ((temp = hm_get(oldvar, temp_int_to_string)) != NULL)
+    {
+        hm_set_var(mem->hm_var, temp_int_to_string, temp);
+        free(temp_int_to_string);
+        ++i;
+        temp_int_to_string = int_to_string(i);
+    }
+
+    while (hm_contains(mem->hm_var, temp_int_to_string))
+    {
+        hm_remove(mem->hm_var, temp_int_to_string);
+        free(temp_int_to_string);
+        ++i;
+        temp_int_to_string = int_to_string(i);
+    }
+
+    free(temp_int_to_string);
+
+    return;
+}
+
 static int fork_execution(struct hm *hm_prefixes, char **prefixes_copy,
                           struct args_info *args_info, struct ast *ast)
 {
@@ -230,8 +259,9 @@ int eval_simple_command(struct ast *ast, struct mem *mem)
         status = eval_ast(hm_get(mem->hm_fun, expanded_argv[0]), mem);
 
         // replace correct hm and free
-        hm_free(mem->hm_var);
-        mem->hm_var = old_hm_var;
+        restore_var(mem, old_hm_var);
+        hm_free(old_hm_var);
+        // mem->hm_var = old_hm_var;
 
         // free alloc prefix and copies
         hm_free(hm_prefixes);
