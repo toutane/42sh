@@ -1,0 +1,7 @@
+funca ()
+{
+    b=3
+}
+
+funca
+echo $b

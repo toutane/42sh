@@ -1,2 +1,3 @@
 run_test_line simple_subshell.test
 run_test_file subshell1.test
+run_test_file subshell2.test
