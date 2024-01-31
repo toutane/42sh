@@ -265,13 +265,13 @@ static int handle_first_operator_char(struct lexer *lexer, struct ctx_info ctx)
     return 0;
 }
 
-static int handle_delimiter(struct lexer *lexer, struct ctx_info ctx)
+static int handle_delimiter(struct lexer *lexer, struct ctx_info *ctx)
 {
-    char cur_char = ctx.cur_char;
-    enum QUOTING_CONTEXT *quoting_ctx = ctx.quoting_ctx;
-    int braces_depth = ctx.braces_depth;
-    int paren_depth = ctx.paren_depth;
-    int backtick_depth = ctx.backtick_depth;
+    char cur_char = ctx->cur_char;
+    enum QUOTING_CONTEXT *quoting_ctx = ctx->quoting_ctx;
+    int braces_depth = ctx->braces_depth;
+    int paren_depth = ctx->paren_depth;
+    int backtick_depth = ctx->backtick_depth;
 
     /* Token Recognition Algorithm Rule 7 (modified)
      * If the current character is an unquoted <blank>, '\n' or ';', any
@@ -292,6 +292,11 @@ static int handle_delimiter(struct lexer *lexer, struct ctx_info ctx)
 
         // Delimit the current token
         return 2;
+    }
+
+    if (cur_char == '(')
+    {
+        (ctx->paren_depth)++;
     }
 
     return 0;
@@ -349,7 +354,7 @@ void recognize_token(struct lexer *lexer, enum QUOTING_CONTEXT *quoting_ctx)
         if (status == 2)
             return;
 
-        status = handle_delimiter(lexer, ctx);
+        status = handle_delimiter(lexer, &ctx);
         if (status == 1)
             continue;
         if (status == 2)

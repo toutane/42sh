@@ -22,6 +22,20 @@ static void get_string_command(char **command, struct stream_info *stream,
             break;
         }
 
+        if (delimiter != ')' && next_char == '\\')
+        {
+            // append_char_to_string(command, next_char);
+            stream_pop(stream);
+            next_char = stream_peek(stream);
+            if (next_char == EOF)
+            {
+                break;
+            }
+            append_char_to_string(command, next_char);
+            stream_pop(stream);
+            continue;
+        }
+
         if (delimiter == ')' && next_char == '(')
         {
             depth++;
@@ -115,6 +129,12 @@ static void wait_and_replace(pid_t pid, char **str, int fds[2])
         append_char_to_string(str, next_char);
     }
 
+    // Remove the trailing newlines
+    while (strlen(*str) != 0 && (*str)[strlen(*str) - 1] == '\n')
+    {
+        (*str)[strlen(*str) - 1] = '\0';
+    }
+
     close(fds[0]);
 }
 
@@ -135,6 +155,7 @@ void command_substitution(char **str, struct stream_info *stream,
     // Gather the command in a string
     char *command = NULL;
     get_string_command(&command, stream, delimiter);
+    // printf("command: %s\n", command);
 
     // If the command is empty, we do nothing and return
     if (command == NULL || command[0] == '\0')
