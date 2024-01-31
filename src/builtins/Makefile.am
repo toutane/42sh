@@ -10,7 +10,8 @@ libbuiltins_a_SOURCES = builtins.c builtins.h \
 						builtin_cd.c \
 						builtin_dot.c \
 						builtin_unset.c \
-						builtin_alias.c
+						builtin_alias.c \
+						builtin_unalias.c
 
 libbuiltins_a_CPPFLAGS = -I$(top_srcdir)/src
 libbuiltins_a_CFLAGS = 	-Wall -Wextra -Werror -std=c99 -pedantic \

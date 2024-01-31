@@ -56,6 +56,24 @@ void pl_free(struct pl *pair, data_free_type data_free)
     free(pair);
 }
 
+void hm_clear(struct hm *hm)
+{
+    if (hm == NULL)
+    {
+        return;
+    }
+
+    if (hm->pairs != NULL)
+    {
+        // Free each pairs of the array
+        for (size_t i = 0; i < hm->size; i++)
+        {
+            pl_free(hm->pairs[i], hm->data_free);
+            hm->pairs[i] = NULL;
+        }
+    }
+}
+
 void hm_free(struct hm *hm)
 {
     if (hm == NULL)

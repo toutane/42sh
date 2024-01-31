@@ -36,12 +36,16 @@ int builtin_alias(int argc, char *argv[], struct mem *mem)
         return 0;
     }
 
-    // Split function base to =
-    key = strtok(argv[1], ALIAS_DELIMITER);
-    value = strtok(NULL, ALIAS_DELIMITER);
+    // Add alias
+    for (int i = 1; i < argc; ++i)
+    {
+        // Split function base to =
+        key = strtok(argv[i], ALIAS_DELIMITER);
+        value = strtok(NULL, ALIAS_DELIMITER);
 
-    // set alias
-    hm_set_var(mem->hm_alias, key, value);
+        // set alias
+        hm_set_var(mem->hm_alias, key, value);
+    }
 
     return 0;
 }

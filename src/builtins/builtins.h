@@ -73,6 +73,9 @@ int builtin_cd(int argc, char *argv[], struct mem *mem);
 /* @brief alias builtin  */
 int builtin_alias(int argc, char *argv[], struct mem *mem);
 
+/* @brief unalias builtin  */
+int builtin_unalias(int argc, char *argv[], struct mem *mem);
+
 /*
  * @brief . builtin
  */
