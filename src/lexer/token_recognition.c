@@ -294,7 +294,7 @@ static int handle_delimiter(struct lexer *lexer, struct ctx_info *ctx)
         return 2;
     }
 
-    if (cur_char == '(')
+    if (cur_char == '(' && *quoting_ctx == NONE)
     {
         (ctx->paren_depth)++;
     }
