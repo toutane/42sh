@@ -191,5 +191,6 @@ void fill_redirection_node_target(struct ast *ast, char *target);
 
 void fill_case_item_word(struct ast *ast, char *word);
 void fill_case_item_list(struct ast *ast, struct ast *ast_child);
+void fill_case_case_item(struct ast *ast, struct ast *ast_child);
 
 #endif /* ! AST_H */

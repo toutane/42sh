@@ -31,7 +31,7 @@ static enum parser_status parse_case_item(struct ast **res, struct lexer *lexer)
             }
         }
 
-        if (lexer_peek(lexer).type == TOKEN_LPAREN)
+        if (lexer_peek(lexer).type == TOKEN_RPAREN)
         {
             lexer_pop(lexer);
 
@@ -56,9 +56,8 @@ static enum parser_status parse_case_item(struct ast **res, struct lexer *lexer)
     return PARSER_UNEXPECTED_TOKEN;
 }
 
-static enum parser_status parse_case_clause(struct ast **res,
-                                            struct lexer *lexer,
-                                            struct ast_case *ast_case)
+static enum parser_status
+parse_case_clause(struct ast **res, struct lexer *lexer, struct ast *ast_case)
 {
     if (parse_case_item(res, lexer) == PARSER_OK)
     {
@@ -83,7 +82,6 @@ static enum parser_status parse_case_clause(struct ast **res,
         }
     }
 
-    *res = NULL;
     return PARSER_UNEXPECTED_TOKEN;
 }
 
@@ -117,10 +115,7 @@ enum parser_status parse_rule_case(struct ast **res, struct lexer *lexer)
                     lexer_pop(lexer);
                 }
 
-                if (parse_case_clause(res, lexer) == PARSER_OK)
-                {
-                    // TODO: fill_case_node
-                }
+                parse_case_clause(res, lexer, case_node);
 
                 if (lexer_peek(lexer).type == TOKEN_ESAC)
                 {
