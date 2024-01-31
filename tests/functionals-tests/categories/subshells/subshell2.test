@@ -1,1 +1,10 @@
-a=sh; (a=42; echo -n $a; (a=21; echo -n $a));echo $a
+a=sh
+(
+    a=42
+    echo -n $a
+    (
+        a=21
+        echo -n $(echo -n "here is a line)")
+    )
+)
+echo $a
