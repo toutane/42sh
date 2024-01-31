@@ -11,6 +11,8 @@ run_test_file break_minus.test
 run_test_file break_tricky.test
 # run_test_file break_string.test
 run_test_file break_more.test
+run_test_file function_break.test
+# run_test_file function_break2.test
 
 run_test_file continue_basic.test
 run_test_file continue_two_loops.test

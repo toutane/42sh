@@ -1,0 +1,9 @@
+func ()
+{
+    break
+}
+
+while true; do
+    echo hu;
+    func;
+done
