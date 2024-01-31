@@ -31,7 +31,7 @@ int builtin_alias(int argc, char *argv[], struct mem *mem)
             fprintf(stderr, "42sh: alias: %s: not found\n", argv[1]);
             return 1;
         }
-        printf("%s='%s'", key, value);
+        printf("%s='%s'\n", key, value);
 
         return 0;
     }

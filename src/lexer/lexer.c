@@ -29,24 +29,6 @@ struct token parse_input_for_tok(struct lexer *lexer)
     return lexer->next_tok;
 }
 
-// Try to replace cur_tok.value with it's value in hm_alias
-static void check_alias(struct lexer *lexer)
-{
-    // Check alias only if token is a token word
-    if (lexer->cur_tok.type != TOKEN_WORD)
-    {
-        return;
-    }
-
-    char *alias_value = hm_get(lexer->hm_alias, lexer->cur_tok.value);
-    if (alias_value != NULL)
-    {
-        // alias found, replace value and free older
-        free(lexer->cur_tok.value);
-        lexer->cur_tok.value = strdup(alias_value);
-    }
-}
-
 struct token lexer_peek(struct lexer *lexer)
 {
     // If the current token is TOKEN_ERROR, we shall not parse other tokens
@@ -94,9 +76,6 @@ struct token lexer_peek(struct lexer *lexer)
             fprintf(stderr, "42sh: %s: %s\n", lexer->cur_tok.value,
                     get_lexer_error_msg(lexer->last_error));
         }
-
-        // Replace token.value with it's alias if exist
-        check_alias(lexer);
 
         PRINT_TOKEN(is_verbose, lexer->cur_tok, "Peek", "current");
         return lexer->cur_tok;
@@ -172,4 +151,22 @@ int is_assignment_word(struct token *token, int is_the_first_word)
     }
 
     return 0;
+}
+
+// Try to replace cur_tok.value with it's value in hm_alias
+void check_alias(struct lexer *lexer)
+{
+    // Check alias only if token is a token word
+    if (lexer->cur_tok.type != TOKEN_WORD)
+    {
+        return;
+    }
+
+    char *alias_value = hm_get(lexer->hm_alias, lexer->cur_tok.value);
+    if (alias_value != NULL)
+    {
+        // alias found, replace value and free older
+        free(lexer->cur_tok.value);
+        lexer->cur_tok.value = strdup(alias_value);
+    }
 }

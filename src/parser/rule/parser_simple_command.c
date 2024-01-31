@@ -105,6 +105,9 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
 
     if (return_status != PARSER_FAIL && lexer_peek(lexer).type == TOKEN_WORD)
     {
+        // Check if the command name is alias
+        check_alias(lexer);
+
         // Fill node and Pop
         fill_sc_node_arg(locals.command, lexer);
         lexer_pop(lexer);

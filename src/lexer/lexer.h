@@ -94,4 +94,6 @@ struct token lexer_pop(struct lexer *lexer);
 
 int is_assignment_word(struct token *token, int is_the_first_word);
 
+void check_alias(struct lexer *lexer);
+
 #endif /* ! LEXER_H */
