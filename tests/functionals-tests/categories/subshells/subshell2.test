@@ -4,7 +4,7 @@ a=sh
     echo -n $a
     (
         a=21
-        echo -n $(echo -n "here is a line)")
+        echo $(echo "here is a line )" )
     )
 )
 echo $a
