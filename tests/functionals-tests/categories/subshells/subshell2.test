@@ -1,0 +1,1 @@
+a=sh; (a=42; echo -n $a; (a=21; echo -n $a));echo $a
