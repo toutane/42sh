@@ -8,7 +8,8 @@
 /**
  * @brief Creates a new lexer given an input string.
  */
-struct lexer *lexer_new(struct stream_info *stream, struct options *opts);
+struct lexer *lexer_new(struct stream_info *stream, struct options *opts,
+                        struct hm *hm_alias);
 
 /**
  ** @brief Free the given lexer, but not its input.

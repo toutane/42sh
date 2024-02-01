@@ -45,7 +45,7 @@ int execution_loop(struct options *opts, struct stream_info *stream,
     int status = 0;
 
     // Create the lexer
-    struct lexer *lexer = lexer_new(stream, opts);
+    struct lexer *lexer = lexer_new(stream, opts, mem->hm_alias);
     to_be_freed.lexer = lexer;
 
     /* DEBUG */

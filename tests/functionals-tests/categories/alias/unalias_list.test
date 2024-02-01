@@ -1,0 +1,12 @@
+alias foo=ls bar='ls -l' baz='ls -1'
+foo
+bar
+baz
+unalias foo bar
+foo
+bar
+baz
+unalias baz
+foo
+bar
+baz

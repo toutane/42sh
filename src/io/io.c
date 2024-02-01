@@ -111,8 +111,9 @@ struct stream_info *stream_new(const char *path, char *buf, int *err)
     return NULL;
 }
 
-void stream_free(struct stream_info *stream)
+void stream_free(void *generic_stream)
 {
+    struct stream_info *stream = generic_stream;
     if (stream == NULL)
     {
         fprintf(stderr, "42sh: stream_free: stream is NULL\n");

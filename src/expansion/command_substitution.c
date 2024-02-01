@@ -209,7 +209,7 @@ static int execute_substitution(char *command, struct mem *mem)
     };
 
     // Create the lexer
-    struct lexer *lexer = lexer_new(cmd_stream, &opts);
+    struct lexer *lexer = lexer_new(cmd_stream, &opts, mem->hm_alias);
     to_be_freed.lexer = lexer;
 
     while (lexer_peek(lexer).type != TOKEN_EOF)

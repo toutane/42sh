@@ -16,9 +16,11 @@ struct mem *mem_new(void)
 
     struct hm *hm_var = hm_new(HM_VARIABLE, MEMORY_SIZE, free);
     struct hm *hm_fun = hm_new(HM_FUNCTION, MEMORY_SIZE, ast_free);
+    struct hm *hm_alias = hm_new(HM_ALIAS, MEMORY_SIZE, free);
 
     mem->hm_var = hm_var;
     mem->hm_fun = hm_fun;
+    mem->hm_alias = hm_alias;
 
     return mem;
 }
@@ -32,6 +34,7 @@ void mem_free(struct mem *mem)
 
     hm_free(mem->hm_var);
     hm_free(mem->hm_fun);
+    hm_free(mem->hm_alias);
 
     free(mem);
 

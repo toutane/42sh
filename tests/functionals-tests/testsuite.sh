@@ -122,10 +122,10 @@ run_stdin()
 # check the differences between ref and my
 check_diff()
 {
-    diff --color=always -u $ref_stdout $my_stdout > $1.diff
+    diff --color=always -u $my_stdout $ref_stdout > $1.diff
     DIFF_CODE=$?
 
-    diff --color=always -u -r $WORKING_DIR_REF $WORKING_DIR_MY > $1_working_dir.diff
+    diff --color=always -u -r $WORKING_DIR_MY $WORKING_DIR_REF > $1_working_dir.diff
     DIFF_CODE_DIR=$?
 
     grep -q $GREP_PATTERN $my_stderr

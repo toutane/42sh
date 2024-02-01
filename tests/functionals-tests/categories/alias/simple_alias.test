@@ -1,0 +1,7 @@
+# this does not work, as the whole line is lexed and
+# parsed as a whole (it matches the list grammar rule)
+alias foo=ls; foo
+
+# this works, as the bar alias was registered before bar was lexed
+alias bar=ls
+bar

@@ -6,6 +6,7 @@
 #include "io/io.h"
 #include "options/opt_parser.h"
 #include "utils/hash_map/hash_map.h"
+#include "utils/stack/stack.h"
 #include "utils/strings/strings.h"
 #include "utils/token/token.h"
 
@@ -34,14 +35,25 @@ enum LEXER_ERROR
  * or lexer_pop is called, and no token is available.
  */
 
+struct item_info
+{
+    struct token *cur_tok;
+    struct token *next_tok;
+    struct stream_info *stream;
+};
+
 struct lexer
 {
     struct options *opts; // The options of the program
-    struct stream_info *stream; // The input stream
     struct token cur_tok; // The current token, if processed
     struct token next_tok; // The next token, if processed
     int must_parse_next_tok; // 1 if the next token must be parsed, 0 otherwise
     enum LEXER_ERROR last_error; // The last error that occured
+    struct hm *hm_alias; // The hash_map containing all alias
+
+    // current stream
+    struct stream_info *stream; // The input stream
+    struct stack *stream_stack; // Stack of all streams
 };
 
 /*
@@ -84,6 +96,8 @@ struct token parse_input_for_tok(struct lexer *lexer);
  * meant to help the parser check if the next token matches some rule.
  */
 struct token lexer_peek(struct lexer *lexer);
+
+struct token lexer_peek_alias(struct lexer *lexer);
 
 /**
  * @brief Returns the next token, and removes it from the stream:

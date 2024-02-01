@@ -9,18 +9,18 @@ struct item
     struct item *next;
 };
 
-typedef void (*data_free_type)(void *);
+typedef void (*data_free_stack)(void *);
 struct stack
 {
     struct item *head;
-    data_free_type free_func;
+    data_free_stack free_func;
     size_t size;
 };
 
 /*
  * @brief set up the stack structure
  */
-struct stack *stack_new(data_free_type free_func);
+struct stack *stack_new(data_free_stack free_func);
 
 void stack_clear(struct stack *stack);
 

@@ -9,6 +9,7 @@ enum hm_type
 {
     HM_VARIABLE,
     HM_FUNCTION,
+    HM_ALIAS,
 };
 
 struct pl
@@ -33,6 +34,8 @@ struct hm *hm_new(enum hm_type type, size_t size, data_free_type data_free);
 void hm_free(struct hm *hm);
 
 void pl_free(struct pl *pair, data_free_type data_free);
+
+void hm_clear(struct hm *hm);
 
 void *hm_get(struct hm *hm, const char *key);
 
