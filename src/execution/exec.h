@@ -55,6 +55,8 @@ int eval_subshell(struct ast *ast, struct mem *mem);
 
 int eval_func(struct ast *ast, struct mem *mem);
 
+int eval_case(struct ast *ast, struct mem *mem);
+
 void set_break_number(int new_val);
 
 int get_break_number(void);

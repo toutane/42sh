@@ -7,7 +7,8 @@ libast_a_SOURCES = ast.c ast.h \
 					node_func/redirection_node.c \
 					node_func/sc_node.c \
 					node_func/for_node.c \
-					node_func/func_node.c
+					node_func/func_node.c \
+					node_func/case_node.c
 
 libast_a_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/ast
 libast_a_CFLAGS = -Wall -Wextra -Werror -std=c99 -pedantic \

@@ -61,6 +61,12 @@ static void delimit_token(struct lexer *lexer, char delim)
             return;
         }
         stream_pop(lexer->stream);
+        if (stream_peek(lexer->stream) == ';'
+            && lexer->next_tok.type == TOKEN_SEMICOLON)
+        {
+            fill_token(&lexer->next_tok, TOKEN_DSEMI, NULL);
+            stream_pop(lexer->stream);
+        }
     }
 }
 

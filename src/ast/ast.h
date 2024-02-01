@@ -7,9 +7,9 @@
 #include <string.h>
 #include <sys/wait.h>
 
-#include "../error_handling/error_handling_execvp.h"
-#include "../lexer/lexer.h"
-#include "../utils/token/token.h"
+#include "error_handling/error_handling_execvp.h"
+#include "lexer/lexer.h"
+#include "utils/token/token.h"
 
 enum ast_type
 {
@@ -25,7 +25,9 @@ enum ast_type
     AST_AND,
     AST_OR,
     AST_SUBSHELL,
-    AST_FUNC
+    AST_FUNC,
+    AST_CASE,
+    AST_CASE_ITEM
 };
 
 enum redirection_type
@@ -141,6 +143,27 @@ struct ast_func
     struct ast *shell_command;
 };
 
+struct ast_case
+{
+    struct ast base;
+    // word before in
+    char *base_name;
+
+    // number of case item
+    int item_number;
+    struct ast **cases_items;
+};
+
+struct ast_case_item
+{
+    struct ast base;
+
+    int argc;
+    char **argv;
+
+    struct ast *compound_list;
+};
+
 /**
  * @brief Frees the ast.
  */
@@ -165,5 +188,9 @@ void init_redirection_node(struct ast *ast);
 void fill_redirection_node_ionumber(struct ast *ast, int ionumber);
 void fill_redirection_node_type(struct ast *ast, struct token tok);
 void fill_redirection_node_target(struct ast *ast, char *target);
+
+void fill_case_item_word(struct ast *ast, char *word);
+void fill_case_item_list(struct ast *ast, struct ast *ast_child);
+void fill_case_case_item(struct ast *ast, struct ast *ast_child);
 
 #endif /* ! AST_H */

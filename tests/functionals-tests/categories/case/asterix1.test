@@ -1,0 +1,8 @@
+case wqep in
+*)
+    echo branco!
+    ;;
+*)
+    echo siuuuu!
+    ;;
+esac

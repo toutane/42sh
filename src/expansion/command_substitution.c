@@ -276,7 +276,8 @@ static void wait_and_replace(pid_t pid, char **str, int fds[2])
     }
 
     // Remove the trailing newlines
-    while (strlen(*str) != 0 && (*str)[strlen(*str) - 1] == '\n')
+    while (*str != NULL && strlen(*str) != 0
+           && (*str)[strlen(*str) - 1] == '\n')
     {
         (*str)[strlen(*str) - 1] = '\0';
     }

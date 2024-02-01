@@ -1,0 +1,10 @@
+case hu in
+    hi)
+        echo ha;
+        ;;
+    hu)
+        ;;
+    hello)
+        echo bravo!
+        ;;
+esac

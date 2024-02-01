@@ -23,6 +23,7 @@ int eval_ast(struct ast *ast, struct mem *mem)
         [AST_OR] = &eval_or,
         [AST_SUBSHELL] = &eval_subshell,
         [AST_FUNC] = &eval_func,
+        [AST_CASE] = &eval_case,
     };
 
     int status = (*functions[ast->type])(ast, mem);

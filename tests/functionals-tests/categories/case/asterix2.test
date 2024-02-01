@@ -1,0 +1,8 @@
+case wqsoadiuep in
+wq*p)
+    echo branco!
+    ;;
+*)
+    echo dommage gros noob
+    ;;
+esac

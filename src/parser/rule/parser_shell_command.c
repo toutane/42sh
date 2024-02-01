@@ -79,5 +79,9 @@ enum parser_status parse_shell_command(struct ast **res, struct lexer *lexer)
     {
         return PARSER_OK;
     }
+    else if (parse_rule_case(res, lexer) == PARSER_OK)
+    {
+        return PARSER_OK;
+    }
     return PARSER_UNEXPECTED_TOKEN;
 }
