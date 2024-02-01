@@ -1,7 +1,7 @@
-#include "stack.h"
-
 #include <stdio.h>
 #include <unistd.h>
+
+#include "stack.h"
 
 struct stack *stack_new(data_free_type free_func)
 {
@@ -41,7 +41,7 @@ void stack_clear(struct stack *stack)
 
     // clear stack head
     item_free(stack->head, stack->free_func);
-    
+
     // reset stack info
     stack->head = NULL;
     stack->size = 0;

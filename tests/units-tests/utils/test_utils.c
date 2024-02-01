@@ -5,8 +5,8 @@
 #include <string.h>
 
 #include "utils/stack/stack.h"
- 
-TestSuite(stack, .timeout=2);
+
+TestSuite(stack, .timeout = 2);
 
 Test(stack, stack_new)
 {
@@ -23,7 +23,7 @@ Test(stack, stack_clear_empty_stack)
 {
     struct stack *stack = stack_new(free);
     stack_clear(stack);
-     
+
     cr_expect(stack->size == 0);
     cr_expect(stack->head == NULL);
     cr_expect(stack->free_func != NULL);
@@ -34,7 +34,7 @@ Test(stack, stack_clear_empty_stack)
 Test(stack, stack_free_empty_stack)
 {
     struct stack *stack = stack_new(free);
-     
+
     cr_expect(stack->size == 0);
     cr_expect(stack->head == NULL);
     cr_expect(stack->free_func != NULL);

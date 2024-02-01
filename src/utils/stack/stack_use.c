@@ -1,7 +1,7 @@
-#include "stack.h"
-
 #include <stdio.h>
 #include <unistd.h>
+
+#include "stack.h"
 
 int is_empty(struct stack *stack)
 {
@@ -28,7 +28,7 @@ void stack_push(struct stack *stack, void *data)
     }
 
     new_item->data = data;
-    
+
     // link new item to the stack
     new_item->next = stack->head;
     stack->head = new_item;
