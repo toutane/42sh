@@ -27,7 +27,7 @@ void *hm_get(struct hm *hm, const char *key)
 
 int hm_contains(struct hm *hm, const char *key)
 {
-    if (hm == NULL)
+    if (hm == NULL || key == NULL)
     {
         return 0;
     }
