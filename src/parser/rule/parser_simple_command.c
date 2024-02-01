@@ -103,8 +103,7 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
         }
     }
 
-    if (return_status != PARSER_FAIL
-        && lexer_peek_alias(lexer).type == TOKEN_WORD)
+    if (return_status != PARSER_FAIL && lexer_peek(lexer).type == TOKEN_WORD)
     {
         // Fill node and Pop
         fill_sc_node_arg(locals.command, lexer);

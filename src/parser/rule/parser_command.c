@@ -25,6 +25,7 @@ enum parser_status parse_command(struct ast **res, struct lexer *lexer)
     // simple_command
     // | shell_command { redirecton }
     // | funcdec { redirecton }
+    lexer_peek_alias(lexer);
     enum parser_status parse_status = PARSER_OK;
     if (lexer->next_tok.type == TOKEN_LPAREN
         && (parse_status = parse_fundec(res, lexer)) == PARSER_OK)
