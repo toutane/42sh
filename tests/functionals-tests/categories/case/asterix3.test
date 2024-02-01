@@ -1,0 +1,8 @@
+case abcdefgh in
+*c*f*)
+    echo branco!
+    ;;
+*)
+    echo dommage gros noob
+    ;;
+esac
