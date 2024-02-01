@@ -28,7 +28,9 @@ struct lexer *lexer_new(struct stream_info *stream, struct options *opts,
 
     // init stack and push default stream
     lexer->stream_stack = stack_new(stream_free);
-    stack_push(lexer->stream_stack, stream);
+    struct item_info *default_item = calloc(1, sizeof(struct item_info));
+    default_item->stream = stream;
+    stack_push(lexer->stream_stack, default_item);
 
     if (lexer->opts->verbose)
     {

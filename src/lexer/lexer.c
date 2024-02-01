@@ -14,6 +14,11 @@
 
 struct token parse_input_for_tok(struct lexer *lexer)
 {
+    if (lexer->stream == NULL)
+    {
+        return lexer->next_tok;
+    }
+
     enum QUOTING_CONTEXT quoting_context = NONE;
 
     // Reset current token
@@ -27,6 +32,97 @@ struct token parse_input_for_tok(struct lexer *lexer)
     categorize_token(&(lexer->next_tok));
 
     return lexer->next_tok;
+}
+
+static void handle_end_of_stream(struct lexer *lexer)
+{
+    stack_pop(lexer->stream_stack);
+
+    lexer->stream = NULL;
+
+    if (is_empty(lexer->stream_stack))
+    {
+        // The EOF was the end of the default stream (so the true EOF)
+        return;
+    }
+    else
+    {
+        struct item_info *cur_infos = stack_peek(lexer->stream_stack);
+
+        free(cur_infos->cur_tok->value);
+        lexer->cur_tok.type = cur_infos->next_tok->type;
+        lexer->cur_tok.value = cur_infos->next_tok->value;
+        free(cur_infos->next_tok);
+        free(cur_infos->cur_tok);
+
+        lexer->stream = cur_infos->stream;
+        parse_input_for_tok(lexer);
+
+        if (lexer->last_error != NO_ERROR)
+        {
+            fprintf(stderr, "42sh: %s: %s\n", lexer->cur_tok.value,
+                    get_lexer_error_msg(lexer->last_error));
+        }
+    }
+}
+
+// Try to replace cur_tok.value with it's value in hm_alias
+struct token lexer_peek_alias(struct lexer *lexer)
+{
+    lexer_peek(lexer);
+
+    if (lexer->cur_tok.type != TOKEN_WORD)
+    {
+        return lexer->cur_tok;
+    }
+
+    char *alias_value = hm_get(lexer->hm_alias, lexer->cur_tok.value);
+
+    if (alias_value == NULL)
+    {
+        return lexer->cur_tok;
+    }
+
+    struct item_info *old_item = stack_peek(lexer->stream_stack);
+    struct token *old_cur_tok = calloc(1, sizeof(struct token));
+    old_cur_tok->type = lexer->cur_tok.type;
+    old_cur_tok->value = lexer->cur_tok.value;
+    old_item->cur_tok = old_cur_tok;
+
+    struct token *old_next_tok = calloc(1, sizeof(struct token));
+    old_next_tok->type = lexer->next_tok.type;
+    old_next_tok->value = lexer->next_tok.value;
+    old_item->next_tok = old_next_tok;
+
+    old_item->stream = lexer->stream;
+
+    // alias found, replace value and free older
+    int err = 0;
+    struct stream_info *alias_stream = stream_new(NULL, alias_value, &err);
+
+    struct item_info *new_item = calloc(1, sizeof(struct item_info));
+    new_item->stream = alias_stream;
+
+    stack_push(lexer->stream_stack, new_item);
+    lexer->stream = alias_stream;
+
+    // Update the next token
+    parse_input_for_tok(lexer);
+
+    // If this is the first token, we put the next token in the current and
+    // we update again the next token
+    lexer->cur_tok.type = lexer->next_tok.type;
+    lexer->cur_tok.value = lexer->next_tok.value;
+
+    parse_input_for_tok(lexer);
+
+    if (lexer->last_error != NO_ERROR)
+    {
+        fprintf(stderr, "42sh: %s: %s\n", lexer->cur_tok.value,
+                get_lexer_error_msg(lexer->last_error));
+    }
+
+    return lexer->cur_tok;
 }
 
 struct token lexer_peek(struct lexer *lexer)
@@ -45,7 +141,7 @@ struct token lexer_peek(struct lexer *lexer)
 
     int is_verbose = lexer->opts->verbose;
 
-    if (lexer->must_parse_next_tok)
+    if (lexer->must_parse_next_tok && !is_empty(lexer->stream_stack))
     {
         if (lexer->cur_tok.value != NULL)
         {
@@ -76,9 +172,11 @@ struct token lexer_peek(struct lexer *lexer)
             fprintf(stderr, "42sh: %s: %s\n", lexer->cur_tok.value,
                     get_lexer_error_msg(lexer->last_error));
         }
+    }
 
-        PRINT_TOKEN(is_verbose, lexer->cur_tok, "Peek", "current");
-        return lexer->cur_tok;
+    if (lexer->cur_tok.type == TOKEN_EOF)
+    {
+        handle_end_of_stream(lexer);
     }
 
     PRINT_TOKEN(is_verbose, lexer->cur_tok, "Peek", "current");
@@ -151,22 +249,4 @@ int is_assignment_word(struct token *token, int is_the_first_word)
     }
 
     return 0;
-}
-
-// Try to replace cur_tok.value with it's value in hm_alias
-void check_alias(struct lexer *lexer)
-{
-    // Check alias only if token is a token word
-    if (lexer->cur_tok.type != TOKEN_WORD)
-    {
-        return;
-    }
-
-    char *alias_value = hm_get(lexer->hm_alias, lexer->cur_tok.value);
-    if (alias_value != NULL)
-    {
-        // alias found, replace value and free older
-        free(lexer->cur_tok.value);
-        lexer->cur_tok.value = strdup(alias_value);
-    }
 }

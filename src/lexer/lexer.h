@@ -35,6 +35,13 @@ enum LEXER_ERROR
  * or lexer_pop is called, and no token is available.
  */
 
+struct item_info
+{
+    struct token *cur_tok;
+    struct token *next_tok;
+    struct stream_info *stream;
+};
+
 struct lexer
 {
     struct options *opts; // The options of the program
@@ -90,6 +97,8 @@ struct token parse_input_for_tok(struct lexer *lexer);
  */
 struct token lexer_peek(struct lexer *lexer);
 
+struct token lexer_peek_alias(struct lexer *lexer);
+
 /**
  * @brief Returns the next token, and removes it from the stream:
  *   calling lexer_pop in a loop will iterate over all tokens until EOF.
@@ -97,7 +106,5 @@ struct token lexer_peek(struct lexer *lexer);
 struct token lexer_pop(struct lexer *lexer);
 
 int is_assignment_word(struct token *token, int is_the_first_word);
-
-void check_alias(struct lexer *lexer);
 
 #endif /* ! LEXER_H */

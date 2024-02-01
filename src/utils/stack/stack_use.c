@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include "io/io.h"
+#include "lexer/lexer.h"
 #include "stack.h"
 
 int is_empty(struct stack *stack)
@@ -50,6 +52,9 @@ void *stack_pop(struct stack *stack)
 
     // Save data and free item
     void *data = item_pop->data;
+    struct item_info *item = item_pop->data;
+    stream_free(item->stream);
+    free(item);
     free(item_pop);
 
     return data;
