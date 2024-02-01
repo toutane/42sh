@@ -4,7 +4,7 @@ void free_all(struct to_be_freed *to_be_freed)
 {
     ast_free(to_be_freed->ast);
     lexer_free(to_be_freed->lexer);
-    stream_free(to_be_freed->stream);
+    //stream_free(to_be_freed->stream);
     mem_free(to_be_freed->mem);
     return;
 }

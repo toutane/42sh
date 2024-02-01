@@ -26,6 +26,10 @@ struct lexer *lexer_new(struct stream_info *stream, struct options *opts,
 
     lexer->hm_alias = hm_alias;
 
+    // init stack and push default stream
+    lexer->stream_stack = stack_new(stream_free);
+    stack_push(lexer->stream_stack, stream);
+
     if (lexer->opts->verbose)
     {
         printf("[LEXER] Lexer created\n");
@@ -51,6 +55,8 @@ void lexer_free(struct lexer *lexer)
     {
         free(lexer->next_tok.value); // Free the next token value if any
     }
+
+    stack_free(lexer->stream_stack);
 
     int is_verbose = lexer->opts->verbose;
 
