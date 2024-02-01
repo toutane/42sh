@@ -1,2 +1,0 @@
-alias $(echo 'toto=tata'); echo toto
-alias toto; echo toto

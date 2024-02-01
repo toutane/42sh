@@ -5,12 +5,6 @@
 
 int builtin_alias(int argc, char *argv[], struct mem *mem)
 {
-    if (argc > 2 || !mem)
-    {
-        printf("42sh: alias: too many arguments\n");
-        return 1;
-    }
-
     if (argc == 1)
     {
         // Print all aliases word='substitute', don't follow SCL
