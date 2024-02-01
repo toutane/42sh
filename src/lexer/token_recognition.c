@@ -239,7 +239,8 @@ static int handle_first_operator_char(struct lexer *lexer, struct ctx_info ctx)
 
     /* Token Recognition Algorithm Rule 6 */
 
-    if (*quoting_ctx == NONE && can_be_first_in_ope(cur_char))
+    if (*quoting_ctx == NONE && ctx.paren_depth == 0 && ctx.backtick_depth == 0
+        && can_be_first_in_ope(cur_char))
     {
         if (lexer->next_tok.type == TOKEN_NONE)
         {
@@ -294,7 +295,7 @@ static int handle_delimiter(struct lexer *lexer, struct ctx_info *ctx)
         return 2;
     }
 
-    if (cur_char == '(')
+    if (cur_char == '(' && *quoting_ctx == NONE)
     {
         (ctx->paren_depth)++;
     }
