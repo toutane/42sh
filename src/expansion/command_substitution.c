@@ -253,7 +253,15 @@ static void wait_and_replace(pid_t pid, char **str, int fds[2])
     close(fds[1]);
 
     // In the parent process, wait for the child to finish
-    waitpid(pid, NULL, 0);
+    int child_status = 0;
+    waitpid(pid, &child_status, 0);
+
+    // If the child exited with a non-zero status, we do not replace.
+    if (WEXITSTATUS(child_status) != 0)
+    {
+        close(fds[0]);
+        return;
+    }
 
     // Read the output of the command
     while (1)

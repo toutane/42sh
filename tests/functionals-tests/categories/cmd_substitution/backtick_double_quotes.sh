@@ -16,3 +16,4 @@ echo "The file has $number_of_lines lines."
 
 echo "The file has `wc -l < env_var/echo_sharp_sign.sh` lines."
 
+echo "Pierre `echo 'Pierre'`" `echo 'Pierre'`" `echo 'Pierre'`"
