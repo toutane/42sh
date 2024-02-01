@@ -12,5 +12,6 @@ run_test_file three_semicolon2.test
 run_test_file three_semicolon3.test
 run_test_file three_semicolon4.test
 run_test_file casual.test
+run_test_file casual_valid.test
 run_test_file no_esac.test
 run_test_file no_in.test
