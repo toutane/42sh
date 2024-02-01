@@ -1,0 +1,12 @@
+b=true
+while $b; do
+    echo hi
+    b=false
+    func ()
+    {
+        echo ha;
+        continue;
+    }
+done
+
+func h

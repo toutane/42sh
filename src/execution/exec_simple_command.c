@@ -68,6 +68,129 @@ static int handle_empty_command(struct ast_cmd *ast_cmd, struct mem *mem)
     return 0;
 }
 
+static void fill_specials_variables(int argc, char **argv, struct mem *mem)
+{
+    char *star_at_var = NULL;
+    char *temp = NULL;
+    for (int i = 1; i < argc; ++i)
+    {
+        // fill $1, $2, $3 ...
+        temp = int_to_string(i);
+        hm_set_var(mem->hm_var, temp, argv[i]);
+        free(temp);
+
+        // fill star_at_func
+        my_strcat(&star_at_var, argv[i]);
+        if (i < argc - 1)
+        {
+            my_strcat(&star_at_var, " ");
+        }
+    }
+
+    // fill $#
+    temp = int_to_string(argc - 1);
+    hm_set_var(mem->hm_var, "#", temp);
+    free(temp);
+
+    // fill $* and $@
+    if (star_at_var != NULL)
+    {
+        hm_set_var(mem->hm_var, "*", star_at_var);
+        hm_set_var(mem->hm_var, "@", star_at_var);
+        free(star_at_var);
+    }
+}
+
+struct args_info
+{
+    char **expanded_argv;
+    int expanded_argc;
+};
+
+static void restore_var(struct mem *mem, struct hm *oldvar)
+{
+    hm_set_var(mem->hm_var, "#", hm_get(oldvar, "#"));
+
+    // restore variables
+    int i = 1;
+    char *temp;
+    char *temp_int_to_string = int_to_string(i);
+    while ((temp = hm_get(oldvar, temp_int_to_string)) != NULL)
+    {
+        hm_set_var(mem->hm_var, temp_int_to_string, temp);
+        free(temp_int_to_string);
+        ++i;
+        temp_int_to_string = int_to_string(i);
+    }
+
+    while (hm_contains(mem->hm_var, temp_int_to_string))
+    {
+        hm_remove(mem->hm_var, temp_int_to_string);
+        free(temp_int_to_string);
+        ++i;
+        temp_int_to_string = int_to_string(i);
+    }
+
+    free(temp_int_to_string);
+
+    return;
+}
+
+static int fork_execution(struct hm *hm_prefixes, char **prefixes_copy,
+                          struct args_info *args_info, struct ast *ast)
+{
+    char **expanded_argv = args_info->expanded_argv;
+    int expanded_argc = args_info->expanded_argc;
+
+    int status = 0;
+    struct ast_cmd *ast_cmd = (struct ast_cmd *)ast;
+    int pid = fork();
+
+    // Check if fork suceed
+    if (pid == -1)
+    {
+        perror("");
+
+        hm_free(hm_prefixes);
+        free_copies(expanded_argv, expanded_argc, prefixes_copy,
+                    ast_cmd->prefix_count);
+
+        _exit(127); // Check this value
+    }
+    if (pid == 0)
+    {
+        setenv_from_hm(hm_prefixes);
+
+        execvp(expanded_argv[0], expanded_argv);
+
+        fprintf(stderr, "42sh: %s: command not found\n", expanded_argv[0]);
+
+        hm_free(hm_prefixes);
+        free_copies(expanded_argv, expanded_argc, prefixes_copy,
+                    ast_cmd->prefix_count);
+
+        _exit(execvp_error(errno));
+    }
+    else
+    {
+        waitpid(pid, &status, 0);
+    }
+
+    hm_free(hm_prefixes);
+    free_copies(expanded_argv, expanded_argc, prefixes_copy,
+                ast_cmd->prefix_count);
+
+    // Check if the command was interrupted by a signal
+    if (WIFSIGNALED(status))
+    {
+        fprintf(stderr, "42sh: command terminated because of a signal");
+        return 129;
+    }
+
+    // Otherwise we return the status error code
+    return WEXITSTATUS(status);
+}
+
 int eval_simple_command(struct ast *ast, struct mem *mem)
 {
     int status = 0;
@@ -129,20 +252,16 @@ int eval_simple_command(struct ast *ast, struct mem *mem)
         struct hm *old_hm_var = mem->hm_var;
         mem->hm_var = cpy_hm_var(mem->hm_var);
 
-        // fill cpy hm with argv[1] to argv[argc - 1]
-        for (int i = 1; i < expanded_argc; ++i)
-        {
-            char *temp = int_to_string(i);
-            hm_set_var(mem->hm_var, temp, expanded_argv[i]);
-            free(temp);
-        }
+        // fill specials variables
+        fill_specials_variables(expanded_argc, expanded_argv, mem);
 
         // exec function, by evaluating ast func
         status = eval_ast(hm_get(mem->hm_fun, expanded_argv[0]), mem);
 
         // replace correct hm and free
-        hm_free(mem->hm_var);
-        mem->hm_var = old_hm_var;
+        restore_var(mem, old_hm_var);
+        hm_free(old_hm_var);
+        // mem->hm_var = old_hm_var;
 
         // free alloc prefix and copies
         hm_free(hm_prefixes);
@@ -164,49 +283,8 @@ int eval_simple_command(struct ast *ast, struct mem *mem)
         return status;
     }
 
-    int pid = fork();
+    struct args_info infos = { .expanded_argc = expanded_argc,
+                               .expanded_argv = expanded_argv };
 
-    // Check if fork suceed
-    if (pid == -1)
-    {
-        perror("");
-
-        hm_free(hm_prefixes);
-        free_copies(expanded_argv, expanded_argc, prefixes_copy,
-                    ast_cmd->prefix_count);
-
-        _exit(127); // Check this value
-    }
-    if (pid == 0)
-    {
-        setenv_from_hm(hm_prefixes);
-
-        execvp(expanded_argv[0], expanded_argv);
-
-        fprintf(stderr, "42sh: %s: command not found\n", expanded_argv[0]);
-
-        hm_free(hm_prefixes);
-        free_copies(expanded_argv, expanded_argc, prefixes_copy,
-                    ast_cmd->prefix_count);
-
-        _exit(execvp_error(errno));
-    }
-    else
-    {
-        waitpid(pid, &status, 0);
-    }
-
-    hm_free(hm_prefixes);
-    free_copies(expanded_argv, expanded_argc, prefixes_copy,
-                ast_cmd->prefix_count);
-
-    // Check if the command was interrupted by a signal
-    if (WIFSIGNALED(status))
-    {
-        fprintf(stderr, "42sh: command terminated because of a signal");
-        return 129;
-    }
-
-    // Otherwise we return the status error code
-    return WEXITSTATUS(status);
+    return fork_execution(hm_prefixes, prefixes_copy, &infos, ast);
 }

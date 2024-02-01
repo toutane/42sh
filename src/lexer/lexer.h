@@ -16,6 +16,7 @@ enum LEXER_ERROR
     UNMATCHED_DOUBLE_QUOTE,
     UNMATCHED_BRACE,
     UNMATCHED_PARENTHESIS,
+    UNMATCHED_BACKTICK,
     BAD_SUBSTITUTION,
 };
 
@@ -51,6 +52,17 @@ enum QUOTING_CONTEXT
     NONE,
     SINGLE_QUOTE,
     DOUBLE_QUOTE,
+};
+
+struct ctx_info
+{
+    enum QUOTING_CONTEXT *quoting_ctx;
+    char cur_char;
+    char prev_char;
+    size_t token_len;
+    int braces_depth;
+    int paren_depth;
+    int backtick_depth;
 };
 
 /**

@@ -1,0 +1,12 @@
+func ()
+{
+    echo "$*"
+}
+func
+func ab
+func 'a  b'
+func "a  b"
+func hi ho ha    hu
+func 'hi ho ha hu'
+func 'hi     ho' "ha hu"
+echo $#

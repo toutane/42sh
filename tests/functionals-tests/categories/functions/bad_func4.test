@@ -3,3 +3,4 @@ func ()
     echo "tata"
 
 func
+echo tata;
