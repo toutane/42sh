@@ -35,17 +35,12 @@ static struct token_map_int word_map[] = {
 };
 
 static struct token_map_int operator_map[] = {
-    { ">", TOKEN_GREAT },
-    { "<", TOKEN_LESS },
-    { ">>", TOKEN_DGREAT },
-    { ">&", TOKEN_GREATAND },
-    { "<&", TOKEN_LESSAND },
-    { ">|", TOKEN_CLOBBER },
-    { "<>", TOKEN_LESSGREAT },
-    { "|", TOKEN_PIPE },
-    { "||", TOKEN_OR },
-    { "&&", TOKEN_AND },
-    { NULL, 0 } // End of array marker
+    { ">", TOKEN_GREAT },      { "<", TOKEN_LESS },
+    { ">>", TOKEN_DGREAT },    { ">&", TOKEN_GREATAND },
+    { "<&", TOKEN_LESSAND },   { ">|", TOKEN_CLOBBER },
+    { "<>", TOKEN_LESSGREAT }, { "|", TOKEN_PIPE },
+    { "||", TOKEN_OR },        { "&&", TOKEN_AND },
+    { ";;", TOKEN_DSEMI },     { NULL, 0 } // End of array marker
 };
 
 void categorize_token(struct token *tok)
@@ -119,6 +114,7 @@ static struct token_map_str token_map[] = {
     { TOKEN_PIPE, "TOKEN_PIPE" },
     { TOKEN_OR, "TOKEN_OR" },
     { TOKEN_AND, "TOKEN_AND" },
+    { TOKEN_DSEMI, "TOKEN_DSEMI" },
 
     { 0, "TOKEN_UNKNOWN" } // End of array marker
 };

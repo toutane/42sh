@@ -9,3 +9,4 @@ run_test_file asterix2.test
 run_test_file asterix3.test
 run_test_file three_semicolon.test
 run_test_file three_semicolon2.test
+run_test_file no_esac.test

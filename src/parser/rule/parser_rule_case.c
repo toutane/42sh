@@ -64,30 +64,23 @@ parse_case_clause(struct ast **res, struct lexer *lexer, struct ast *ast_case)
     {
         fill_case_case_item(ast_case, *res);
 
-        while (lexer_peek(lexer).type == TOKEN_SEMICOLON)
+        while (lexer_peek(lexer).type == TOKEN_DSEMI)
         {
             lexer_pop(lexer);
 
-            if (lexer_peek(lexer).type == TOKEN_SEMICOLON)
+            while (lexer_peek(lexer).type == TOKEN_NEWLINE)
             {
                 lexer_pop(lexer);
+            }
 
-                while (lexer_peek(lexer).type == TOKEN_NEWLINE)
-                {
-                    lexer_pop(lexer);
-                }
-
-                if (parse_case_item(res, lexer) == PARSER_OK)
-                {
-                    fill_case_case_item(ast_case, *res);
-                }
-                else
-                {
-                    return PARSER_OK;
-                }
+            if (parse_case_item(res, lexer) == PARSER_OK)
+            {
+                fill_case_case_item(ast_case, *res);
             }
             else
-                break;
+            {
+                return PARSER_OK;
+            }
         }
     }
 
