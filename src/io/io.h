@@ -29,7 +29,7 @@ struct stream_info *stream_new(const char *path, char *buf, int *err);
  * @brief Free a stream_info object
  * @param stream The stream_info object to free
  */
-void stream_free(struct stream_info *stream);
+void stream_free(void *generic_stream);
 
 /*
  * @brief Read a character from a stream

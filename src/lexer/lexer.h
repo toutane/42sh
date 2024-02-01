@@ -6,6 +6,7 @@
 #include "io/io.h"
 #include "options/opt_parser.h"
 #include "utils/hash_map/hash_map.h"
+#include "utils/stack/stack.h"
 #include "utils/strings/strings.h"
 #include "utils/token/token.h"
 
@@ -37,12 +38,15 @@ enum LEXER_ERROR
 struct lexer
 {
     struct options *opts; // The options of the program
-    struct stream_info *stream; // The input stream
     struct token cur_tok; // The current token, if processed
     struct token next_tok; // The next token, if processed
     int must_parse_next_tok; // 1 if the next token must be parsed, 0 otherwise
     enum LEXER_ERROR last_error; // The last error that occured
     struct hm *hm_alias; // The hash_map containing all alias
+
+    // current stream
+    struct stream_info *stream; // The input stream
+    struct stack *stream_stack; // Stack of all streams
 };
 
 /*

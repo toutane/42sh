@@ -3,7 +3,7 @@
 
 #include "stack.h"
 
-struct stack *stack_new(data_free_type free_func)
+struct stack *stack_new(data_free_stack free_func)
 {
     struct stack *new = calloc(1, sizeof(struct stack));
     if (new == NULL)
@@ -18,7 +18,7 @@ struct stack *stack_new(data_free_type free_func)
     return new;
 }
 
-static void item_free(struct item *item, data_free_type free_func)
+static void item_free(struct item *item, data_free_stack free_func)
 {
     if (item == NULL)
     {
