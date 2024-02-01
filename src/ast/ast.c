@@ -11,6 +11,8 @@ static void free_case_item(struct ast *ast)
     free(ast_case_item->argv);
 
     ast_free(ast_case_item->compound_list);
+
+    free(ast);
     return;
 }
 
@@ -26,6 +28,7 @@ static void free_case(struct ast *ast)
     }
     free(ast_case->cases_items);
 
+    free(ast);
     return;
 }
 

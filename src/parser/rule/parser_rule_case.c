@@ -11,9 +11,10 @@ static enum parser_status parse_case_item(struct ast **res, struct lexer *lexer)
 
     if (lexer_peek(lexer).type == TOKEN_WORD)
     {
-        struct ast *case_item_node = calloc(1, sizeof(struct ast_case_item *));
+        struct ast *case_item_node = calloc(1, sizeof(struct ast_case_item));
         case_item_node->type = AST_CASE_ITEM;
 
+        fill_case_item_word(case_item_node, lexer->cur_tok.value);
         lexer_pop(lexer);
 
         while (lexer_peek(lexer).type == TOKEN_PIPE)
@@ -61,24 +62,32 @@ parse_case_clause(struct ast **res, struct lexer *lexer, struct ast *ast_case)
 {
     if (parse_case_item(res, lexer) == PARSER_OK)
     {
-        while (lexer_peek(lexer).type == TOKEN_WORD
-               && !strcmp(lexer->cur_tok.value, ";;"))
+        fill_case_case_item(ast_case, *res);
+
+        while (lexer_peek(lexer).type == TOKEN_SEMICOLON)
         {
             lexer_pop(lexer);
 
-            while (lexer_peek(lexer).type == TOKEN_NEWLINE)
+            if (lexer_peek(lexer).type == TOKEN_SEMICOLON)
             {
                 lexer_pop(lexer);
-            }
 
-            if (parse_case_item(res, lexer) == PARSER_OK)
-            {
-                fill_case_case_item(ast_case, *res);
+                while (lexer_peek(lexer).type == TOKEN_NEWLINE)
+                {
+                    lexer_pop(lexer);
+                }
+
+                if (parse_case_item(res, lexer) == PARSER_OK)
+                {
+                    fill_case_case_item(ast_case, *res);
+                }
+                else
+                {
+                    return PARSER_OK;
+                }
             }
             else
-            {
-                return PARSER_OK;
-            }
+                break;
         }
     }
 
@@ -119,6 +128,8 @@ enum parser_status parse_rule_case(struct ast **res, struct lexer *lexer)
 
                 if (lexer_peek(lexer).type == TOKEN_ESAC)
                 {
+                    lexer_pop(lexer);
+
                     *res = case_node;
                     return PARSER_OK;
                 }
@@ -128,6 +139,5 @@ enum parser_status parse_rule_case(struct ast **res, struct lexer *lexer)
         *res = NULL;
         ast_free(case_node);
     }
-
     return PARSER_UNEXPECTED_TOKEN;
 }
