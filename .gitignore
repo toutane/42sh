@@ -64,3 +64,4 @@ compile_commands.json
 
 # trash directory
 .cache
+tmux*
