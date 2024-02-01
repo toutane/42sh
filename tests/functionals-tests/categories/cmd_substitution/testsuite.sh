@@ -6,6 +6,7 @@ run_test_file multiple_paren.sh
 run_test_file ambiguous.sh
 run_test_file par_in_sub.sh
 run_test_file par_in_quotes.sh
+run_test_file paren_double_quoted.sh
 
 # When command substitution is inside backticks
 run_test_file basic_backtick.test

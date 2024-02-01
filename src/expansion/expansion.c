@@ -282,6 +282,12 @@ static void expand_loop(struct stream_info *stream, char **str, struct mem *mem)
             continue;
         }
 
+        if (context != SINGLE_QUOTE && cur_char == '`')
+        {
+            command_substitution(str, stream, mem);
+            continue;
+        }
+
         append_char_to_string(str, cur_char);
         stream_pop(stream);
     }
