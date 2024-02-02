@@ -81,4 +81,9 @@ int builtin_unalias(int argc, char *argv[], struct mem *mem);
  */
 int builtin_dot(int argc, char *argv[], struct mem *mem);
 
+/*
+ * @brief zouzoulkowsky builtin
+ */
+int builtin_zouzoulkowsky(int argc, char *argv[], struct mem *mem);
+
 #endif /* ! BUILTINS_H */

@@ -1,4 +1,4 @@
-#define NB_BUILTINS 12
+#define NB_BUILTINS 13
 #define BUILTIN_ERROR 2
 
 #include "builtins.h"
@@ -16,6 +16,7 @@ static struct builtin_matchs builtin_words[NB_BUILTINS] = {
     { .name = "unset", .fun = builtin_unset },
     { .name = "alias", .fun = builtin_alias },
     { .name = "unalias", .fun = builtin_unalias },
+    { .name = "bestProjectOfIng1", .fun = builtin_zouzoulkowsky },
 };
 
 // check if the cord is a builtin command
