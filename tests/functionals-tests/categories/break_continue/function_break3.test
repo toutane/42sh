@@ -1,0 +1,7 @@
+func ()
+{
+    break
+    echo good job
+}
+
+func
