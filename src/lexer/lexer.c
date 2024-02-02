@@ -34,42 +34,10 @@ struct token parse_input_for_tok(struct lexer *lexer)
     return lexer->next_tok;
 }
 
-static void handle_end_of_stream(struct lexer *lexer)
-{
-    stack_pop(lexer->stream_stack);
-
-    lexer->stream = NULL;
-
-    if (is_empty(lexer->stream_stack))
-    {
-        // The EOF was the end of the default stream (so the true EOF)
-        return;
-    }
-    else
-    {
-        struct item_info *cur_infos = stack_peek(lexer->stream_stack);
-
-        free(cur_infos->cur_tok->value);
-        lexer->cur_tok.type = cur_infos->next_tok->type;
-        lexer->cur_tok.value = cur_infos->next_tok->value;
-        free(cur_infos->next_tok);
-        free(cur_infos->cur_tok);
-
-        lexer->stream = cur_infos->stream;
-        parse_input_for_tok(lexer);
-
-        if (lexer->last_error != NO_ERROR)
-        {
-            fprintf(stderr, "42sh: %s: %s\n", lexer->cur_tok.value,
-                    get_lexer_error_msg(lexer->last_error));
-        }
-    }
-}
-
 // Try to replace cur_tok.value with it's value in hm_alias
 struct token lexer_peek_alias(struct lexer *lexer)
 {
-    lexer_peek(lexer);
+    // lexer_peek(lexer);
 
     if (lexer->cur_tok.type != TOKEN_WORD)
     {
@@ -84,6 +52,7 @@ struct token lexer_peek_alias(struct lexer *lexer)
     }
 
     struct item_info *old_item = stack_peek(lexer->stream_stack);
+
     struct token *old_cur_tok = calloc(1, sizeof(struct token));
     old_cur_tok->type = lexer->cur_tok.type;
     old_cur_tok->value = lexer->cur_tok.value;
@@ -121,6 +90,10 @@ struct token lexer_peek_alias(struct lexer *lexer)
         fprintf(stderr, "42sh: %s: %s\n", lexer->cur_tok.value,
                 get_lexer_error_msg(lexer->last_error));
     }
+
+    // PRINT_TOKEN(lexer->opts->verbose, lexer->cur_tok, "Peek_Alias",
+    // "current"); PRINT_TOKEN(lexer->opts->verbose, lexer->next_tok,
+    // "Peek_Alias", "next");
 
     return lexer->cur_tok;
 }
@@ -174,12 +147,8 @@ struct token lexer_peek(struct lexer *lexer)
         }
     }
 
-    if (lexer->cur_tok.type == TOKEN_EOF)
-    {
-        handle_end_of_stream(lexer);
-    }
-
-    PRINT_TOKEN(is_verbose, lexer->cur_tok, "Peek", "current");
+    PRINT_TOKEN(is_verbose, lexer->cur_tok, "Peek", "current")
+    // PRINT_TOKEN(is_verbose, lexer->next_tok, "Peek", "next");
 
     return lexer->cur_tok;
 }
@@ -189,7 +158,7 @@ struct token lexer_pop(struct lexer *lexer)
     lexer_peek(lexer);
 
     // Print the token if verbose mode is enabled
-    PRINT_TOKEN(lexer->opts->verbose, lexer->cur_tok, "Pop", "current");
+    // PRINT_TOKEN(lexer->opts->verbose, lexer->cur_tok, "Pop", "current");
 
     lexer->must_parse_next_tok = 1;
     return lexer->cur_tok;

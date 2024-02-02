@@ -70,18 +70,55 @@ static void delimit_token(struct lexer *lexer, char delim)
     }
 }
 
-static int handle_eof(struct lexer *lexer, struct ctx_info ctx)
+static int handle_eof(struct lexer *lexer, struct ctx_info *ctx)
 {
     /* Token Recognition Algorithm Rule 1
      * If the end of the input stream is encountered, the current token
      * shall be delimited. If an EOF is encountered while looking for
      * matching single quote the lexer returns a TOKEN_ERROR */
 
-    if (ctx.cur_char == EOF)
+    if (ctx->cur_char == EOF)
     {
-        delimit_token(lexer, EOF);
-        set_lexer_last_error(lexer, &ctx);
-        return 1;
+        if (lexer->stream_stack->size == 1)
+        {
+            // The EOF was the end of the default stream (so the true EOF)
+            delimit_token(lexer, EOF);
+            set_lexer_last_error(lexer, ctx);
+            return 1;
+        }
+        else
+        {
+            stack_pop(lexer->stream_stack);
+            struct item_info *cur_infos = stack_peek(lexer->stream_stack);
+
+            enum token_type type = cur_infos->next_tok->type;
+            if (type != TOKEN_NONE && type != TOKEN_EOF && type != TOKEN_ERROR)
+            {
+                /* We go back to the previous token (we need to go back to the
+                 * previous token because we need to reparse the current token
+                 * with the new stream). */
+                if (cur_infos->next_tok->value != NULL)
+                {
+                    size_t len = strlen(cur_infos->next_tok->value) + 1;
+                    fseek(cur_infos->stream->fp, -len, SEEK_CUR);
+                }
+                else
+                {
+                    /* If the value of the next token is NULL, it means that the
+                     * next token is a delimiter, so we need to go back to the
+                     * previous character. */
+                    fseek(cur_infos->stream->fp, -1, SEEK_CUR);
+                }
+            }
+
+            free(cur_infos->next_tok->value);
+            free(cur_infos->next_tok);
+            free(cur_infos->cur_tok->value);
+            free(cur_infos->cur_tok);
+
+            lexer->stream = cur_infos->stream;
+            ctx->cur_char = stream_peek(lexer->stream);
+        }
     }
 
     return 0;
@@ -338,7 +375,7 @@ void recognize_token(struct lexer *lexer, enum QUOTING_CONTEXT *quoting_ctx)
     {
         set_context(lexer, &ctx);
 
-        if (handle_eof(lexer, ctx))
+        if (handle_eof(lexer, &ctx))
             return;
 
         int status = handle_second_operator_char(lexer, ctx);
