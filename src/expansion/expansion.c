@@ -246,6 +246,22 @@ static void handle_dollar(char **str, struct stream_info *stream,
     expand_variable(str, expression, mem->hm_var);
 }
 
+static void handle_tilde(char **str, struct stream_info *stream,
+                         struct mem *mem)
+{
+    // Consume the tild
+    stream_pop(stream);
+
+    char *value = get_variable("HOME", mem->hm_var);
+
+    if (value == NULL)
+    {
+        return;
+    }
+
+    my_strcat(str, value);
+}
+
 static void expand_loop(struct stream_info *stream, char **str, struct mem *mem)
 {
     enum QUOTING_CONTEXT context = NONE;
@@ -400,6 +416,17 @@ static char **word_expansions(char **expanded_argv, int *expanded_argc,
 
         if (handle_quotes(expanded_argv, expanded_argc, stream, &context))
         {
+            continue;
+        }
+
+        // tild expansion
+        if (context == NONE && cur_char == '~')
+        {
+            handle_tilde(&temp_str, stream, mem);
+            my_strcat(&expanded_argv[*expanded_argc], temp_str);
+
+            free(temp_str);
+            temp_str = NULL;
             continue;
         }
 
