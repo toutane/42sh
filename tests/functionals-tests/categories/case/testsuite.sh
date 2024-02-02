@@ -15,3 +15,4 @@ run_test_file casual.test
 run_test_file casual_valid.test
 run_test_file no_esac.test
 run_test_file no_in.test
+run_test_file quoted.test

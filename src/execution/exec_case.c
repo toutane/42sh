@@ -13,7 +13,7 @@ static int is_in_argv(int argc, char **argv, char *word, struct mem *mem)
     {
         temp = expand_string(&(argv[i]), mem);
 
-        if (fnmatch(argv[i], expanded_word, 0) == 0)
+        if (fnmatch(temp, expanded_word, 0) == 0)
         {
             free(expanded_word);
             free(temp);

@@ -1,0 +1,11 @@
+case hello in
+    hi)
+        echo ha;
+        ;;
+    hu)
+        echo hb;
+        ;;
+    'hello')
+        echo bravo!
+        ;;
+esac
