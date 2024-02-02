@@ -1,8 +1,10 @@
 #define _XOPEN_SOURCE 500
+#define _POSIX_SOURCE
 
 #include "expansion.h"
 
 #include <ctype.h>
+#include <pwd.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -252,14 +254,34 @@ static void handle_tilde(char **str, struct stream_info *stream,
     // Consume the tild
     stream_pop(stream);
 
-    char *value = get_variable("HOME", mem->hm_var);
+    // Get HOME variable
+    char *home = get_variable("HOME", mem->hm_var);
 
-    if (value == NULL)
+    // Get the expression
+    char next_char = stream_peek(stream);
+    char *expression = NULL;
+    recognize_expr(next_char, &expression, stream);
+
+    // Expande home variable
+    if (expression == NULL || expression[0] == '/')
     {
+        my_strcat(str, home);
+        my_strcat(str, expression);
         return;
     }
 
-    my_strcat(str, value);
+    // Try to get home from expression
+    struct passwd *p;
+    if ((p = getpwnam(expression)) == NULL)
+    {
+        my_strcat(str, "~");
+        my_strcat(str, expression);
+        return;
+    }
+
+    my_strcat(str, p->pw_dir);
+    free(expression);
+    return;
 }
 
 static void expand_loop(struct stream_info *stream, char **str, struct mem *mem)
@@ -295,6 +317,12 @@ static void expand_loop(struct stream_info *stream, char **str, struct mem *mem)
         if (cur_char == '$')
         {
             handle_dollar(str, stream, &context, mem);
+            continue;
+        }
+
+        if (context == NONE && cur_char == '~')
+        {
+            handle_tilde(str, stream, mem);
             continue;
         }
 
