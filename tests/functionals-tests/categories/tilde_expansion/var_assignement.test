@@ -1,2 +1,2 @@
 a=~:~root:~/ref:~/toto
-echo a
+echo $a
