@@ -1,7 +1,7 @@
 #include "builtins.h"
 #include "utils/printers/printers.h"
 
-#define ALIAS_DELIMITER "="
+#define ALIAS_DELIMITER '='
 
 int builtin_alias(int argc, char *argv[], struct mem *mem)
 {
@@ -34,8 +34,12 @@ int builtin_alias(int argc, char *argv[], struct mem *mem)
     for (int i = 1; i < argc; ++i)
     {
         // Split function base to =
-        key = strtok(argv[i], ALIAS_DELIMITER);
-        value = strtok(NULL, ALIAS_DELIMITER);
+        char *pivot = strchr(argv[i], ALIAS_DELIMITER);
+        *pivot = '\0';
+
+        // set key and value
+        key = argv[i];
+        value = (pivot + 1);
 
         // set alias
         hm_set_var(mem->hm_alias, key, value);
