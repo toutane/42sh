@@ -31,6 +31,8 @@ int eval_for(struct ast *ast, struct mem *mem)
     char **expanded_array =
         argv_expansions(ast_for->array, &expanded_array_size, mem);
 
+    set_loop_number(get_loop_number() + 1);
+
     // Eval the ast loop
     int break_number;
     int continue_number;
@@ -55,6 +57,8 @@ int eval_for(struct ast *ast, struct mem *mem)
             continue;
         }
     }
+
+    set_loop_number(get_loop_number() - 1);
 
     // Free expanded array
     for (int j = 0; j < expanded_array_size; j++)

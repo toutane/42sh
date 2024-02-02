@@ -65,4 +65,8 @@ void set_continue_number(int new_val);
 
 int get_continue_number(void);
 
+void set_loop_number(int new_val);
+
+int get_loop_number(void);
+
 #endif /* ! EXEC_H */
