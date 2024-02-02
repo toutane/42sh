@@ -51,8 +51,7 @@ struct lexer
     enum LEXER_ERROR last_error; // The last error that occured
     struct hm *hm_alias; // The hash_map containing all alias
 
-    // current stream
-    struct stream_info *stream; // The input stream
+    struct stream_info *stream; // The current input stream
     struct stack *stream_stack; // Stack of all streams
 };
 

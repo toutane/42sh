@@ -99,16 +99,22 @@ static int handle_eof(struct lexer *lexer, struct ctx_info *ctx)
                  * with the new stream). */
                 if (cur_infos->next_tok->value != NULL)
                 {
-                    size_t len = strlen(cur_infos->next_tok->value) + 1;
+                    size_t len = strlen(cur_infos->next_tok->value);
                     fseek(cur_infos->stream->fp, -len, SEEK_CUR);
                 }
-                else
+
+                if (cur_infos->next_tok->value == NULL)
                 {
-                    /* If the value of the next token is NULL, it means that the
-                     * next token is a delimiter, so we need to go back to the
-                     * previous character. */
                     fseek(cur_infos->stream->fp, -1, SEEK_CUR);
                 }
+
+                fseek(cur_infos->stream->fp, -1, SEEK_CUR);
+                while (isspace(stream_peek(cur_infos->stream)))
+                {
+                    fseek(cur_infos->stream->fp, -1, SEEK_CUR);
+                }
+
+                fseek(cur_infos->stream->fp, 1, SEEK_CUR);
             }
 
             free(cur_infos->next_tok->value);
