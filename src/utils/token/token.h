@@ -40,6 +40,7 @@ enum token_type
     TOKEN_PIPE, // '|'
     TOKEN_AND, // '&&'
     TOKEN_OR, // '||'
+    TOKEN_DSEMI, // ';;'
 
     /* Reserved words */
 
@@ -57,6 +58,8 @@ enum token_type
     TOKEN_UNTIL, // 'until'
     TOKEN_DO, // 'do'
     TOKEN_DONE, // 'done'
+    TOKEN_CASE, // 'case'
+    TOKEN_ESAC // 'esac'
 };
 
 /*

@@ -1,5 +1,37 @@
 #include "ast.h"
 
+static void free_case_item(struct ast *ast)
+{
+    struct ast_case_item *ast_case_item = (struct ast_case_item *)ast;
+
+    for (int i = 0; i < ast_case_item->argc; ++i)
+    {
+        free(ast_case_item->argv[i]);
+    }
+    free(ast_case_item->argv);
+
+    ast_free(ast_case_item->compound_list);
+
+    free(ast);
+    return;
+}
+
+static void free_case(struct ast *ast)
+{
+    struct ast_case *ast_case = (struct ast_case *)ast;
+
+    free(ast_case->base_name);
+
+    for (int i = 0; i < ast_case->item_number; ++i)
+    {
+        ast_free(ast_case->cases_items[i]);
+    }
+    free(ast_case->cases_items);
+
+    free(ast);
+    return;
+}
+
 static void free_func(struct ast *ast)
 {
     struct ast_func *ast_func = (struct ast_func *)ast;
@@ -174,6 +206,8 @@ void ast_free(void *ast)
         [AST_OR] = &free_ast_and_or,
         [AST_FUNC] = &free_func,
         [AST_SUBSHELL] = &free_ast_subshell,
+        [AST_CASE] = &free_case,
+        [AST_CASE_ITEM] = &free_case_item,
     };
     (*functions[((struct ast *)ast)->type])(ast);
 }

@@ -17,7 +17,8 @@ libparser_a_SOURCES = parser.h parser.c \
 					  rule/parser_rule_while.c \
 					  rule/parser_redirection.c \
 					  rule/parser_prefix.c \
-					  rule/parser_fundec.c
+					  rule/parser_fundec.c \
+					  rule/parser_rule_case.c
 
 libparser_a_CPPFLAGS = -I$(top_srcdir)/src
 libparser_a_CFLAGS = -Wall -Wextra -Werror -std=c99 -pedantic \

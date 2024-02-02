@@ -29,21 +29,18 @@ static struct token_map_int word_map[] = {
     { "until", TOKEN_UNTIL },
     { "do", TOKEN_DO },
     { "done", TOKEN_DONE },
+    { "case", TOKEN_CASE },
+    { "esac", TOKEN_ESAC },
     { NULL, 0 } // End of array marker
 };
 
 static struct token_map_int operator_map[] = {
-    { ">", TOKEN_GREAT },
-    { "<", TOKEN_LESS },
-    { ">>", TOKEN_DGREAT },
-    { ">&", TOKEN_GREATAND },
-    { "<&", TOKEN_LESSAND },
-    { ">|", TOKEN_CLOBBER },
-    { "<>", TOKEN_LESSGREAT },
-    { "|", TOKEN_PIPE },
-    { "||", TOKEN_OR },
-    { "&&", TOKEN_AND },
-    { NULL, 0 } // End of array marker
+    { ">", TOKEN_GREAT },      { "<", TOKEN_LESS },
+    { ">>", TOKEN_DGREAT },    { ">&", TOKEN_GREATAND },
+    { "<&", TOKEN_LESSAND },   { ">|", TOKEN_CLOBBER },
+    { "<>", TOKEN_LESSGREAT }, { "|", TOKEN_PIPE },
+    { "||", TOKEN_OR },        { "&&", TOKEN_AND },
+    { ";;", TOKEN_DSEMI },     { NULL, 0 } // End of array marker
 };
 
 void categorize_token(struct token *tok)
@@ -101,6 +98,8 @@ static struct token_map_str token_map[] = {
     { TOKEN_UNTIL, "TOKEN_UNTIL" },
     { TOKEN_DO, "TOKEN_DO" },
     { TOKEN_DONE, "TOKEN_DONE" },
+    { TOKEN_CASE, "TOKEN_CASE" },
+    { TOKEN_ESAC, "TOKEN_ESAC" },
 
     /* Operators */
 
@@ -115,6 +114,7 @@ static struct token_map_str token_map[] = {
     { TOKEN_PIPE, "TOKEN_PIPE" },
     { TOKEN_OR, "TOKEN_OR" },
     { TOKEN_AND, "TOKEN_AND" },
+    { TOKEN_DSEMI, "TOKEN_DSEMI" },
 
     { 0, "TOKEN_UNKNOWN" } // End of array marker
 };
@@ -141,7 +141,8 @@ int is_reserved_word(struct token token)
         || type == TOKEN_ELIF || type == TOKEN_FI || type == TOKEN_NEG
         || type == TOKEN_LBRACE || type == TOKEN_RBRACE || type == TOKEN_FOR
         || type == TOKEN_IN || type == TOKEN_WHILE || type == TOKEN_UNTIL
-        || type == TOKEN_DO || type == TOKEN_DONE;
+        || type == TOKEN_DO || type == TOKEN_DONE || type == TOKEN_CASE
+        || type == TOKEN_ESAC;
 }
 
 int can_be_first_in_ope(char c)

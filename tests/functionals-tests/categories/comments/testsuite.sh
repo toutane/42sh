@@ -1,1 +1,2 @@
 run_test_line comments1.test
+run_test_file comment_return_code.test

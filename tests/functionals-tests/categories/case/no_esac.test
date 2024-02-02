@@ -1,0 +1,4 @@
+case hello in
+*)
+    echo ok;
+    ;;

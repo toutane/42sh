@@ -1,4 +1,4 @@
-#include "../ast.h"
+#include "ast.h"
 
 void fill_while_node(struct ast *ast, struct ast *ast_child)
 {

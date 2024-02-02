@@ -13,7 +13,8 @@ TOTAL_RUN=0
 TOTAL_FAIL=0
 
 # grep regex to match memory leaks
-GREP_PATTERN="LeakSanitizer"
+GREP_LEAKS="LeakSanitizer"
+GREP_SEG="AddressSanitizer"
 
 # redirect files
 ref_stdout=/tmp/.ref_stdout
@@ -128,8 +129,11 @@ check_diff()
     diff --color=always -u -r $WORKING_DIR_MY $WORKING_DIR_REF > $1_working_dir.diff
     DIFF_CODE_DIR=$?
 
-    grep -q $GREP_PATTERN $my_stderr
-    GREP_CODE=$?
+    grep -q $GREP_LEAKS $my_stderr
+    GREP_LEAKS_CODE=$?
+
+    grep -q $GREP_SEG $my_stderr
+    GREP_SEG_CODE=$?
 
     # check timeouts
     if [ $WAS_TIMEOUT -eq 1 ]; then
@@ -144,8 +148,14 @@ check_diff()
     fi
 
     #check memory leaks
-    if [ $GREP_CODE -eq 0 ]; then
+    if [ $GREP_LEAKS_CODE -eq 0 ]; then
         echo -ne "$RED MEMORY_LEAKS($INPUT)$WHITE"
+        sucess=false
+    fi
+
+    #check memory segfault
+    if [ $GREP_SEG_CODE -eq 0 ]; then
+        echo -ne "$RED SEGV($INPUT)$WHITE"
         sucess=false
     fi
 
