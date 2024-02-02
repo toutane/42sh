@@ -5,6 +5,8 @@ int eval_until(struct ast *ast, struct mem *mem)
     int status = 0;
     struct ast_until *ast_until = (struct ast_until *)ast;
 
+    set_loop_number(get_loop_number() + 1);
+
     int break_number;
     int continue_number;
     while (eval_ast(ast_until->condition, mem) != EXIT_SUCCESS
@@ -26,6 +28,8 @@ int eval_until(struct ast *ast, struct mem *mem)
             continue;
         }
     }
+
+    set_loop_number(get_loop_number() - 1);
 
     return status;
 }
