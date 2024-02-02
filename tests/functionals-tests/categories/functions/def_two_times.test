@@ -1,0 +1,10 @@
+func ()
+{
+    echo toto
+}
+func
+func ()
+{
+    echo tata
+}
+func

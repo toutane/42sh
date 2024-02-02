@@ -1,0 +1,10 @@
+foo="a b c             d"
+bar="Goodbye World"
+
+echo $foo $bar
+
+for i in $foo; do
+    echo "$i";
+done;
+
+echo $foo $bar

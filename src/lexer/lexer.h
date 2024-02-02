@@ -3,8 +3,23 @@
 
 #include <stddef.h>
 
-#include "../io_backend/io_backend.h"
-#include "token.h"
+#include "io/io.h"
+#include "options/opt_parser.h"
+#include "utils/hash_map/hash_map.h"
+#include "utils/stack/stack.h"
+#include "utils/strings/strings.h"
+#include "utils/token/token.h"
+
+enum LEXER_ERROR
+{
+    NO_ERROR,
+    UNMATCHED_SINGLE_QUOTE,
+    UNMATCHED_DOUBLE_QUOTE,
+    UNMATCHED_BRACE,
+    UNMATCHED_PARENTHESIS,
+    UNMATCHED_BACKTICK,
+    BAD_SUBSTITUTION,
+};
 
 /**
  * @file lexer.h
@@ -20,22 +35,46 @@
  * or lexer_pop is called, and no token is available.
  */
 
-struct lexer
+struct item_info
 {
-    struct stream_info *stream; // The input stream
-    struct token cur_tok; // The next token, if processed
-    int must_parse_next_tok; // 1 if the next token must be parsed, 0 otherwise
+    struct token *cur_tok;
+    struct token *next_tok;
+    struct stream_info *stream;
 };
 
-/**
- * @brief Creates a new lexer given an input string.
- */
-struct lexer *lexer_new(struct stream_info *stream);
+struct lexer
+{
+    struct options *opts; // The options of the program
+    struct token cur_tok; // The current token, if processed
+    struct token next_tok; // The next token, if processed
+    int must_parse_next_tok; // 1 if the next token must be parsed, 0 otherwise
+    enum LEXER_ERROR last_error; // The last error that occured
+    struct hm *hm_alias; // The hash_map containing all alias
 
-/**
- ** @brief Free the given lexer, but not its input.
+    struct stream_info *stream; // The current input stream
+    struct stack *stream_stack; // Stack of all streams
+};
+
+/*
+ * @brief The different contexts in which a quote can be found.
  */
-void lexer_free(struct lexer *lexer);
+enum QUOTING_CONTEXT
+{
+    NONE,
+    SINGLE_QUOTE,
+    DOUBLE_QUOTE,
+};
+
+struct ctx_info
+{
+    enum QUOTING_CONTEXT *quoting_ctx;
+    char cur_char;
+    char prev_char;
+    size_t token_len;
+    int braces_depth;
+    int paren_depth;
+    int backtick_depth;
+};
 
 /**
  * @brief Returns a token from the input stream
@@ -57,10 +96,14 @@ struct token parse_input_for_tok(struct lexer *lexer);
  */
 struct token lexer_peek(struct lexer *lexer);
 
+struct token lexer_peek_alias(struct lexer *lexer);
+
 /**
  * @brief Returns the next token, and removes it from the stream:
  *   calling lexer_pop in a loop will iterate over all tokens until EOF.
  */
 struct token lexer_pop(struct lexer *lexer);
+
+int is_assignment_word(struct token *token, int is_the_first_word);
 
 #endif /* ! LEXER_H */

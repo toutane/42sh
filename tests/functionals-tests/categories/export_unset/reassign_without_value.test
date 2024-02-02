@@ -1,0 +1,9 @@
+export a=42
+
+echo $a
+printenv a
+
+export a
+
+echo $a
+printenv a

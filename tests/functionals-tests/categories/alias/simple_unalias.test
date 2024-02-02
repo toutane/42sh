@@ -1,0 +1,4 @@
+alias foo=ls
+foo
+unalias foo
+foo

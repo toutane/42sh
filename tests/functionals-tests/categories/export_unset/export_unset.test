@@ -1,0 +1,9 @@
+export vara="foo"
+
+echo $a
+env | grep vara
+
+unset vara
+
+echo $a
+env | grep vara

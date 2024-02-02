@@ -1,0 +1,8 @@
+if echo ok; then cat; fi < foo
+if echo ok; then cat; fi < foo > output
+if echo ok; then cat; fi < foo >> output
+if echo ok; then cat; fi <> foo
+if echo ok; then cat; fi < > foo
+if echo ok; then cat; fi < > foo
+if echo ok; then cat; fi 1<&2 3>&12
+if echo ok; then cat; fi < foo 2> output

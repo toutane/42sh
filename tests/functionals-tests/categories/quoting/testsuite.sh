@@ -1,0 +1,3 @@
+run_test_line quoting.test
+run_test_file escape_in_double_quotes.test
+run_test_file echo_with_escape.test

@@ -1,33 +1,29 @@
-#define _POSIX_C_SOURCE 200809L
-
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "ast/ast.h"
-#include "error_handling/error_handling.h"
-#include "io_backend/io_backend.h"
-#include "lexer/lexer.h"
-#include "lexer/token.h"
+#include "execution/exec.h"
+#include "io/io.h"
 #include "options/opt_parser.h"
-#include "parser/parser.h"
-#include "utils/utils.h"
+#include "utils/memory/memory.h"
+#include "utils/variables/variables.h"
+
+#define HM_SIZE 128
 
 int main(int argc, char *argv[])
 {
     int status; // Gather error status, passed to functions
 
-    // Parse command line options
-    struct options options = {
+    // Options structure, filled by parse_options
+    struct options opts = {
         .ast_dot = 0, .command = 0, .pretty_print = 0, .verbose = 0
     };
-    status = parse_options(argc, argv, &options);
+
+    // Parse command line options
+    status = parse_options(argc, argv, &opts);
     if (status != 0)
     {
         return status;
     }
 
-    // get input stream according to options
-    struct stream_info *stream = get_stream(argc, &options, &status);
+    // Get input stream according to options
+    struct stream_info *stream = get_stream(argc, &opts, &status);
     if (stream == NULL)
     {
         return status != 0 ? status
@@ -35,34 +31,9 @@ int main(int argc, char *argv[])
                                            // program should exit with success
     }
 
-    struct lexer *lexer = lexer_new(stream);
-    struct ast *ast = NULL;
+    struct mem *mem = mem_new();
+    set_default_variables(mem->hm_var);
 
-    if (parse(&ast, lexer) != PARSER_OK)
-    {
-        error(ast, lexer, stream, "42sh: grammar error during parsing\n");
-        return GRAMMAR_ERROR;
-    }
-
-    if (options.pretty_print)
-    {
-        ast_pretty_print(ast);
-    }
-
-    if (options.ast_dot)
-    {
-        status = create_dot_file(ast, "ast.dot");
-        if (status != 0)
-        {
-            free_all(ast, lexer, stream);
-            return EXIT_FAILURE;
-        }
-    }
-
-    status = ast_eval(ast);
-
-    // clean
-    free_all(ast, lexer, stream);
-
-    return status;
+    // Launch execution loop
+    return execution_loop(&opts, stream, mem);
 }

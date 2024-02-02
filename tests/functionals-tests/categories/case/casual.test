@@ -1,0 +1,30 @@
+for i in [a b c 1 2 3 toto]; do
+    case $i in
+    3)
+        echo tata $(echo $i)
+        ;;
+    *)
+        `for j in [12 tata toto]; do
+        case $i in
+            12)
+                ;;
+            13)
+                (echo $j)
+                ;;
+            tata)
+                echo tata $(echo $j)
+                ;;
+            totoi)
+                echo tata $(echo $j)
+                ;;
+            toti)
+                echo tata $(echo $j)
+                ;;
+            toto)
+                echo MEENNN
+                ;;
+            esac
+        done`
+        ;;
+    esac
+done

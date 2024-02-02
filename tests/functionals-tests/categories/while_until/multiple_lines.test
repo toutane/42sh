@@ -1,0 +1,35 @@
+a=true
+
+while
+
+
+$a
+
+do
+
+a=false
+
+
+echo hello
+
+
+
+done
+
+a=false
+
+    until
+
+
+$a
+
+do
+
+a=true
+
+
+echo hello
+
+
+
+done

@@ -1,27 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-// TODO: put in utils module
-static int is_char_in_string(char c, char *str)
-{
-    int i = 0;
-    while (str[i] != '\0')
-    {
-        if (str[i] == c)
-        {
-            return 1;
-        }
-        i++;
-    }
-    return 0;
-}
+#include "builtins.h"
+#include "utils/strings/strings.h"
 
 /*
  * @brief: Check if argv is an option, and set the corresponding flag if it is
  */
-static int parse_options(char *argv, char *optionString, int *nflag,
-                         int *interpret)
+static int parse_echo_options(char *argv, char *optionString, int *nflag,
+                              int *interpret)
 {
     if (argv == NULL)
     {
@@ -111,15 +95,22 @@ void interpret_print(char *str)
  * -E: disable interpretation of backslash escapes (default)
  *  Return 0 on success, -1 on error
  */
-int builtin_echo(int argc, char *argv[])
+int builtin_echo(int argc, char *argv[], struct mem *mem)
 {
+    if (mem == NULL)
+    {
+        _exit(EXIT_FAILURE);
+    }
+
     int nflag = 0;
     int interpret = 0;
 
     char *optionString = "neE";
 
     int start_index = 1;
-    while (parse_options(argv[start_index], optionString, &nflag, &interpret))
+    while (
+        parse_echo_options(argv[start_index], optionString, &nflag, &interpret)
+        && strlen(argv[start_index]) != 0)
     {
         start_index++;
     }
@@ -143,8 +134,7 @@ int builtin_echo(int argc, char *argv[])
             }
         }
 
-        // Print a space between arguments
-        if (i < argc - 1)
+        if (i < argc - 1 && argv[i + 1] != NULL)
         {
             if (printf(" ") == EOF)
             {

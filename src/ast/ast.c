@@ -1,210 +1,213 @@
 #include "ast.h"
 
-void ast_print(struct ast *ast)
+static void free_case_item(struct ast *ast)
 {
-    if (!ast)
+    struct ast_case_item *ast_case_item = (struct ast_case_item *)ast;
+
+    for (int i = 0; i < ast_case_item->argc; ++i)
     {
-        printf("NULL");
-        return;
+        free(ast_case_item->argv[i]);
     }
-    if (ast->type == AST_SIMPLE_COMMAND)
-    {
-        printf(":%s:", ast->argv[0]);
-        for (size_t i = 1; i < ast->nb_args; i++)
-        {
-            printf(" %s", ast->argv[i]);
-        }
-    }
-    else if (ast->type == AST_COMMAND_LIST)
-    {
-        printf("List(");
-        if (ast->nb_child > 0)
-        {
-            for (size_t i = 0; i < ast->nb_child; i++)
-            {
-                ast_print(ast->children[i]);
-            }
-        }
-        printf(")\n");
-    }
-    else if (ast->type == AST_CONDITION)
-    {
-        printf("If(\n");
-        printf("cond: ");
-        ast_print(ast->children[0]);
-        printf("then: ");
-        ast_print(ast->children[1]);
-        printf("else: "); // Potentially put condition to print else if not NULL
-        ast_print(ast->children[2]);
-        printf(")");
-    }
+    free(ast_case_item->argv);
+
+    ast_free(ast_case_item->compound_list);
+
+    free(ast);
+    return;
 }
 
-void ast_free(struct ast *ast)
+static void free_case(struct ast *ast)
 {
-    if (!ast)
+    struct ast_case *ast_case = (struct ast_case *)ast;
+
+    free(ast_case->base_name);
+
+    for (int i = 0; i < ast_case->item_number; ++i)
     {
-        return;
+        ast_free(ast_case->cases_items[i]);
     }
-    if (ast->type == AST_SIMPLE_COMMAND)
+    free(ast_case->cases_items);
+
+    free(ast);
+    return;
+}
+
+static void free_func(struct ast *ast)
+{
+    struct ast_func *ast_func = (struct ast_func *)ast;
+    free(ast_func->name);
+
+    ast_free(ast_func->shell_command);
+
+    free(ast);
+    return;
+}
+
+static void free_ast_cmd(struct ast *ast)
+{
+    struct ast_cmd *ast_cmd = (struct ast_cmd *)ast;
+    for (int i = 0; i < ast_cmd->argc; ++i)
     {
-        if (ast->nb_args > 0)
-        {
-            for (size_t i = 0; i < ast->nb_args; i++)
-            {
-                free(ast->argv[i]);
-            }
-            free(ast->argv);
-            ast->argv = NULL;
-        }
+        if (ast_cmd->argv[i])
+            free(ast_cmd->argv[i]);
     }
-    else if (ast->type == AST_COMMAND_LIST)
+    free(ast_cmd->argv);
+
+    for (int i = 0; i < ast_cmd->prefix_count; ++i)
     {
-        if (ast->nb_child > 0)
-        {
-            for (size_t i = 0; i < ast->nb_child; i++)
-            {
-                ast_free(ast->children[i]);
-            }
-            free(ast->children);
-            ast->children = NULL;
-        }
+        if (ast_cmd->prefix[i])
+            free(ast_cmd->prefix[i]);
     }
-    else if (ast->type == AST_CONDITION)
+    free(ast_cmd->prefix);
+    free(ast);
+    return;
+}
+
+static void free_ast_cmd_list(struct ast *ast)
+{
+    struct ast_cmd_list *ast_cmd_list = (struct ast_cmd_list *)ast;
+    ast_free(ast_cmd_list->cmd);
+    ast_free(ast_cmd_list->next);
+    free(ast);
+    return;
+}
+
+static void free_ast_if(struct ast *ast)
+{
+    struct ast_condition *ast_if = (struct ast_condition *)ast;
+    ast_free(ast_if->condition);
+    ast_free(ast_if->then_body);
+    ast_free(ast_if->else_body);
+    free(ast);
+    return;
+}
+
+static void free_ast_pipeline(struct ast *ast)
+{
+    struct ast_pipeline *ast_pipeline = (struct ast_pipeline *)ast;
+    ast_free(ast_pipeline->left);
+    ast_free(ast_pipeline->right);
+    free(ast);
+    return;
+}
+
+static void free_ast_redir(struct ast *ast)
+{
+    struct ast_redirection *ast_redirection = (struct ast_redirection *)ast;
+    if (ast_redirection->target)
     {
-        ast_free(ast->children[0]);
-        ast_free(ast->children[1]);
-        ast_free(ast->children[2]);
-        free(ast->children);
-        ast->children = NULL;
+        free(ast_redirection->target);
+    }
+    if (ast_redirection->next)
+    {
+        ast_free(ast_redirection->next);
+    }
+    free(ast);
+    return;
+}
+
+static void free_ast_neg(struct ast *ast)
+{
+    struct ast_neg *ast_neg = (struct ast_neg *)ast;
+    if (ast_neg->data)
+    {
+        ast_free(ast_neg->data);
+    }
+    free(ast);
+    return;
+}
+
+void free_ast_for(struct ast *ast)
+{
+    struct ast_for *ast_for = (struct ast_for *)ast;
+    if (ast_for->condition)
+        free(ast_for->condition);
+    if (ast_for->data)
+        ast_free(ast_for->data);
+
+    for (size_t i = 0; i < ast_for->array_size; ++i)
+    {
+        free(ast_for->array[i]);
+    }
+    if (ast_for->array)
+    {
+        free(ast_for->array);
+    }
+    free(ast);
+    return;
+}
+
+void free_ast_while(struct ast *ast)
+{
+    struct ast_while *ast_while = (struct ast_while *)ast;
+    if (ast_while->condition)
+        ast_free(ast_while->condition);
+    if (ast_while->data)
+        ast_free(ast_while->data);
+    free(ast);
+    return;
+}
+
+void free_ast_until(struct ast *ast)
+{
+    struct ast_until *ast_until = (struct ast_until *)ast;
+    if (ast_until->condition)
+        ast_free(ast_until->condition);
+    if (ast_until->data)
+        ast_free(ast_until->data);
+    free(ast);
+    return;
+}
+
+static void free_ast_and_or(struct ast *ast)
+{
+    struct ast_and_or *ast_and_or = (struct ast_and_or *)ast;
+    if (ast_and_or->left)
+    {
+        ast_free(ast_and_or->left);
+    }
+    if (ast_and_or->right)
+    {
+        ast_free(ast_and_or->right);
     }
     free(ast);
 }
 
-int eval_sc_node(struct ast *ast)
+static void free_ast_subshell(struct ast *ast)
 {
-    int status = 0;
-    if (is_builtin_word(ast->argv[0]))
+    struct ast_subshell *ast_subshell = (struct ast_subshell *)ast;
+    if (ast_subshell->compound_list)
     {
-        status = (builtin_fun(ast->argv[0]))(ast->nb_args - 1, ast->argv);
-        fflush(stdout); // Flush stdout to avoid mixing output
-        return status;
+        ast_free(ast_subshell->compound_list);
     }
-
-    int pid = fork();
-    if (pid == 0)
-    {
-        execvp(ast->argv[0], ast->argv);
-        return execvp_error(errno);
-    }
-    else
-    {
-        waitpid(pid, &status, 0);
-    }
-
-    // check if the command was interrupted by a signal
-    if (WIFSIGNALED(status))
-    {
-        fprintf(stderr, "42sh: command terminated because of a signal");
-        return 129;
-    }
-
-    // otherwise we return the status error code
-    return WEXITSTATUS(status);
+    free(ast);
 }
 
-int ast_eval(struct ast *ast)
+typedef void (*free_type)(struct ast *ast);
+
+void ast_free(void *ast)
 {
     if (!ast)
     {
-        return 0;
-    }
-    int status = 0;
-    if (ast->type == AST_SIMPLE_COMMAND)
-    {
-        status = eval_sc_node(ast);
-    }
-    else if (ast->type == AST_COMMAND_LIST)
-    {
-        for (size_t i = 0; i < ast->nb_child; i++)
-        {
-            status = ast_eval(ast->children[i]);
-        }
-    }
-    else if (ast->type == AST_CONDITION)
-    {
-        if (ast_eval(ast->children[0]) == EXIT_SUCCESS)
-        {
-            status = ast_eval(ast->children[1]);
-        }
-        else if (ast->children[2] != NULL)
-        {
-            status = ast_eval(ast->children[2]);
-        }
-    }
-    return status;
-}
-
-static void ast_pretty_print_aux(struct ast *ast)
-{
-    if (ast == NULL)
-    {
-        fprintf(stderr, "ast_pretty_print: ast is NULL\n");
         return;
     }
 
-    enum ast_type type = ast->type;
-    switch (type)
-    {
-    case AST_SIMPLE_COMMAND:
-        printf("command");
-        printf(" \"%s\"", ast->argv[0]); // Print command value
-        for (size_t i = 1; i < ast->nb_args - 1; i++)
-        {
-            printf(" \"%s\"", ast->argv[i]); // Print arguments values
-        }
-        break;
-    case AST_COMMAND_LIST:
-        if (ast->nb_child > 0)
-        {
-            ast_pretty_print_aux(ast->children[0]);
-            for (size_t i = 1; i < ast->nb_child; i++)
-            {
-                printf("; ");
-                ast_pretty_print_aux(ast->children[i]);
-            }
-        }
-        break;
-    case AST_CONDITION:
-        if (ast->nb_child > 0)
-        {
-            printf("if { ");
-            ast_pretty_print_aux(ast->children[0]);
-            printf(" }; then { ");
-            ast_pretty_print_aux(ast->children[1]);
-            printf(" }");
-            if (ast->nb_child > 2)
-            {
-                printf("; else { ");
-                ast_pretty_print_aux(ast->children[2]);
-                printf(" }");
-            }
-        }
-        break;
-    default:
-        fprintf(stderr, "ast_pretty_print: ast type is invalid\n");
-        break;
-    }
-}
-
-void ast_pretty_print(struct ast *ast)
-{
-    if (ast == NULL)
-    {
-        return;
-    }
-
-    printf("AST pretty print========================\n\n");
-    ast_pretty_print_aux(ast);
-    printf("\n\n========================================\n");
+    static const free_type functions[] = {
+        [AST_SIMPLE_COMMAND] = &free_ast_cmd,
+        [AST_COMMAND_LIST] = &free_ast_cmd_list,
+        [AST_CONDITION] = &free_ast_if,
+        [AST_REDIRECTION] = &free_ast_redir,
+        [AST_PIPELINE] = &free_ast_pipeline,
+        [AST_WHILE] = &free_ast_while,
+        [AST_UNTIL] = &free_ast_until,
+        [AST_FOR] = &free_ast_for,
+        [AST_NEG] = &free_ast_neg,
+        [AST_AND] = &free_ast_and_or,
+        [AST_OR] = &free_ast_and_or,
+        [AST_FUNC] = &free_func,
+        [AST_SUBSHELL] = &free_ast_subshell,
+        [AST_CASE] = &free_case,
+        [AST_CASE_ITEM] = &free_case_item,
+    };
+    (*functions[((struct ast *)ast)->type])(ast);
 }

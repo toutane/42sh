@@ -1,0 +1,1 @@
+a="OKKK";my_fun () { echo tata; }; echo $a; my_fun; (echo $a; my_fun; unset -f my_fun; unset a; echo $a; my_fun ; ); echo $a; my_fun

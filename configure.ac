@@ -40,18 +40,20 @@ AC_CONFIG_FILES([
    src/lexer/Makefile
    src/parser/Makefile
    src/ast/Makefile
-   src/io_backend/Makefile
+   src/io/Makefile
    src/options/Makefile
    src/builtins/Makefile
    src/utils/Makefile
    src/error_handling/Makefile
+   src/execution/Makefile
+   src/expansion/Makefile
 
    tests/Makefile
    tests/functionals-tests/Makefile
    tests/units-tests/lexer/Makefile
    tests/units-tests/parser/Makefile
    tests/units-tests/ast/Makefile
-   tests/units-tests/io_backend/Makefile
+   tests/units-tests/io/Makefile
    tests/units-tests/options/Makefile
    tests/units-tests/utils/Makefile
 ])

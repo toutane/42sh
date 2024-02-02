@@ -1,0 +1,11 @@
+if true; do
+echo $?
+done
+
+echo $?
+
+if true; do
+eco $?
+done
+
+echo $?

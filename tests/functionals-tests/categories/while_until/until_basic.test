@@ -1,0 +1,15 @@
+a=false
+
+until $a
+do
+	echo "je suis la"
+	a=true
+done
+
+a=true
+
+until $a
+do
+	echo "je suis la"
+	a=false
+done

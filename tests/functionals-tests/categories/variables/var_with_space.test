@@ -1,0 +1,9 @@
+name='Jack Sparrow'
+echo $name
+echo "$name"
+echo '$name'
+echo \$name
+echo "My name is $name"
+echo "My name is \$name"
+echo "My name is $name and I am \"Captain\""
+echo "My name is ${name} and I am \"Captain\""

@@ -1,0 +1,1 @@
+func (){echo ha $1}; func; func; echo at

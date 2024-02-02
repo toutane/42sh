@@ -1,0 +1,7 @@
+echo visible
+
+for ! i in hello world; do
+    echo $i;
+done
+
+echo hidden

@@ -1,0 +1,18 @@
+a=true
+while $a
+do
+    b=true
+    echo hi;
+    a=false;
+    while $b
+    do
+        echo hp
+        b=false
+        continue 10
+        echo io
+    done
+    echo ha;
+done
+echo hu;
+echo hq;
+echo ha;

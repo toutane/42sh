@@ -1,4 +1,4 @@
-run_test if.test
+run_test_line if.test
 run_test_file if1.test
 run_test_file if2.test
 run_test_file if3.test
@@ -18,3 +18,10 @@ run_test_file if16.test
 run_test_file if17.test
 run_test_file if18.test
 run_test_file if19.test
+run_test_file if20.test
+run_test_file if21.test
+run_test_file if22.test
+run_test_file if23.test
+run_test_file if24.test
+run_test_file if25.test
+run_test_file if26.test

@@ -1,0 +1,11 @@
+echo toto; exit 2
+echo toto exit 2
+exit 42 echo ok
+exit 42 || echo ok
+exit 42 && echo ok
+exit 42 | ls
+exit && exit 1a
+exit || exit 1a
+exit 1a && exit
+exit 1a || exit
+exit 1 1; echo tata

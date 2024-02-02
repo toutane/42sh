@@ -1,0 +1,6 @@
+count=0
+while [ "$count" -lt 3 ]; do
+    result=$(echo "Iteration: $count")
+    echo "$result"
+    ((count++))
+done

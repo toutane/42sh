@@ -55,3 +55,13 @@ Makefile
 configure~
 build/*
 debug/*
+
+# when working in pie
+.__afs*
+
+# compile_commands.json
+compile_commands.json
+
+# trash directory
+.cache
+tmux*

@@ -1,0 +1,4 @@
+alias foo='ls -l'; foo -a
+foo -a
+unalias foo; foo -a
+foo -a

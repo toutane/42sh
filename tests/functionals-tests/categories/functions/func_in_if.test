@@ -1,0 +1,8 @@
+if true; then
+    func ()
+    {
+        echo $1
+    }
+    func
+fi
+func

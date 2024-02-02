@@ -1,0 +1,5 @@
+if ls; then
+    echo hu;
+else
+    echo ha;
+fi

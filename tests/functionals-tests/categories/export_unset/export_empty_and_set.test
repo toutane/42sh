@@ -1,0 +1,8 @@
+export varranne
+
+echo $varranne
+
+varranne="toto"
+
+echo $varranne
+env | grep varranne

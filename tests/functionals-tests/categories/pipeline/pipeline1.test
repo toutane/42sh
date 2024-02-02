@@ -1,0 +1,19 @@
+echo pipe | cat -e
+ls | sort
+ls | grep "txt" | sort
+invalid_command | sort
+echo ha | echo hi
+echo ha | eqpwoeiupo
+pd[asod] | echo hu
+das | efsdf
+das|efsdf
+das |
+| efsdf
+echo pipe | cat -e | cat -e  | cat -e  | cat -e  | cat -e  | cat -e  | cat -e | cat -e | cat -e  | cat -e  | cat -e  | cat -e  | cat -e  | cat -e | cat -e | cat -e  | cat -e  | cat -e  | cat -e  | cat -e  | cat -e | cat -e | cat -e  | cat -e  | cat -e  | cat -e  | cat -e  | cat -e  
+echo pipe | cat -e |
+true | false
+false | true
+true|false
+false|true
+false|true|
+true|false|echo tata

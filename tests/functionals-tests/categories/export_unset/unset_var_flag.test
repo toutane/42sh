@@ -1,0 +1,7 @@
+export foo=42
+
+echo $foo
+
+unset -v foo
+
+echo $foo

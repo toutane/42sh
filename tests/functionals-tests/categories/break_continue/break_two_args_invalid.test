@@ -1,0 +1,8 @@
+a=true
+while $a
+do
+    echo hi;
+    break 1 -1 
+    echo ha;
+    a=false
+done

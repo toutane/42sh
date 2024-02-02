@@ -1,0 +1,9 @@
+abba=42
+
+echo $abba
+printenv | grep abba
+
+export abba
+
+echo $abba
+printenv | grep abba

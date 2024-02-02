@@ -1,0 +1,6 @@
+alias foo=ls bar='ls -l'
+foo
+bar
+unalias -a
+foo
+bar

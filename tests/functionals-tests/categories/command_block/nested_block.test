@@ -1,0 +1,1 @@
+{ echo a; echo b; { echo hu; echo op } }

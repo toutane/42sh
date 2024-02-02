@@ -1,0 +1,8 @@
+func ()
+{
+    echo $1
+}
+
+func ewriuy
+unset -f func
+func ewriuy

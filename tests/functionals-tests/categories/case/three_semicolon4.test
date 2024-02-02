@@ -1,0 +1,5 @@
+case hello in
+*)
+    echo ok
+    ;;;
+esac

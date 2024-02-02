@@ -1,0 +1,12 @@
+a=true
+
+while $a
+do
+	a=false
+	until $a
+	do
+		echo "hello world"
+		a=true
+	done
+	a=false
+done
