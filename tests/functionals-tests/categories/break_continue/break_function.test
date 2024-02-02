@@ -1,0 +1,8 @@
+func ()
+{
+    break;
+    echo hu;
+}
+
+func
+echo i
