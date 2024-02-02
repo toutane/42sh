@@ -191,6 +191,34 @@ static int fork_execution(struct hm *hm_prefixes, char **prefixes_copy,
     return WEXITSTATUS(status);
 }
 
+int remove_first_nulls(char **expanded_argv, int expanded_argc)
+{
+    // Remove the first nulls from the expanded_argv array
+    int i = 0;
+    while (i < expanded_argc && expanded_argv[i] == NULL)
+    {
+        i++;
+    }
+
+    // Reallocate the array to remove the first nulls
+    if (i > 0)
+    {
+        for (int j = 0; j < expanded_argc - i; j++)
+        {
+            expanded_argv[j] = expanded_argv[j + i];
+        }
+        expanded_argv[expanded_argc - i] = NULL;
+    }
+
+    // Check if expanded_argv is empty
+    if (expanded_argv[0] == NULL)
+    {
+        free(expanded_argv);
+        return 1;
+    }
+    return 0;
+}
+
 int eval_simple_command(struct ast *ast, struct mem *mem)
 {
     int status = 0;
@@ -217,6 +245,10 @@ int eval_simple_command(struct ast *ast, struct mem *mem)
 
     int expanded_argc = ast_cmd->argc;
     char **expanded_argv = argv_expansions(ast_cmd->argv, &expanded_argc, mem);
+    if (remove_first_nulls(expanded_argv, expanded_argc))
+    {
+        return 0;
+    }
 
     /* If the command is not empty, we need to expand the prefixes if any and
      * assign the variables to the environment of the command that will be
@@ -235,9 +267,8 @@ int eval_simple_command(struct ast *ast, struct mem *mem)
 
         prefixes_copy[i] = expand_string(&(ast_cmd->prefix[i]), mem);
 
-        char *word = prefixes_copy[i];
-        char *key = get_key_from_assignment_word(word);
-        char *value = get_value_from_assignment_word(word);
+        char *key = get_key_from_assignment_word(prefixes_copy[i]);
+        char *value = get_value_from_assignment_word(prefixes_copy[i]);
 
         hm_set_var(hm_prefixes, key, value);
 

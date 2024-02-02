@@ -25,7 +25,7 @@ struct token parse_input_for_tok(struct lexer *lexer)
     lexer->next_tok.type = TOKEN_NONE;
 
     // Reset last error
-    lexer->last_error = NO_ERROR;
+    // lexer->last_error = NO_ERROR;
 
     recognize_token(lexer, &quoting_context);
 
@@ -37,8 +37,6 @@ struct token parse_input_for_tok(struct lexer *lexer)
 // Try to replace cur_tok.value with it's value in hm_alias
 struct token lexer_peek_alias(struct lexer *lexer)
 {
-    // lexer_peek(lexer);
-
     if (lexer->cur_tok.type != TOKEN_WORD)
     {
         return lexer->cur_tok;
@@ -50,6 +48,15 @@ struct token lexer_peek_alias(struct lexer *lexer)
     {
         return lexer->cur_tok;
     }
+
+    if (alias_value[0] == '\0')
+    {
+        free(lexer->cur_tok.value);
+        lexer->cur_tok.value = strdup("");
+        return lexer->cur_tok;
+    }
+
+    lexer->last_error = NO_ERROR;
 
     struct item_info *old_item = stack_peek(lexer->stream_stack);
 
@@ -85,15 +92,13 @@ struct token lexer_peek_alias(struct lexer *lexer)
 
     parse_input_for_tok(lexer);
 
+    /*
     if (lexer->last_error != NO_ERROR)
     {
         fprintf(stderr, "42sh: %s: %s\n", lexer->cur_tok.value,
                 get_lexer_error_msg(lexer->last_error));
     }
-
-    // PRINT_TOKEN(lexer->opts->verbose, lexer->cur_tok, "Peek_Alias",
-    // "current"); PRINT_TOKEN(lexer->opts->verbose, lexer->next_tok,
-    // "Peek_Alias", "next");
+    */
 
     return lexer->cur_tok;
 }
@@ -101,7 +106,11 @@ struct token lexer_peek_alias(struct lexer *lexer)
 struct token lexer_peek(struct lexer *lexer)
 {
     // If the current token is TOKEN_ERROR, we shall not parse other tokens
-    if (lexer->last_error != NO_ERROR)
+    if (lexer->last_error != NO_ERROR && lexer->cur_tok.type == TOKEN_ERROR)
+    {
+        return lexer->cur_tok;
+    }
+    /*
     {
         lexer->cur_tok.type = TOKEN_ERROR;
 
@@ -111,6 +120,7 @@ struct token lexer_peek(struct lexer *lexer)
 
         return lexer->cur_tok;
     }
+    */
 
     int is_verbose = lexer->opts->verbose;
 
@@ -139,16 +149,15 @@ struct token lexer_peek(struct lexer *lexer)
             lexer->cur_tok.value = lexer->next_tok.value;
             parse_input_for_tok(lexer);
         }
+    }
 
-        if (lexer->last_error != NO_ERROR)
-        {
-            fprintf(stderr, "42sh: %s: %s\n", lexer->cur_tok.value,
-                    get_lexer_error_msg(lexer->last_error));
-        }
+    if (lexer->last_error != NO_ERROR && lexer->cur_tok.type == TOKEN_ERROR)
+    {
+        fprintf(stderr, "42sh: %s: %s\n", lexer->cur_tok.value,
+                get_lexer_error_msg(lexer->last_error));
     }
 
     PRINT_TOKEN(is_verbose, lexer->cur_tok, "Peek", "current")
-    // PRINT_TOKEN(is_verbose, lexer->next_tok, "Peek", "next");
 
     return lexer->cur_tok;
 }

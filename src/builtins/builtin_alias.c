@@ -38,6 +38,7 @@ int builtin_alias(int argc, char *argv[], struct mem *mem)
         value = strtok(NULL, ALIAS_DELIMITER);
 
         // set alias
+        value = value ? value : "";
         hm_set_var(mem->hm_alias, key, value);
     }
 

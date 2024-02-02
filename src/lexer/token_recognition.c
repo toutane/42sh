@@ -92,7 +92,7 @@ static int handle_eof(struct lexer *lexer, struct ctx_info *ctx)
             struct item_info *cur_infos = stack_peek(lexer->stream_stack);
 
             enum token_type type = cur_infos->next_tok->type;
-            if (type != TOKEN_NONE && type != TOKEN_EOF && type != TOKEN_ERROR)
+            if (type != TOKEN_NONE && type != TOKEN_EOF)
             {
                 /* We go back to the previous token (we need to go back to the
                  * previous token because we need to reparse the current token
