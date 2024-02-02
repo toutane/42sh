@@ -20,3 +20,4 @@ run_test_file expand_pwd.test
 run_test_file reassign_pwd.test
 run_test_file expand_oldpwd.test
 run_test_file expand_ifs.test
+run_test_file ifs_whitespace_whit_dot.test

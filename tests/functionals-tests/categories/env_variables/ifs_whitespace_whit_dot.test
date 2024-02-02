@@ -1,0 +1,3 @@
+IFS=":"
+foo="Hello::World:How:::Are:You"
+echo $foo
