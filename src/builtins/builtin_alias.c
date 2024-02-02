@@ -37,6 +37,12 @@ int builtin_alias(int argc, char *argv[], struct mem *mem)
         key = strtok(argv[i], ALIAS_DELIMITER);
         value = strtok(NULL, ALIAS_DELIMITER);
 
+        // if value is empty repace by empty string
+        if (value == NULL)
+        {
+            value = "";
+        }
+
         // set alias
         hm_set_var(mem->hm_alias, key, value);
     }
