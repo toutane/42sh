@@ -454,6 +454,11 @@ char **argv_expansions(char **original_argv, int *argc, struct mem *mem)
     for (int i = 0; i < *argc; i++)
     {
         int err = 0;
+        if (original_argv[i][0] == '\0')
+        {
+            continue;
+        }
+
         struct stream_info *stream = stream_new(NULL, original_argv[i], &err);
         if (stream == NULL)
         {

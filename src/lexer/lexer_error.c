@@ -37,7 +37,7 @@ void set_lexer_last_error(struct lexer *lexer, struct ctx_info *ctx)
         lexer->last_error = quoting_ctx == SINGLE_QUOTE
             ? UNMATCHED_SINGLE_QUOTE
             : UNMATCHED_DOUBLE_QUOTE;
-        lexer->cur_tok.type = TOKEN_ERROR;
+        lexer->next_tok.type = TOKEN_ERROR;
         return;
     }
 
@@ -62,5 +62,9 @@ void set_lexer_last_error(struct lexer *lexer, struct ctx_info *ctx)
         return;
     }
 
-    lexer->last_error = NO_ERROR;
+    if (lexer->cur_tok.type != TOKEN_ERROR)
+    {
+        lexer->last_error = NO_ERROR;
+        return;
+    }
 }

@@ -25,7 +25,7 @@ struct token parse_input_for_tok(struct lexer *lexer)
     lexer->next_tok.type = TOKEN_NONE;
 
     // Reset last error
-    lexer->last_error = NO_ERROR;
+    // lexer->last_error = NO_ERROR;
 
     recognize_token(lexer, &quoting_context);
 
@@ -34,43 +34,9 @@ struct token parse_input_for_tok(struct lexer *lexer)
     return lexer->next_tok;
 }
 
-static void handle_end_of_stream(struct lexer *lexer)
-{
-    stack_pop(lexer->stream_stack);
-
-    lexer->stream = NULL;
-
-    if (is_empty(lexer->stream_stack))
-    {
-        // The EOF was the end of the default stream (so the true EOF)
-        return;
-    }
-    else
-    {
-        struct item_info *cur_infos = stack_peek(lexer->stream_stack);
-
-        free(cur_infos->cur_tok->value);
-        lexer->cur_tok.type = cur_infos->next_tok->type;
-        lexer->cur_tok.value = cur_infos->next_tok->value;
-        free(cur_infos->next_tok);
-        free(cur_infos->cur_tok);
-
-        lexer->stream = cur_infos->stream;
-        parse_input_for_tok(lexer);
-
-        if (lexer->last_error != NO_ERROR)
-        {
-            fprintf(stderr, "42sh: %s: %s\n", lexer->cur_tok.value,
-                    get_lexer_error_msg(lexer->last_error));
-        }
-    }
-}
-
 // Try to replace cur_tok.value with it's value in hm_alias
 struct token lexer_peek_alias(struct lexer *lexer)
 {
-    lexer_peek(lexer);
-
     if (lexer->cur_tok.type != TOKEN_WORD)
     {
         return lexer->cur_tok;
@@ -83,7 +49,17 @@ struct token lexer_peek_alias(struct lexer *lexer)
         return lexer->cur_tok;
     }
 
+    if (alias_value[0] == '\0')
+    {
+        free(lexer->cur_tok.value);
+        lexer->cur_tok.value = strdup("");
+        return lexer->cur_tok;
+    }
+
+    lexer->last_error = NO_ERROR;
+
     struct item_info *old_item = stack_peek(lexer->stream_stack);
+
     struct token *old_cur_tok = calloc(1, sizeof(struct token));
     old_cur_tok->type = lexer->cur_tok.type;
     old_cur_tok->value = lexer->cur_tok.value;
@@ -116,11 +92,13 @@ struct token lexer_peek_alias(struct lexer *lexer)
 
     parse_input_for_tok(lexer);
 
+    /*
     if (lexer->last_error != NO_ERROR)
     {
         fprintf(stderr, "42sh: %s: %s\n", lexer->cur_tok.value,
                 get_lexer_error_msg(lexer->last_error));
     }
+    */
 
     return lexer->cur_tok;
 }
@@ -128,7 +106,11 @@ struct token lexer_peek_alias(struct lexer *lexer)
 struct token lexer_peek(struct lexer *lexer)
 {
     // If the current token is TOKEN_ERROR, we shall not parse other tokens
-    if (lexer->last_error != NO_ERROR)
+    if (lexer->last_error != NO_ERROR && lexer->cur_tok.type == TOKEN_ERROR)
+    {
+        return lexer->cur_tok;
+    }
+    /*
     {
         lexer->cur_tok.type = TOKEN_ERROR;
 
@@ -138,6 +120,7 @@ struct token lexer_peek(struct lexer *lexer)
 
         return lexer->cur_tok;
     }
+    */
 
     int is_verbose = lexer->opts->verbose;
 
@@ -166,20 +149,15 @@ struct token lexer_peek(struct lexer *lexer)
             lexer->cur_tok.value = lexer->next_tok.value;
             parse_input_for_tok(lexer);
         }
-
-        if (lexer->last_error != NO_ERROR)
-        {
-            fprintf(stderr, "42sh: %s: %s\n", lexer->cur_tok.value,
-                    get_lexer_error_msg(lexer->last_error));
-        }
     }
 
-    if (lexer->cur_tok.type == TOKEN_EOF)
+    if (lexer->last_error != NO_ERROR && lexer->cur_tok.type == TOKEN_ERROR)
     {
-        handle_end_of_stream(lexer);
+        fprintf(stderr, "42sh: %s: %s\n", lexer->cur_tok.value,
+                get_lexer_error_msg(lexer->last_error));
     }
 
-    PRINT_TOKEN(is_verbose, lexer->cur_tok, "Peek", "current");
+    PRINT_TOKEN(is_verbose, lexer->cur_tok, "Peek", "current")
 
     return lexer->cur_tok;
 }
@@ -189,7 +167,7 @@ struct token lexer_pop(struct lexer *lexer)
     lexer_peek(lexer);
 
     // Print the token if verbose mode is enabled
-    PRINT_TOKEN(lexer->opts->verbose, lexer->cur_tok, "Pop", "current");
+    // PRINT_TOKEN(lexer->opts->verbose, lexer->cur_tok, "Pop", "current");
 
     lexer->must_parse_next_tok = 1;
     return lexer->cur_tok;
