@@ -1,12 +1,15 @@
 #include "exec.h"
 
+static int status = 0;
+
 typedef int (*eval_type)(struct ast *ast, struct mem *mem);
 
 int eval_ast(struct ast *ast, struct mem *mem)
 {
     if (!ast)
     {
-        return 0;
+        // Nothing to do return previous status
+        return status;
     }
 
     static const eval_type functions[] = {
@@ -41,8 +44,6 @@ int execution_loop(struct options *opts, struct stream_info *stream,
     struct to_be_freed to_be_freed = {
         .ast = NULL, .lexer = NULL, .stream = stream, .mem = mem
     };
-
-    int status = 0;
 
     // Create the lexer
     struct lexer *lexer = lexer_new(stream, opts, mem->hm_alias);
