@@ -1,0 +1,2 @@
+HOME="/tmp/hello world"
+echo ~
