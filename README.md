@@ -1,6 +1,6 @@
 # 42sh
 
-42sh is a POSIX-compatible shell that draws inspiration from bash, offering versatility in reading input through various means such as strings, files, or standard input. This shell implementation encompasses fundamental shell functionalities, including control-flow mechanisms, variable handling, parameter expansion, and command substitution. Additionally, 42sh features a set of built-in commands, such as echo, true, false, cd, export, unset, and alias, providing a comprehensive environment for shell scripting and command execution.
+42sh is a POSIX-compatible shell that draws inspiration from bash, offering versatility in reading input through various means such as strings, files, or standard input. This shell implementation encompasses fundamental shell functionalities, including control-flow mechanisms, variable handling, parameter expansion, and command substitution. Additionally, 42sh features a set of built-in commands, such as echo, cd, export, and alias, providing a comprehensive environment for shell scripting and command execution.
 
 ## Usage
 
